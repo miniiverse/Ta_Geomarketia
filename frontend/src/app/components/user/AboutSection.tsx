@@ -421,7 +421,7 @@ function CtaCard() {
       </div>
 
       <Link
-        href="/solutions"
+        href="/about/more"
         style={{
           display: "flex",
           alignItems: "center",

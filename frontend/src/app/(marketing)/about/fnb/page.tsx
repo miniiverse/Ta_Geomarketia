@@ -426,7 +426,7 @@ export default function FnbPage() {
             </h1>
 
             <p style={{ fontFamily:"'Inter',sans-serif", fontSize:"0.95rem", lineHeight:1.78, color:"rgba(255,255,255,0.55)", marginBottom:36, maxWidth:460 }}>
-              Geomarketia enables F&B businesses to analyze foot traffic, competitor density,
+              Geomarketia enables Food & Beverage businesses to analyze foot traffic, competitor density,
               and consumer behavior to find the best outlet locations, optimize networks, and
               maximize revenue performance.
             </p>
@@ -455,7 +455,7 @@ export default function FnbPage() {
               <span style={{ background:"linear-gradient(90deg,#60A5FA,#34D399)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>Data Driven Solutions.</span>
             </h2>
             <p style={{ fontFamily:"'Inter',sans-serif", fontSize:"0.95rem", lineHeight:1.75, color:"#64748B", margin:0 }}>
-              F&B businesses face fierce competition and complex decisions around location and expansion.
+              Food & Beverage businesses face fierce competition and complex decisions around location and expansion.
               Geomarketia transforms geospatial data into clear, actionable insights to help you
               open smarter and grow faster.
             </p>
