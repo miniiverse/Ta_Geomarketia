@@ -45,13 +45,13 @@ function LocationIntelligenceIcon() {
             <stop offset="0%" stopColor="#0EA5E9" stopOpacity="0.7" />
             <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.5" />
           </linearGradient>
-          <linearGradient id="liHexGrad2" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#10B981" stopOpacity="0.65" />
-            <stop offset="100%" stopColor="#059669" stopOpacity="0.45" />
+          <linearGradient id="liHexGrad2">
+            <stop offset="0%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#1E40AF" />
           </linearGradient>
-          <linearGradient id="liIconBg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#059669" />
-            <stop offset="100%" stopColor="#0D9488" />
+          <linearGradient id="liIconBg">
+            <stop offset="0%" stopColor="#1A56DB" />
+            <stop offset="100%" stopColor="#1E40AF" />
           </linearGradient>
           <filter id="liShadow">
             <feDropShadow
@@ -74,7 +74,7 @@ function LocationIntelligenceIcon() {
               dx="0"
               dy="4"
               stdDeviation="8"
-              floodColor="rgba(5,150,105,0.5)"
+              floodColor="rgba(26,86,219,0.5)"
             />
           </filter>
           <clipPath id="liScreenClip">
@@ -232,7 +232,7 @@ function LocationIntelligenceIcon() {
             key={`h2${i}`}
             points={`${cx},${cy - 12} ${cx + 10},${cy - 6} ${cx + 10},${cy + 6} ${cx},${cy + 12} ${cx - 10},${cy + 6} ${cx - 10},${cy - 6}`}
             fill="url(#liHexGrad2)"
-            stroke="#34D399"
+            stroke="#60A5FA"
             strokeWidth="0.6"
             opacity={op as number}
             style={{
@@ -499,7 +499,7 @@ function LocationIntelligenceIcon() {
             fill="white"
             opacity="0.95"
           />
-          <circle cx="466" cy="56" r="3.5" fill="#059669" />
+          <circle cx="466" cy="56" r="3.5" fill="#1A56DB" />
         </g>
         <g style={{ animation: "liBadgeFloat 4s ease-in-out infinite" }}>
           <rect
@@ -592,7 +592,7 @@ function LocationIntelligenceIcon() {
           y1="58"
           x2="438"
           y2="42"
-          stroke="rgba(52,211,153,0.2)"
+          stroke="rgba(96,165,250,0.2)"
           strokeWidth="1"
           strokeDasharray="4 3"
         />
@@ -3108,7 +3108,7 @@ export default function LocationIntelligencePage() {
               Turn Location Data into{" "}
               <span
                 style={{
-                  background: "linear-gradient(90deg, #34D399, #60A5FA)",
+                  background: "linear-gradient(90deg, #60A5FA, #34D399)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -3260,7 +3260,6 @@ export default function LocationIntelligencePage() {
                   background: "linear-gradient(90deg, #60A5FA, #34D399)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
                 }}
               >
                 Smarter Business{" "}
