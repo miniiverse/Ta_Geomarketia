@@ -246,7 +246,8 @@ export default function RegisterPage() {
             }}
           >
             <CubeIcon size={36} />
-            <span
+            <Link
+              href="/"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 fontWeight: 700,
@@ -258,7 +259,7 @@ export default function RegisterPage() {
               }}
             >
               Geomarketia
-            </span>
+            </Link>
           </div>
 
        

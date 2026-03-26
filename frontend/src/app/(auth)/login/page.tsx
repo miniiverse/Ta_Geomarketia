@@ -264,7 +264,8 @@ export default function LoginPage() {
             }}
           >
             <CubeIcon size={36} />
-            <span
+            <Link
+                href="/"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 fontWeight: 700,
@@ -276,7 +277,7 @@ export default function LoginPage() {
               }}
             >
               Geomarketia
-            </span>
+            </Link>
           </div>
 
           <div
