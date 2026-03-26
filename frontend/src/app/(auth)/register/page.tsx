@@ -199,7 +199,7 @@ export default function RegisterPage() {
         padding: "24px 0",
       }}
     >
-      {/* Grid bg */}
+
       <div
         style={{
           position: "absolute",
@@ -209,7 +209,7 @@ export default function RegisterPage() {
           pointerEvents: "none",
         }}
       />
-      {/* Glow blobs */}
+
       <div style={{ position: "absolute", left: "-100px", top: "-100px", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(26,86,219,0.22) 0%, transparent 65%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", right: "-80px", bottom: "-80px", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(5,150,105,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", right: "20%", top: "10%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
@@ -230,11 +230,11 @@ export default function RegisterPage() {
           animation: "lgCardIn 0.6s cubic-bezier(0.22,1,0.36,1) both",
         }}
       >
-        {/* Top accent bar */}
+
         <div style={{ height: 4, background: "linear-gradient(90deg, #1A56DB, #34D399, #60A5FA)" }} />
 
         <div style={{ padding: "36px 40px 40px" }}>
-          {/* Logo */}
+ 
           <div
             style={{
               display: "flex",
@@ -261,7 +261,7 @@ export default function RegisterPage() {
             </span>
           </div>
 
-          {/* Heading */}
+       
           <div
             style={{
               marginBottom: 28,
@@ -286,7 +286,8 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Fields */}
+         
+         
           <div
             style={{
               display: "flex",
@@ -317,7 +318,7 @@ export default function RegisterPage() {
 
             <div style={{ height: 1, background: `linear-gradient(90deg, transparent, ${C.border}, transparent)`, margin: "2px 0" }} />
 
-            {/* Submit button */}
+         
             <button
               onClick={handleSubmit}
               disabled={loading}
@@ -387,7 +388,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Footer */}
         <div
           style={{
             background: C.blueLight,
