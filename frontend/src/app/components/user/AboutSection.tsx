@@ -3,32 +3,71 @@
 import Link from "next/link";
 
 interface Solution {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   desc: string;
   href: string;
 }
 
+const IconRetail = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
+  </svg>
+);
+
+const IconFnB = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+    <line x1="6" y1="1" x2="6" y2="4" />
+    <line x1="10" y1="1" x2="10" y2="4" />
+    <line x1="14" y1="1" x2="14" y2="4" />
+  </svg>
+);
+
+const IconHealthcare = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+  </svg>
+);
+
+const IconSearch = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+const IconArrow = () => (
+  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <path d="M3 7h8M7 3l4 4-4 4" />
+  </svg>
+);
+
+
 const solutions: Solution[] = [
   {
-    icon: "🏪",
+    icon: <IconRetail />,
     title: "Retail",
     desc: "Identify optimal store locations and analyze retail market trends.",
     href: "/about/retail",
   },
   {
-    icon: "🍽️",
+    icon: <IconFnB />,
     title: "Food & Beverage",
     desc: "Analyze and find strategic locations for F&B businesses.",
     href: "/about/fnb",
   },
   {
-    icon: "🏥",
+    icon: <IconHealthcare />,
     title: "Healthcare",
     desc: "Optimize locations for clinics, hospitals, and healthcare services.",
     href: "/about/healthcare",
   },
 ];
+
 
 function MapIllustration() {
   return (
@@ -36,8 +75,7 @@ function MapIllustration() {
       style={{
         borderRadius: 20,
         overflow: "hidden",
-        background:
-          "linear-gradient(145deg, #1a56db 0%, #2563eb 55%, #0ea5e9 100%)",
+        background: "linear-gradient(145deg, #1a56db 0%, #2563eb 55%, #0ea5e9 100%)",
         height: "100%",
         minHeight: 380,
         position: "relative",
@@ -56,209 +94,51 @@ function MapIllustration() {
           pointerEvents: "none",
         }}
       />
-
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "radial-gradient(circle at 50% 60%, rgba(255,255,255,0.12) 0%, transparent 65%)",
+          background: "radial-gradient(circle at 50% 60%, rgba(255,255,255,0.12) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
-
       <svg
         width="220"
         height="240"
         viewBox="0 0 220 240"
         fill="none"
-        style={{
-          position: "relative",
-          zIndex: 1,
-          animation: "gmFadeUp 0.8s ease both",
-        }}
+        style={{ position: "relative", zIndex: 1, animation: "gmFadeUp 0.8s ease both" }}
       >
-        <path
-          d="M28 112 L110 68 L192 112 L110 156Z"
-          fill="#60a5fa"
-          opacity="0.45"
-        />
-        <path
-          d="M28 112 L110 156 L110 172 L28 128Z"
-          fill="#1d4ed8"
-          opacity="0.65"
-        />
-        <path
-          d="M192 112 L110 156 L110 172 L192 128Z"
-          fill="#2563eb"
-          opacity="0.55"
-        />
-
-        <line
-          x1="28"
-          y1="112"
-          x2="192"
-          y2="112"
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth="1"
-        />
-        <line
-          x1="49"
-          y1="101"
-          x2="171"
-          y2="101"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-        <line
-          x1="69"
-          y1="90"
-          x2="151"
-          y2="90"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-        <line
-          x1="49"
-          y1="123"
-          x2="171"
-          y2="123"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-        <line
-          x1="69"
-          y1="134"
-          x2="151"
-          y2="134"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-
-        <line
-          x1="69"
-          y1="90"
-          x2="28"
-          y2="112"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-        <line
-          x1="110"
-          y1="68"
-          x2="110"
-          y2="156"
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth="1"
-        />
-        <line
-          x1="151"
-          y1="90"
-          x2="192"
-          y2="112"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="1"
-        />
-        <line
-          x1="69"
-          y1="134"
-          x2="28"
-          y2="128"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="1"
-        />
-        <line
-          x1="151"
-          y1="134"
-          x2="192"
-          y2="128"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="1"
-        />
-
-        <path
-          d="M69 90 L110 68 L110 112 L69 112Z"
-          fill="rgba(255,255,255,0.06)"
-        />
-        <path
-          d="M110 112 L151 90 L192 112 L151 134Z"
-          fill="rgba(22,163,74,0.18)"
-        />
-
-        <rect
-          x="148"
-          y="34"
-          width="13"
-          height="56"
-          rx="3"
-          fill="#34d399"
-          opacity="0.95"
-        />
-        <rect
-          x="165"
-          y="46"
-          width="13"
-          height="44"
-          rx="3"
-          fill="#60a5fa"
-          opacity="0.9"
-        />
+        <path d="M28 112 L110 68 L192 112 L110 156Z" fill="#60a5fa" opacity="0.45" />
+        <path d="M28 112 L110 156 L110 172 L28 128Z" fill="#1d4ed8" opacity="0.65" />
+        <path d="M192 112 L110 156 L110 172 L192 128Z" fill="#2563eb" opacity="0.55" />
+        <line x1="28" y1="112" x2="192" y2="112" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+        <line x1="49" y1="101" x2="171" y2="101" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="69" y1="90" x2="151" y2="90" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="49" y1="123" x2="171" y2="123" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="69" y1="134" x2="151" y2="134" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="69" y1="90" x2="28" y2="112" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="110" y1="68" x2="110" y2="156" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+        <line x1="151" y1="90" x2="192" y2="112" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="69" y1="134" x2="28" y2="128" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <line x1="151" y1="134" x2="192" y2="128" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <path d="M69 90 L110 68 L110 112 L69 112Z" fill="rgba(255,255,255,0.06)" />
+        <path d="M110 112 L151 90 L192 112 L151 134Z" fill="rgba(22,163,74,0.18)" />
+        <rect x="148" y="34" width="13" height="56" rx="3" fill="#34d399" opacity="0.95" />
+        <rect x="165" y="46" width="13" height="44" rx="3" fill="#60a5fa" opacity="0.9" />
         <rect x="182" y="22" width="13" height="68" rx="3" fill="#34d399" />
-        <rect
-          x="144"
-          y="88"
-          width="56"
-          height="2"
-          rx="1"
-          fill="white"
-          opacity="0.45"
-        />
-
-        <rect
-          x="134"
-          y="24"
-          width="74"
-          height="68"
-          rx="6"
-          fill="rgba(255,255,255,0.08)"
-          stroke="white"
-          strokeWidth="1.5"
-          strokeOpacity="0.55"
-        />
-
-        <rect
-          x="90"
-          y="50"
-          width="46"
-          height="46"
-          rx="6"
-          fill="white"
-          opacity="0.92"
-        />
-        <circle
-          cx="113"
-          cy="73"
-          r="15"
-          fill="none"
-          stroke="#e5e7eb"
-          strokeWidth="1"
-        />
+        <rect x="144" y="88" width="56" height="2" rx="1" fill="white" opacity="0.45" />
+        <rect x="134" y="24" width="74" height="68" rx="6" fill="rgba(255,255,255,0.08)" stroke="white" strokeWidth="1.5" strokeOpacity="0.55" />
+        <rect x="90" y="50" width="46" height="46" rx="6" fill="white" opacity="0.92" />
+        <circle cx="113" cy="73" r="15" fill="none" stroke="#e5e7eb" strokeWidth="1" />
         <path d="M113 58 A15 15 0 0 1 126 79 L113 73Z" fill="#fbbf24" />
         <path d="M113 58 A15 15 0 0 0 100 79 L113 73Z" fill="#60a5fa" />
         <path d="M113 73 L100 79 A15 15 0 0 0 126 79 Z" fill="#34d399" />
-
-        <path
-          d="M110 56 C100 56 92 64 92 74 C92 87 110 106 110 106 C110 106 128 87 128 74 C128 64 120 56 110 56Z"
-          fill="#ffffff"
-        />
-        <path
-          d="M110 58 C101 58 94 65 94 74 C94 86 110 104 110 104 C110 104 126 86 126 74 C126 65 119 58 110 58Z"
-          fill="#1A56DB"
-        />
+        <path d="M110 56 C100 56 92 64 92 74 C92 87 110 106 110 106 C110 106 128 87 128 74 C128 64 120 56 110 56Z" fill="#ffffff" />
+        <path d="M110 58 C101 58 94 65 94 74 C94 86 110 104 110 104 C110 104 126 86 126 74 C126 65 119 58 110 58Z" fill="#1A56DB" />
         <circle cx="110" cy="74" r="8" fill="white" opacity="0.95" />
         <circle cx="110" cy="74" r="4" fill="#1A56DB" />
         <ellipse cx="110" cy="108" rx="11" ry="3.5" fill="rgba(0,0,0,0.18)" />
-
         <circle cx="52" cy="75" r="4" fill="white" opacity="0.5" />
         <circle cx="168" cy="148" r="3" fill="white" opacity="0.35" />
         <circle cx="38" cy="148" r="5" fill="white" opacity="0.25" />
@@ -267,6 +147,7 @@ function MapIllustration() {
     </div>
   );
 }
+
 
 function SolutionCard({ icon, title, desc, href }: Solution) {
   return (
@@ -305,7 +186,6 @@ function SolutionCard({ icon, title, desc, href }: Solution) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 22,
           marginBottom: 14,
           flexShrink: 0,
         }}
@@ -368,20 +248,12 @@ function SolutionCard({ icon, title, desc, href }: Solution) {
         }}
       >
         Learn more
-        <svg
-          width="14"
-          height="14"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
-          <path d="M3 7h8M7 3l4 4-4 4" />
-        </svg>
+        <IconArrow />
       </button>
     </Link>
   );
 }
+
 
 function CtaCard() {
   return (
@@ -414,10 +286,9 @@ function CtaCard() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 20,
         }}
       >
-        🔍
+        <IconSearch />
       </div>
 
       <Link
@@ -449,20 +320,12 @@ function CtaCard() {
         }}
       >
         See More Solutions
-        <svg
-          width="14"
-          height="14"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        >
-          <path d="M3 7h8M7 3l4 4-4 4" />
-        </svg>
+        <IconArrow />
       </Link>
     </div>
   );
 }
+
 
 export default function AboutSection() {
   return (

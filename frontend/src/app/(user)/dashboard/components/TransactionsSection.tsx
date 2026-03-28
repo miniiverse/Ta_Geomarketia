@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const transactions = [
   {
-    title: "Population Heatmap",
+    title: "Restaurant Location Analysis",
     region: "Batu Ampar",
     date: "Apr 20, 2024",
     price: "Rp 400.000",
@@ -12,20 +12,20 @@ const transactions = [
     statusColor: "#D97706",
     statusBg: "#FFFBEB",
     statusBorder: "#FDE68A",
-    type: "Heatmap",
+    type: "Food & Beverage",
     icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path
-          d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"
+          d="M6 3v7M10 3v7M6 7h4M14 3v18M18 3v6c0 2-4 2-4 0V3"
           stroke="currentColor"
           strokeWidth="1.8"
-          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       </svg>
     ),
   },
   {
-    title: "Retail Market Analysis",
+    title: "Retail Site Selection",
     region: "Bengkong",
     date: "Apr 15, 2024",
     price: "Rp 950.000",
@@ -33,17 +33,21 @@ const transactions = [
     statusColor: "#059669",
     statusBg: "#ECFDF5",
     statusBorder: "#A7F3D0",
-    type: "Market",
+    type: "Retail",
     icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <rect x="4" y="10" width="3" height="8" fill="currentColor" />
-        <rect x="10" y="6" width="3" height="12" fill="currentColor" />
-        <rect x="16" y="3" width="3" height="15" fill="currentColor" />
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M6 8h12l-1 12H7L6 8z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+        <path d="M9 8a3 3 0 016 0" stroke="currentColor" strokeWidth="1.8" />
       </svg>
     ),
   },
   {
-    title: "Consumer Density Map",
+    title: "Emergency Coverage Map",
     region: "Sekupang",
     date: "Apr 8, 2024",
     price: "Rp 1.100.000",
@@ -51,15 +55,20 @@ const transactions = [
     statusColor: "#059669",
     statusBg: "#ECFDF5",
     statusBorder: "#A7F3D0",
-    type: "Density",
+    type: "Healthcare",
     icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path
           d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z"
           stroke="currentColor"
           strokeWidth="1.8"
         />
-        <circle cx="12" cy="11" r="2" fill="currentColor" />
+        <path
+          d="M12 9v4M10 11h4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
@@ -69,9 +78,7 @@ export default function TransactionsSection() {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <div
-      style={{ marginTop: 28, fontFamily: "'Inter', sans-serif" }}
-    >
+    <div style={{ marginTop: 28, fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
       <div
         style={{
