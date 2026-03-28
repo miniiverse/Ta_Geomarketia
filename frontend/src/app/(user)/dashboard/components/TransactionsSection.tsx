@@ -1,16 +1,23 @@
 "use client";
 
+import { useState } from "react";
+
 const transactions = [
   {
-    title: "Population Heatmap - Medan",
-    date: "April 20, 2024",
+    title: "Population Heatmap",
+    region: "Batu Ampar",
+    date: "Apr 20, 2024",
     price: "Rp 400.000",
     status: "Pending",
+    statusColor: "#D97706",
+    statusBg: "#FFFBEB",
+    statusBorder: "#FDE68A",
+    type: "Heatmap",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path
           d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"
-          stroke="#1A56DB"
+          stroke="currentColor"
           strokeWidth="1.8"
           strokeLinejoin="round"
         />
@@ -18,136 +25,155 @@ const transactions = [
     ),
   },
   {
-    title: "Retail Market Analysis - Bandung",
-    date: "April 15, 2024",
+    title: "Retail Market Analysis",
+    region: "Bengkong",
+    date: "Apr 15, 2024",
     price: "Rp 950.000",
     status: "Completed",
+    statusColor: "#059669",
+    statusBg: "#ECFDF5",
+    statusBorder: "#A7F3D0",
+    type: "Market",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <rect x="4" y="10" width="3" height="8" fill="#1A56DB" />
-        <rect x="10" y="6" width="3" height="12" fill="#1A56DB" />
-        <rect x="16" y="3" width="3" height="15" fill="#1A56DB" />
+        <rect x="4" y="10" width="3" height="8" fill="currentColor" />
+        <rect x="10" y="6" width="3" height="12" fill="currentColor" />
+        <rect x="16" y="3" width="3" height="15" fill="currentColor" />
       </svg>
     ),
   },
   {
-    title: "Consumer Density Map - Bali",
-    date: "April 8, 2024",
+    title: "Consumer Density Map",
+    region: "Sekupang",
+    date: "Apr 8, 2024",
     price: "Rp 1.100.000",
     status: "Completed",
+    statusColor: "#059669",
+    statusBg: "#ECFDF5",
+    statusBorder: "#A7F3D0",
+    type: "Density",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path
           d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z"
-          stroke="#1A56DB"
+          stroke="currentColor"
           strokeWidth="1.8"
         />
-        <circle cx="12" cy="11" r="2" fill="#1A56DB" />
+        <circle cx="12" cy="11" r="2" fill="currentColor" />
       </svg>
     ),
   },
 ];
 
 export default function TransactionsSection() {
+  const [hovered, setHovered] = useState<number | null>(null);
+
   return (
     <div
-      style={{
-        marginTop: 32,
-        fontFamily: "'Inter', sans-serif",
-      }}
+      style={{ marginTop: 28, fontFamily: "'Inter', sans-serif" }}
     >
-      {/* HEADER */}
+      {/* Header */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-end",
           marginBottom: 16,
         }}
       >
         <div>
           <p
             style={{
-              margin: 0,
-              fontSize: 12,
-              fontWeight: 500,
-              color: "#9ca3af",
-              letterSpacing: "0.06em",
+              margin: "0 0 3px",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "rgba(26,86,219,0.45)",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
-              marginBottom: 3,
+              fontFamily: "'JetBrains Mono','Fira Code',monospace",
             }}
           >
-            History
+            HISTORY · PAYMENT RECORDS
           </p>
           <h2
             style={{
               margin: 0,
-              fontSize: 18,
-              fontWeight: 700,
-              color: "#1A56DB",
-              letterSpacing: "-0.02em",
+              fontSize: 20,
+              fontWeight: 800,
+              color: "#0F172A",
+              letterSpacing: "-0.03em",
             }}
           >
             Recent Transactions
           </h2>
         </div>
-
-        <div
+        <button
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 5,
-            padding: "7px 14px",
-            background: "#eff4ff",
-            border: "1px solid #d4e2fd",
-            borderRadius: 999,
+            gap: 6,
+            padding: "8px 16px",
+            background: "#EBF3FF",
+            border: "1.5px solid #BFDBFE",
+            borderRadius: 10,
             cursor: "pointer",
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            color: "#1A56DB",
+            letterSpacing: "0.01em",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "#DBEAFE";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "#EBF3FF";
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#1A56DB" }}>
-            View All
-          </span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          View All
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
             <path
               d="M9 18l6-6-6-6"
-              stroke="#1A56DB"
+              stroke="currentColor"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
-        </div>
+        </button>
       </div>
 
-      {/* CARD WRAPPER */}
+      {/* Table card */}
       <div
         style={{
-          background: "#fff",
-          border: "1px solid #e8eef5",
-          borderRadius: 16,
-          boxShadow: "0 2px 16px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04)",
+          background: "#ffffff",
+          border: "1.5px solid #E0ECFF",
+          borderRadius: 18,
           overflow: "hidden",
+          boxShadow: "0 4px 24px rgba(26,86,219,0.07)",
         }}
       >
-        {/* TABLE HEADER */}
+        {/* Table header */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 150px 150px 120px",
-            padding: "10px 20px",
-            background: "#f9fafb",
-            borderBottom: "1px solid #e8eef5",
+            gridTemplateColumns: "1fr 120px 160px 120px 44px",
+            padding: "12px 20px",
+            background: "#F0F7FF",
+            borderBottom: "1.5px solid #E0ECFF",
           }}
         >
-          {["Transaction", "Date", "Amount", "Status"].map((h) => (
+          {["Transaction", "Date", "Amount", "Status", ""].map((h) => (
             <span
               key={h}
               style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "#9ca3af",
-                letterSpacing: "0.06em",
+                fontSize: 10,
+                fontWeight: 700,
+                color: "rgba(26,86,219,0.45)",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
+                fontFamily: "'JetBrains Mono','Fira Code',monospace",
               }}
             >
               {h}
@@ -155,63 +181,86 @@ export default function TransactionsSection() {
           ))}
         </div>
 
-        {/* ROWS */}
+        {/* Rows */}
         {transactions.map((item, i) => (
           <div
             key={i}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 150px 150px 120px",
+              gridTemplateColumns: "1fr 120px 160px 120px 44px",
               alignItems: "center",
               padding: "14px 20px",
               borderBottom:
-                i !== transactions.length - 1 ? "1px solid #f1f5f9" : "none",
+                i !== transactions.length - 1 ? "1px solid #EBF3FF" : "none",
+              background: hovered === i ? "#F7FAFF" : "transparent",
+              transition: "background 0.18s",
+              cursor: "default",
             }}
           >
-            {/* TITLE */}
+            {/* Transaction */}
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   borderRadius: 10,
-                  background: "#eff4ff",
-                  border: "1px solid #d4e2fd",
+                  background: "#EBF3FF",
+                  border: "1.5px solid #BFDBFE",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 16,
+                  color: "#1A56DB",
                   flexShrink: 0,
+                  transition: "transform 0.2s",
+                  transform: hovered === i ? "scale(1.08)" : "scale(1)",
                 }}
               >
                 {item.icon}
               </div>
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: "#1A56DB",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {item.title}
-              </span>
+              <div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#0F172A",
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {item.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: "#1A56DB",
+                    fontWeight: 600,
+                    letterSpacing: "0.07em",
+                    textTransform: "uppercase",
+                    marginTop: 2,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {item.region} · {item.type}
+                </div>
+              </div>
             </div>
 
-            {/* DATE */}
+            {/* Date */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
-                color: "#6b7280",
-                fontSize: 13,
+                gap: 5,
+                color: "#94A3B8",
+                fontSize: 12,
               }}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  stroke="#9ca3af"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -220,38 +269,36 @@ export default function TransactionsSection() {
               {item.date}
             </div>
 
-            {/* PRICE */}
+            {/* Price */}
             <div
               style={{
                 fontSize: 14,
-                fontWeight: 700,
-                color: "#1A56DB",
-                letterSpacing: "-0.01em",
+                fontWeight: 800,
+                color: "#0F172A",
+                letterSpacing: "-0.02em",
+                fontVariantNumeric: "tabular-nums",
               }}
             >
               {item.price}
             </div>
 
-            {/* STATUS */}
+            {/* Status */}
             <div>
               <span
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
-                  padding: "4px 11px",
-                  borderRadius: 999,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  background:
-                    item.status === "Completed"
-                      ? "rgba(236,253,245,0.92)"
-                      : "rgba(255,251,235,0.92)",
-                  color: item.status === "Completed" ? "#16A34A" : "#D97706",
-                  border:
-                    item.status === "Completed"
-                      ? "1px solid #bbf7d0"
-                      : "1px solid #fde68a",
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  background: item.statusBg,
+                  color: item.statusColor,
+                  border: `1px solid ${item.statusBorder}`,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  fontFamily: "'JetBrains Mono',monospace",
                 }}
               >
                 <span
@@ -259,17 +306,86 @@ export default function TransactionsSection() {
                     width: 5,
                     height: 5,
                     borderRadius: "50%",
-                    background:
-                      item.status === "Completed" ? "#16A34A" : "#D97706",
+                    background: item.statusColor,
                     display: "inline-block",
+                    animation:
+                      item.status === "Pending"
+                        ? "trDot 1.5s ease-in-out infinite"
+                        : "none",
                   }}
                 />
                 {item.status}
               </span>
             </div>
+
+            {/* Action */}
+            <div>
+              <button
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  border: `1px solid ${hovered === i ? "#BFDBFE" : "#E0ECFF"}`,
+                  background: hovered === i ? "#EBF3FF" : "#ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.18s",
+                  color: "#1A56DB",
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9 18l6-6-6-6"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         ))}
+
+        {/* Footer */}
+        <div
+          style={{
+            padding: "12px 20px",
+            borderTop: "1.5px solid #E0ECFF",
+            background: "#F0F7FF",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span style={{ fontSize: 11, color: "#94A3B8" }}>
+            Showing 3 of 12 transactions
+          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}>
+              Total spent
+            </span>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 800,
+                color: "#1A56DB",
+                letterSpacing: "-0.02em",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              Rp 2.450.000
+            </span>
+          </div>
+        </div>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @keyframes trDot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+      `}</style>
     </div>
   );
 }

@@ -1,163 +1,174 @@
 "use client";
 
+import { useState } from "react";
+
 const stats = [
   {
     label: "Total Maps",
     value: "16",
+    sublabel: "All regions",
+    color: "#1A56DB",
+    lightBg: "#EBF3FF",
+    border: "#BFDBFE",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <path
           d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>
     ),
+    trend: "+3 this month",
+    trendUp: true,
+    bar: 80,
   },
   {
     label: "In Progress",
     value: "5",
+    sublabel: "Active analyses",
+    color: "#D97706",
+    lightBg: "#FFFBEB",
+    border: "#FDE68A",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <path
           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>
     ),
+    trend: "2 near deadline",
+    trendUp: false,
+    bar: 35,
   },
   {
     label: "Transactions",
     value: "12",
+    sublabel: "Total purchases",
+    color: "#059669",
+    lightBg: "#ECFDF5",
+    border: "#A7F3D0",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <path
           d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>
     ),
+    trend: "+2 this week",
+    trendUp: true,
+    bar: 60,
   },
   {
     label: "Completed",
     value: "9",
+    sublabel: "Delivered reports",
+    color: "#7C3AED",
+    lightBg: "#F5F3FF",
+    border: "#DDD6FE",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <path
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>
     ),
+    trend: "75% success rate",
+    trendUp: true,
+    bar: 75,
   },
 ];
 
 export default function StatsSection() {
+  const [hovered, setHovered] = useState<number | null>(null);
+
   return (
     <div
       style={{
-        marginTop: 24,
+        marginTop: 20,
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-        gap: 16,
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        gap: 14,
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      {stats.map((item) => (
+      {stats.map((item, i) => (
         <div
           key={item.label}
+          onMouseEnter={() => setHovered(i)}
+          onMouseLeave={() => setHovered(null)}
           style={{
-            padding: "20px 24px",
-            background: "#ffffff",
-            border: "1px solid #e8eef5",
+            background: hovered === i ? item.lightBg : "#ffffff",
+            border: `1.5px solid ${hovered === i ? item.border : "#E8EEF8"}`,
             borderRadius: 16,
-            boxShadow: "0 2px 16px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
+            padding: "20px 22px",
+            position: "relative",
+            overflow: "hidden",
+            cursor: "default",
+            transition: "all 0.25s ease",
+            boxShadow: hovered === i
+              ? `0 8px 32px ${item.color}18, 0 2px 8px rgba(0,0,0,0.06)`
+              : "0 2px 12px rgba(0,0,0,0.05)",
+            transform: hovered === i ? "translateY(-3px)" : "translateY(0)",
           }}
         >
-          <div
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: 10,
-              background: "#eff4ff",
-              border: "1px solid #d4e2fd",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#1A56DB",
-            }}
-          >
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, height: 3,
+            background: `linear-gradient(90deg, ${item.color}, ${item.color}55)`,
+            borderRadius: "16px 16px 0 0",
+            opacity: hovered === i ? 1 : 0,
+            transition: "opacity 0.25s",
+          }} />
+
+          <div style={{
+            position: "absolute", top: 14, right: 16,
+            fontSize: 10, fontWeight: 700, color: `${item.color}50`,
+            fontFamily: "'JetBrains Mono','Fira Code',monospace",
+          }}>
+            {`0${i + 1}`}
+          </div>
+
+          <div style={{
+            width: 40, height: 40, borderRadius: 11,
+            background: item.lightBg, border: `1.5px solid ${item.border}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: item.color, marginBottom: 14,
+            transition: "transform 0.2s",
+            transform: hovered === i ? "scale(1.08)" : "scale(1)",
+          }}>
             {item.icon}
           </div>
 
-          <div>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 28,
-                fontWeight: 700,
-                color: "#1A56DB",
-                letterSpacing: "-0.03em",
-                lineHeight: 1,
-              }}
-            >
-              {item.value}
-            </h2>
-
-            <p
-              style={{
-                margin: "5px 0 0",
-                fontSize: 13,
-                fontWeight: 500,
-                color: "#6b7280",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {item.label}
-            </p>
+          <div style={{
+            fontSize: 36, fontWeight: 800, color: item.color,
+            letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 4,
+            fontVariantNumeric: "tabular-nums",
+          }}>
+            {item.value}
           </div>
 
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "4px 10px",
-              background: "#eff4ff",
-              border: "1px solid #d4e2fd",
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 2, letterSpacing: "-0.01em" }}>
+            {item.label}
+          </div>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 14 }}>
+            {item.sublabel}
+          </div>
+
+          <div style={{ height: 5, background: `${item.color}14`, borderRadius: 999, marginBottom: 0 }}>
+            <div style={{
+              width: `${item.bar}%`, height: "100%",
+              background: `linear-gradient(90deg, ${item.color}88, ${item.color})`,
               borderRadius: 999,
-              width: "fit-content",
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#1A56DB",
-                display: "inline-block",
-              }}
-            />
-            <span style={{ fontSize: 11, fontWeight: 600, color: "#1A56DB" }}>
-              Active
-            </span>
+            }} />
           </div>
         </div>
       ))}
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+      `}</style>
     </div>
   );
 }
