@@ -157,6 +157,9 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
             position: "absolute",
             bottom: 10,
             left: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
             fontSize: 9,
             color: "rgba(255,255,255,0.9)",
@@ -164,7 +167,15 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
             letterSpacing: "0.04em",
           }}
         >
-          📍 {item.coords}
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z"
+              stroke="white"
+              strokeWidth="2"
+            />
+            <circle cx="12" cy="11" r="2" fill="white" />
+          </svg>
+          {item.coords}
         </div>
       </div>
 
