@@ -201,7 +201,7 @@ function ProfileDropdown() {
     },
     {
       label: "My Analysis",
-      href: "/analysis",
+      href: "/myanalysis",
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path

@@ -151,7 +151,6 @@ export default function TransactionsSection() {
         </button>
       </div>
 
-      {/* Table card */}
       <div
         style={{
           background: "#ffffff",
@@ -161,7 +160,6 @@ export default function TransactionsSection() {
           boxShadow: "0 4px 24px rgba(26,86,219,0.07)",
         }}
       >
-        {/* Table header */}
         <div
           style={{
             display: "grid",
@@ -188,7 +186,6 @@ export default function TransactionsSection() {
           ))}
         </div>
 
-        {/* Rows */}
         {transactions.map((item, i) => (
           <div
             key={i}
@@ -206,7 +203,6 @@ export default function TransactionsSection() {
               cursor: "default",
             }}
           >
-            {/* Transaction */}
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div
                 style={{
@@ -254,7 +250,6 @@ export default function TransactionsSection() {
               </div>
             </div>
 
-            {/* Date */}
             <div
               style={{
                 display: "flex",
@@ -276,7 +271,6 @@ export default function TransactionsSection() {
               {item.date}
             </div>
 
-            {/* Price */}
             <div
               style={{
                 fontSize: 14,
@@ -289,7 +283,6 @@ export default function TransactionsSection() {
               {item.price}
             </div>
 
-            {/* Status */}
             <div>
               <span
                 style={{
@@ -325,7 +318,6 @@ export default function TransactionsSection() {
               </span>
             </div>
 
-            {/* Action */}
             <div>
               <button
                 style={{
@@ -356,7 +348,6 @@ export default function TransactionsSection() {
           </div>
         ))}
 
-        {/* Footer */}
         <div
           style={{
             padding: "12px 20px",
