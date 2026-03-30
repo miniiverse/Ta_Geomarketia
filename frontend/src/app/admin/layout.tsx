@@ -1,21 +1,34 @@
-import Navbar from "../components/admin/Navbar";
-import Sidebar from "./dashboard-admin/components/Sidebar";
+"use client";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+import { useState } from "react";
+import AdminNavbar from "../components/admin/Navbar";
+import AdminSidebar from "./dashboard-admin/components/AdminSidebar";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <>
-      <Navbar />
-      <Sidebar />
+      <AdminNavbar
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+      />
+
+      <AdminSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
       <main
         style={{
-          marginLeft: "240px",
           marginTop: "64px",
-          minHeight: "calc(100vh - 64px)",
-          background: "#f8faff",
-          padding: "28px 32px",
+          marginLeft: sidebarOpen ? "248px" : "0px",
+          transition: "margin-left 0.3s",
+          minHeight: "100vh",
+          padding: "24px",
         }}
       >
-        {children}
+        {children} 
       </main>
     </>
   );
