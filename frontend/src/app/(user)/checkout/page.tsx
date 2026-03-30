@@ -8,7 +8,6 @@ import { BankTransferTab } from "./components/BankTransferTab";
 import { EWalletTab } from "./components/EWalletTab";
 import { QrisTab } from "./components/QrisTab";
 import { OrderSummary } from "./components/OrderSummary";
-import { SecurityCard } from "./components/SecurityCard";
 
 export type TabType = "credit-card" | "bank-transfer" | "e-wallet" | "qris";
 
@@ -21,25 +20,37 @@ export default function PaymentPage() {
   const [activeTab, setActiveTab] = useState<TabType>("credit-card");
 
   return (
-    <main style={{ minHeight: "calc(100vh - 66px)", background: "#F3F4F6", fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <main style={{
+      minHeight: "calc(100vh - 66px)",
+      background: "#F3F4F6",
+      fontFamily: "'Inter', system-ui, sans-serif",
+    }}>
       <PaymentHeader />
 
-      <div className="payment-grid" style={{ width: "100%", padding: "1.5rem 2rem", boxSizing: "border-box", display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.25rem", alignItems: "start" }}>
-
-        <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", overflow: "hidden" }}>
+      <div
+        className="payment-grid"
+        style={{
+          width: "100%", padding: "1.5rem 2rem", boxSizing: "border-box",
+          display: "grid", gridTemplateColumns: "1fr 300px",
+          gap: "1.25rem", alignItems: "start",
+        }}
+      >
+        <div style={{
+          background: "#fff", borderRadius: 16,
+          border: "1px solid #E5E7EB",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+          overflow: "hidden",
+        }}>
           <PaymentTabs activeTab={activeTab} onTabChange={setActiveTab} />
           <div style={{ padding: "1.5rem" }}>
-            {activeTab === "credit-card" && <CreditCardTab />}
+            {activeTab === "credit-card"   && <CreditCardTab />}
             {activeTab === "bank-transfer" && <BankTransferTab />}
-            {activeTab === "e-wallet" && <EWalletTab />}
-            {activeTab === "qris" && <QrisTab />}
+            {activeTab === "e-wallet"      && <EWalletTab />}
+            {activeTab === "qris"          && <QrisTab />}
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <OrderSummary subtotal={subtotal} tax={tax} total={total} formatRp={formatRp} />
-          <SecurityCard />
-        </div>
+        <OrderSummary subtotal={subtotal} tax={tax} total={total} formatRp={formatRp} />
       </div>
 
       <style>{`

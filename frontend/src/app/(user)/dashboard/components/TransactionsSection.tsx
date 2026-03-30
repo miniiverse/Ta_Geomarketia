@@ -107,7 +107,7 @@ export default function TransactionsSection() {
               margin: 0,
               fontSize: 20,
               fontWeight: 800,
-              color: "#0F172A",
+              color: "#1A56DB",
               letterSpacing: "-0.03em",
             }}
           >

@@ -57,17 +57,53 @@ const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
 
 export function PaymentTabs({ activeTab, onTabChange }: PaymentTabsProps) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderBottom: "1px solid #E5E7EB" }}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "14px 8px", background: activeTab === tab.id ? "#fff" : "#FAFAFA", border: "none", borderBottom: activeTab === tab.id ? "2.5px solid #1A56DB" : "2.5px solid transparent", borderRight: "1px solid #E5E7EB", color: activeTab === tab.id ? "#1A56DB" : "#6B7280", fontSize: "0.8rem", fontWeight: activeTab === tab.id ? 700 : 500, cursor: "pointer", transition: "all 0.15s", fontFamily: "'Inter', system-ui, sans-serif" }}
-        >
-          <span style={{ flexShrink: 0 }}>{tab.icon}</span>
-          <span className="tab-label">{tab.label}</span>
-        </button>
-      ))}
+    <div style={{
+      display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+      borderBottom: "1px solid #E5E7EB",
+      background: "#FAFBFF",
+    }}>
+      {tabs.map((tab, idx) => {
+        const isActive = activeTab === tab.id;
+        const isLast = idx === tabs.length - 1;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+              padding: "15px 8px",
+              background: isActive
+                ? "#fff"
+                : "transparent",
+              border: "none",
+              borderBottom: isActive ? "2.5px solid #1A56DB" : "2.5px solid transparent",
+              borderRight: isLast ? "none" : "1px solid #EEF2FF",
+              color: isActive ? "#1A56DB" : "#94A3B8",
+              fontSize: "0.8rem",
+              fontWeight: isActive ? 700 : 500,
+              cursor: "pointer",
+              transition: "all 0.15s",
+              fontFamily: "'Inter', system-ui, sans-serif",
+              position: "relative",
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                (e.currentTarget as HTMLElement).style.color = "#1A56DB";
+                (e.currentTarget as HTMLElement).style.background = "#F0F6FF";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                (e.currentTarget as HTMLElement).style.color = "#94A3B8";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+              }
+            }}
+          >
+            <span style={{ flexShrink: 0 }}>{tab.icon}</span>
+            <span className="tab-label">{tab.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

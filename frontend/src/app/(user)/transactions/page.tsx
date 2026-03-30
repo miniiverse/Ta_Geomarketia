@@ -9,7 +9,7 @@ export default function TransactionPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8FAFC",
+        background: "#ffffff",
         padding: "36px 40px",
         fontFamily:
           "'DM Sans', 'Plus Jakarta Sans', 'Inter', sans-serif",

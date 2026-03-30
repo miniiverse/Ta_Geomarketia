@@ -73,7 +73,7 @@ export default function ProjectsFilterSidebar() {
                 margin: 0,
                 fontSize: 14,
                 fontWeight: 800,
-                color: "#0F172A",
+                color: "#1A56DB",
                 letterSpacing: "-0.02em",
               }}
             >

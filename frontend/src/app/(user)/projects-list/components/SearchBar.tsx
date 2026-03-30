@@ -24,19 +24,6 @@ export default function ProjectsHeader() {
         }}
       >
         <div>
-          <p
-            style={{
-              margin: "0 0 4px",
-              fontSize: 10,
-              fontWeight: 700,
-              color: "rgba(26,86,219,0.5)",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-            GEOMARKETIA · MARKETPLACE
-          </p>
           <h1
             style={{
               margin: 0,

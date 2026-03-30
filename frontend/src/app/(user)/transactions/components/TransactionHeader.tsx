@@ -1,5 +1,14 @@
 const IconReceipt = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#1A56DB"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
     <path d="M16 8H8M16 12H8M12 16H8" />
   </svg>
@@ -7,27 +16,14 @@ const IconReceipt = () => (
 
 export default function TransactionHeader() {
   const chips = [
-    { label: "Total",   value: "12", color: "#1A56DB", bg: "#EFF6FF" },
-    { label: "Paid",    value: "7",  color: "#16A34A", bg: "#F0FDF4" },
-    { label: "Pending", value: "3",  color: "#D97706", bg: "#FFFBEB" },
-    { label: "Failed",  value: "2",  color: "#DC2626", bg: "#FEF2F2" },
+    { label: "Total", value: "12", color: "#1A56DB", bg: "#EFF6FF" },
+    { label: "Paid", value: "7", color: "#16A34A", bg: "#F0FDF4" },
+    { label: "Pending", value: "3", color: "#D97706", bg: "#FFFBEB" },
+    { label: "Failed", value: "2", color: "#DC2626", bg: "#FEF2F2" },
   ];
 
   return (
     <div style={{ marginBottom: 32 }}>
-      <p
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.12em",
-          color: "#94A3B8",
-          textTransform: "uppercase",
-          marginBottom: 16,
-        }}
-      >
-        Geomarketia &nbsp;/&nbsp; User Dashboard &nbsp;/&nbsp; Transactions
-      </p>
-
       <div
         style={{
           display: "flex",
@@ -58,15 +54,37 @@ export default function TransactionHeader() {
               style={{
                 fontSize: 28,
                 fontWeight: 800,
-                color: "#0F172A",
+                color: "#1A56DB",
                 letterSpacing: "-0.02em",
                 lineHeight: 1.2,
                 margin: 0,
               }}
             >
-              My Transactions
+              My{" "}
+              <span
+                style={{
+                  fontSize: 28,
+                  fontWeight: 800,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.2,
+                  background: "linear-gradient(90deg, #60A5FA, #34D399)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Transactions
+              </span>
             </h1>
-            <p style={{ marginTop: 4, color: "#64748B", fontSize: 14, fontWeight: 400, margin: "4px 0 0" }}>
+
+            <p
+              style={{
+                marginTop: 4,
+                color: "#64748B",
+                fontSize: 14,
+                fontWeight: 400,
+                margin: "4px 0 0",
+              }}
+            >
               Track all your purchases and download invoices
             </p>
           </div>
@@ -86,7 +104,9 @@ export default function TransactionHeader() {
                 gap: 6,
               }}
             >
-              <span style={{ fontSize: 15, fontWeight: 700, color: chip.color }}>
+              <span
+                style={{ fontSize: 15, fontWeight: 700, color: chip.color }}
+              >
                 {chip.value}
               </span>
               <span style={{ fontSize: 12, color: chip.color, opacity: 0.8 }}>
