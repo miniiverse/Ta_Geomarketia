@@ -264,7 +264,7 @@ export default function AdminNavbar({ sidebarOpen, onToggleSidebar }: AdminNavba
                         </svg>
                       ),
                       label: "My Profile",
-                      href: "/admin/profile",
+                      href: "/admin/profile-admin",
                       danger: false,
                     },
                     {
