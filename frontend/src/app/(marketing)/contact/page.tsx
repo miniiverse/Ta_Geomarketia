@@ -386,8 +386,7 @@ function HeroContact() {
         />
       ))}
 
-      <div className="ct-container">
-        <div className="ct-hero-inner">
+<div className="ct-hero-grid">
           <div
             style={{
               animation: "ctFadeUp 0.8s ease both",
@@ -436,7 +435,7 @@ function HeroContact() {
               style={{
                 fontFamily: "'Inter',sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(28px,3.6vw,48px)",
+                fontSize: "clamp(2rem,3.4vw,3.2rem)",
                 lineHeight: 1.12,
                 color: "#ffffff",
                 marginBottom: 20,
@@ -494,7 +493,7 @@ function HeroContact() {
             <HeroVisual />
           </div>
         </div>
-      </div>
+      
     </section>
   );
 }
@@ -649,31 +648,19 @@ export default function ContactPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .ct-container {
-          max-width: 1160px;
-          margin: 0 auto;
-          padding: 0 40px;
+        .ct-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; margin-top:-66px; }
+        .ct-hero-grid {
           position: relative;
-          z-index: 1;
-        }
-
-        /* ── HERO ───────────────────────── */
-        .ct-hero {
-          background: #040F2E;
-          position: relative;
-          overflow: hidden;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          padding: 110px 0 80px;
-          margin-top: -66px;
-        }
-        .ct-hero-inner {
+          z-index: 2;
+          width: 100%;
+          padding: 6rem 3.5rem 4rem;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 64px;
+          gap: 3rem;
           align-items: center;
-        }
+          max-width: 1440px;
+          margin: 0 auto;
+          }
 
         .ct-wa-btn {
           display: inline-flex;

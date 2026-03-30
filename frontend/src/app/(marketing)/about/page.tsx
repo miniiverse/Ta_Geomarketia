@@ -410,9 +410,9 @@ export default function AboutPage() {
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
         /* ── HERO ──────────────────────── */
-        .gma-container { max-width:1160px; margin:0 auto; padding:0 40px; position:relative; z-index:1; }
-        .gma-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; padding:110px 0 80px; }
-        .gma-hero-inner { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+        .gma-container { max-width:1440px; margin:0 auto; padding:0 3.5rem; position:relative; z-index:1; }
+        .gma-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; padding:0; }
+        .gma-hero-inner { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; padding:6rem 0 4rem; }
 
         @keyframes gmFadeUp        { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
         @keyframes gmBlink         { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:1;transform:scale(1.6)} }

@@ -728,31 +728,10 @@ export default function ReviewPage() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         /* ── SHARED ─────────────────────── */
-        .rv-container {
-          max-width: 1160px;
-          margin: 0 auto;
-          padding: 0 40px;
-          position: relative;
-          z-index: 1;
-        }
-
-        /* ── HERO ───────────────────────── */
-        .rv-hero {
-          background: #040F2E;
-          position: relative;
-          overflow: hidden;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          padding: 110px 0 80px;
-          margin-top: -66px; 
-        }
-        .rv-hero-inner {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 64px;
-          align-items: center;
-        }
+        .rv-container { max-width:1440px; margin:0 auto; padding:0 3.5rem; position:relative; z-index:1; }
+        .rv-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; margin-top:-66px; }
+        .rv-hero-inner { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; padding:6rem 0 4rem; }
+        
 
         /* stats row */
         .rv-hero-stats {
