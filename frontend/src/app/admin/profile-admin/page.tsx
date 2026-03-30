@@ -90,7 +90,7 @@ export default function AdminProfilePage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#F5F7FB", fontFamily: "'Inter',sans-serif", padding: "28px 32px 40px" }}>
+      <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "'Inter',sans-serif", padding: "28px 32px 40px" }}>
 
     
         <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>

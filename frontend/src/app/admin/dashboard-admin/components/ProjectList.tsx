@@ -386,7 +386,7 @@ export default function ProjectList() {
         }}
       >
         <Link
-          href="/projects"
+          href="/admin/projects"
           style={{
             display: "inline-flex",
             alignItems: "center",
