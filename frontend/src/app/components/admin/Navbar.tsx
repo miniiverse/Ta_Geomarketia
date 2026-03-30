@@ -282,6 +282,7 @@ export default function AdminNavbar({ sidebarOpen, onToggleSidebar }: AdminNavba
                   ].map((item) => (
                     <button
                       key={item.label}
+                      onClick={() => window.location.href = item.href}
                       style={{
                         width: "100%",
                         display: "flex",
