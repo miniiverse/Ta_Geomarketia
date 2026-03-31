@@ -668,25 +668,8 @@ export default function TransactionTable() {
           )}
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div
-            style={{
-              padding: "16px 22px",
-              borderTop: "1px solid #f1f5f9",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "6px",
-            }}
-          >
-            <button
-              onClick={() => setPage(1)}
-              disabled={page === 1}
-              style={navBtnStyle(page === 1)}
-            >
-              «
-            </button>
+          <div style={{ padding: "16px 22px", borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
@@ -722,13 +705,6 @@ export default function TransactionTable() {
               style={navBtnStyle(page === totalPages)}
             >
               ›
-            </button>
-            <button
-              onClick={() => setPage(totalPages)}
-              disabled={page === totalPages}
-              style={navBtnStyle(page === totalPages)}
-            >
-              »
             </button>
           </div>
         )}
