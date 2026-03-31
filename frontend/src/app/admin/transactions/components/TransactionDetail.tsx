@@ -67,7 +67,7 @@ export default function TransactionDetail({
           boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
         }}
       >
-        {/* Header */}
+    
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -178,7 +178,7 @@ export default function TransactionDetail({
             </button>
           </div>
 
-          {/* Tabs */}
+          
           <div style={{ display: "flex", gap: "4px" }}>
             {tabs.map((t) => (
               <button
@@ -221,11 +221,11 @@ export default function TransactionDetail({
           </div>
         </div>
 
-        {/* Body */}
+       
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
           {tab === "detail" && (
             <div>
-              {/* Info Cards */}
+             
               <div
                 style={{
                   display: "grid",
@@ -317,7 +317,7 @@ export default function TransactionDetail({
                 ))}
               </div>
 
-              {/* Transaction Info */}
+             
               <div
                 style={{
                   background: "#F8FAFF",
@@ -428,7 +428,7 @@ export default function TransactionDetail({
 
           {tab === "invoice" && (
             <div>
-              {/* Invoice Preview */}
+           
               <div
                 style={{
                   background: "#fff",
@@ -438,7 +438,7 @@ export default function TransactionDetail({
                   boxShadow: "0 2px 16px rgba(26,86,219,0.06)",
                 }}
               >
-                {/* Invoice Header */}
+           
                 <div
                   style={{
                     background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -495,7 +495,7 @@ export default function TransactionDetail({
                   </div>
                 </div>
 
-                {/* Invoice Body */}
+                
                 <div style={{ padding: "24px 28px" }}>
                   <div
                     style={{
@@ -566,7 +566,7 @@ export default function TransactionDetail({
                     </div>
                   </div>
 
-                  {/* Invoice Table */}
+               
                   <div
                     style={{
                       border: "1px solid #EBF3FF",
@@ -641,7 +641,7 @@ export default function TransactionDetail({
                     </div>
                   </div>
 
-                  {/* Total */}
+               
                   <div
                     style={{
                       display: "flex",
@@ -714,7 +714,7 @@ export default function TransactionDetail({
                   </div>
                 </div>
 
-                {/* Payment Status Banner */}
+             
                 <div
                   style={{
                     background: isPaid ? "#ECFDF5" : isPending ? "#FFFBEB" : "#FEF2F2",
@@ -755,7 +755,6 @@ export default function TransactionDetail({
           )}
         </div>
 
-        {/* Footer */}
         <div
           style={{
             padding: "16px 28px",

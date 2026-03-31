@@ -48,7 +48,7 @@ export default function TransactionPage() {
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      {/* Top Bar */}
+  
       <div
         style={{
           background: "#fff",
@@ -83,7 +83,7 @@ export default function TransactionPage() {
       </div>
 
       <div style={{ padding: "32px" }}>
-        {/* Header */}
+   
         <div style={{ marginBottom: "28px" }}>
           <h1
             style={{
@@ -101,7 +101,7 @@ export default function TransactionPage() {
           </p>
         </div>
 
-        {/* Stats Cards */}
+       
         <div
           style={{
             display: "grid",
@@ -184,7 +184,7 @@ export default function TransactionPage() {
           ))}
         </div>
 
-        {/* Table */}
+        
         <TransactionTable />
       </div>
     </div>

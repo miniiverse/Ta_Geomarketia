@@ -202,7 +202,7 @@ export default function TransactionTable() {
           overflow: "hidden",
         }}
       >
-        {/* Filters Bar */}
+        
         <div
           style={{
             padding: "18px 22px",
@@ -222,7 +222,7 @@ export default function TransactionTable() {
               flexWrap: "wrap",
             }}
           >
-            {/* Status Filter */}
+           
             <div style={{ position: "relative" }}>
               <select
                 value={filterStatus}
@@ -258,7 +258,7 @@ export default function TransactionTable() {
               </svg>
             </div>
 
-            {/* Category Filter */}
+           
             <div style={{ position: "relative" }}>
               <select
                 value={filterCategory}
@@ -294,7 +294,6 @@ export default function TransactionTable() {
               </svg>
             </div>
 
-            {/* Payment Filter */}
             <div style={{ position: "relative" }}>
               <select
                 value={filterPayment}
@@ -331,7 +330,7 @@ export default function TransactionTable() {
               </svg>
             </div>
 
-            {/* Search */}
+          
             <div style={{ position: "relative" }}>
               <input
                 type="text"
@@ -386,7 +385,7 @@ export default function TransactionTable() {
               Showing {paginated.length} of {filtered.length} transactions
             </span>
             
-            {/* Export Excel */}
+           
             <button
               style={{
                 display: "flex",
@@ -423,7 +422,7 @@ export default function TransactionTable() {
           </div>
         </div>
 
-        {/* Table */}
+      
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -482,7 +481,7 @@ export default function TransactionTable() {
                         "transparent")
                     }
                   >
-                    {/* Invoice ID */}
+                 
                     <td
                       style={{
                         padding: "14px 18px",
@@ -496,7 +495,7 @@ export default function TransactionTable() {
                       {trx.invoiceId}
                     </td>
 
-                    {/* Project Name */}
+                  
                     <td
                       style={{
                         padding: "14px 18px",
@@ -532,7 +531,7 @@ export default function TransactionTable() {
                             </td>
 
 
-                    {/* Payment */}
+                 
                     <td
                       style={{
                         padding: "14px 18px",
@@ -559,7 +558,7 @@ export default function TransactionTable() {
                       </span>
                     </td>
 
-                     {/* Amount */}
+                 
                      <td
                       style={{
                         padding: "14px 18px",
@@ -573,7 +572,7 @@ export default function TransactionTable() {
                       {trx.amount}
                     </td>
                     
-                    {/* Status */}
+                  
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <span
                         style={{
@@ -602,7 +601,7 @@ export default function TransactionTable() {
                       </span>
                     </td>
 
-                    {/* Date */}
+                
                     <td
                       style={{
                         padding: "14px 18px",
@@ -615,7 +614,6 @@ export default function TransactionTable() {
                       {trx.date}
                     </td>
 
-                    {/* Actions */}
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setSelectedTransaction(trx)}
