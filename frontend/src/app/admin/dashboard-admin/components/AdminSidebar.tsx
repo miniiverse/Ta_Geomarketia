@@ -46,7 +46,7 @@ const navItems = [
   },
   {
     label: "Sync Midtrans",
-    href: "/admin/sync-midtrans",
+    href: "/admin/midtrans",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M23 4v6h-6" />
