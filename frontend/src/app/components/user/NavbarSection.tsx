@@ -117,7 +117,7 @@ export default function Navbar() {
           }}
         >
           <Link
-            href="/about"
+            href="/"
             style={{
               display: "flex",
               alignItems: "center",

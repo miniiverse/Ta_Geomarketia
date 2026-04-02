@@ -457,7 +457,7 @@ export default function HeroSection() {
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <Link
-              href="/analyze"
+              href="/projects-list"
               style={{
                 padding: "10px 26px",
                 borderRadius: 100,
