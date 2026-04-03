@@ -697,7 +697,7 @@ function ReviewsSection() {
             </span>
           </h2>
           <p className="rv-section-sub">
-            From healthcare to retail, logistics to F&B. Geomarketia is powering
+            From healthcare to retail, logistics to Food & Beverage. Geomarketia is powering
             smarter location decisions for businesses everywhere.
           </p>
         </div>

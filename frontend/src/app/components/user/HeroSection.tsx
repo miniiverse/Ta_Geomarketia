@@ -452,7 +452,7 @@ export default function HeroSection() {
             }}
           >
             GeoMarket Analytica helps businesses analyze market potential using
-            geospatial data. competitor distribution, and Al-driven insights.
+            geospatial data. competitor distribution, and Al driven insights.
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

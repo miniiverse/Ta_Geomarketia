@@ -57,7 +57,7 @@ const solutions: Solution[] = [
   {
     icon: <IconFnB />,
     title: "Food & Beverage",
-    desc: "Analyze and find strategic locations for F&B businesses.",
+    desc: "Analyze and find strategic locations for Food & Beverage businesses.",
     href: "/about/fnb",
   },
   {

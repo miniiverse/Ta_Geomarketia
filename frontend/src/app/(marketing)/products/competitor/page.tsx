@@ -561,7 +561,7 @@ const solutions = [
     number: "03",
     title: "Opportunity & Gap Identification",
     description:
-      "Discover market gaps and opportunities by comparing competitor presence with demographic and spatial data. Identify locations with high potential and low competition for better decision-making.",
+      "Discover market gaps and opportunities by comparing competitor presence with demographic and spatial data. Identify locations with high potential and low competition for better decision making.",
     accentColor: "#059669",
     accentBg: "#F0FDF4",
     accentBorder: "#BBF7D0",

@@ -2663,7 +2663,7 @@ const solutions = [
     number: "04",
     title: "Understand the Characteristics of Your Target Area",
     description:
-      "Perform in-depth site analysis to gain insights into customer distribution, traffic flow, nearby businesses, and accessibility. This helps you evaluate whether a location aligns with your business strategy before making investment decisions.",
+      "Perform in depth site analysis to gain insights into customer distribution, traffic flow, nearby businesses, and accessibility. This helps you evaluate whether a location aligns with your business strategy before making investment decisions.",
     accentColor: "#059669",
     accentBg: "#F0FDF4",
     accentBorder: "#BBF7D0",
@@ -3275,8 +3275,8 @@ export default function LocationIntelligencePage() {
                 margin: 0,
               }}
             >
-              Make informed decisions with data-driven geospatial insights.
-              Analyze, compare, and identify high-potential locations based on
+              Make informed decisions with data driven geospatial insights.
+              Analyze, compare, and identify high potential locations based on
               real market data to grow your business with confidence.
             </p>
           </div>

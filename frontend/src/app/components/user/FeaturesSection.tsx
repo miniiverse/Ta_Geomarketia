@@ -533,7 +533,7 @@ function AIVisual() {
 const content: Record<TabId, TabContent> = {
   location: {
     title: "Location Intelligence",
-    desc: "Make smarter location decisions by understanding the potential of each area through geospatial data and location-based insights.",
+    desc: "Make smarter location decisions by understanding the potential of each area through geospatial data and location based insights.",
     href: "/products/location",
     visual: <LocationVisual />,
   },
@@ -551,7 +551,7 @@ const content: Record<TabId, TabContent> = {
   },
   ai: {
     title: "AI Market Solutions",
-    desc: "Transform complex geospatial data into actionable insights with AI-driven market analysis.",
+    desc: "Transform complex geospatial data into actionable insights with AI driven market analysis.",
     href: "/products/ai",
     visual: <AIVisual />,
   },

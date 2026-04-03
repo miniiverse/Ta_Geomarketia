@@ -1521,7 +1521,7 @@ function IlloAIMarketSolutions() {
 const slides = [
   {
     title: "Location Intelligence",
-    desc: "Make smarter location decisions by understanding the potential of each area through geospatial data and location-based insights.",
+    desc: "Make smarter location decisions by understanding the potential of each area through geospatial data and location based insights.",
     illustration: <IlloLocationIntelligence />,
   },
   {

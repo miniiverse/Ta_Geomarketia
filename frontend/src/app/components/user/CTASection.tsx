@@ -156,7 +156,7 @@ export default function CtaSection() {
           <h2 className="cta-title">Want To Try Our App?</h2>
 
           <p className="cta-sub">
-            Sign up now and start location-based market analysis with accurate data
+            Sign up now and start location based market analysis with accurate data
             and interactive visualizations free to try.
           </p>
 

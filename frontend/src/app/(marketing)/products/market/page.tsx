@@ -505,7 +505,7 @@ const solutions = [
     number: "01",
     title: "Demand & Point of Interest Insights",
     description:
-      "Leverage point of interest (POI) data to understand demand patterns and identify high-potential areas across key industries. Gain insights into market activity and business distribution in sectors such as Food & Beverage, Retail, and Healthcare.",
+      "Leverage point of interest (POI) data to understand demand patterns and identify high potential areas across key industries. Gain insights into market activity and business distribution in sectors such as Food & Beverage, Retail, and Healthcare.",
     accentColor: "#1A56DB",
     accentBg: "#EFF6FF",
     accentBorder: "#BFDBFE",
@@ -523,7 +523,7 @@ const solutions = [
     number: "02",
     title: "Mobility & Foot Traffic Analysis",
     description:
-      "Analyze movement patterns and foot traffic to understand how people interact with different locations. Identify peak hours, visitor trends, and high-activity zones to support better location-based decisions.",
+      "Analyze movement patterns and foot traffic to understand how people interact with different locations. Identify peak hours, visitor trends, and high activity zones to support better location based decisions.",
     accentColor: "#0891B2",
     accentBg: "#ECFEFF",
     accentBorder: "#A5F3FC",
@@ -559,7 +559,7 @@ const solutions = [
     number: "04",
     title: "Enriched Data & External Insights",
     description:
-      "Enhance your analysis with additional contextual data to provide deeper insights and more accurate decision-making. Integrate various data sources to better understand market conditions and opportunities.",
+      "Enhance your analysis with additional contextual data to provide deeper insights and more accurate decision making. Integrate various data sources to better understand market conditions and opportunities.",
     accentColor: "#D97706",
     accentBg: "#FFFBEB",
     accentBorder: "#FDE68A",
@@ -689,7 +689,7 @@ export default function MarketInsightsPage() {
               Understanding
             </h1>
             <p style={{ fontFamily: "'Inter',system-ui,sans-serif", fontSize: "0.95rem", lineHeight: 1.78, color: "rgba(255,255,255,0.55)", marginBottom: 36, maxWidth: 460 }}>
-              Unlock deeper market understanding with comprehensive data and geospatial analysis. Discover hidden patterns, identify trends, and gain actionable insights to support smarter, data-driven business decisions across different markets.
+              Unlock deeper market understanding with comprehensive data and geospatial analysis. Discover hidden patterns, identify trends, and gain actionable insights to support smarter, data driven business decisions across different markets.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 40 }} />
           </div>
@@ -720,7 +720,7 @@ export default function MarketInsightsPage() {
               Decisions
             </h2>
             <p style={{ fontFamily: "'Inter',sans-serif", fontSize: "0.95rem", lineHeight: 1.75, color: "#64748B", margin: 0 }}>
-              Gain a deeper understanding of your market through geospatial insights. Analyze demand patterns across Food & Beverage, Retail, and Healthcare sectors, explore customer behavior, and uncover high-potential opportunities to support more strategic and data-driven business decisions.
+              Gain a deeper understanding of your market through geospatial insights. Analyze demand patterns across Food & Beverage, Retail, and Healthcare sectors, explore customer behavior, and uncover high potential opportunities to support more strategic and data driven business decisions.
             </p>
           </div>
 

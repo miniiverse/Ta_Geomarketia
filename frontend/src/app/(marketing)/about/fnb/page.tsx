@@ -285,7 +285,7 @@ const challenges = [
       problem: "Struggling to Identify High Potential Locations",
       solutionLabel: "Find the Optimal Location",
       solutionText:
-        "Leverage data-driven insights to identify the most promising locations by analyzing demographics, accessibility, competition, and economic activity ensuring every expansion decision is strategic and profitable.",
+        "Leverage data driven insights to identify the most promising locations by analyzing demographics, accessibility, competition, and economic activity ensuring every expansion decision is strategic and profitable.",
       accentColor: "#1A56DB",
       accentBg: "#EFF6FF",
       accentBorder: "#BFDBFE",

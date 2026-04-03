@@ -548,9 +548,9 @@ function useSlideIn(direction: "left" | "right", delay = 0) {
 const solutions = [
   {
     number: "01",
-    title: "AI-Powered Market Analysis",
+    title: "AI Powered Market Analysis",
     description:
-      "Leverage artificial intelligence to analyze market patterns, competitor distribution, and customer behavior. Gain deeper insights from complex datasets without manual analysis, enabling faster and more accurate decision-making.",
+      "Leverage artificial intelligence to analyze market patterns, competitor distribution, and customer behavior. Gain deeper insights from complex datasets without manual analysis, enabling faster and more accurate decision making.",
     accentColor: "#1A56DB",
     accentBg: "#EFF6FF",
     accentBorder: "#BFDBFE",
@@ -568,7 +568,7 @@ const solutions = [
     number: "02",
     title: "Smart Location Recommendation",
     description:
-      "Get AI-generated recommendations for the best business locations based on demand, competition, and surrounding factors. Identify high-potential areas tailored to your business type, including Food & Beverage, Retail, and Healthcare.",
+      "Get AI generated recommendations for the best business locations based on demand, competition, and surrounding factors. Identify high potential areas tailored to your business type, including Food & Beverage, Retail, and Healthcare.",
     accentColor: "#0891B2",
     accentBg: "#ECFEFF",
     accentBorder: "#A5F3FC",
@@ -711,7 +711,7 @@ export default function AIMarketSolutionsPage() {
               Insights
             </h1>
             <p style={{ fontFamily:"'Inter',system-ui,sans-serif", fontSize:"0.95rem", lineHeight:1.78, color:"rgba(255,255,255,0.55)", marginBottom:36, maxWidth:460 }}>
-              Empower your business with AI driven insights designed to support smarter and faster decision-making. Transform complex geospatial and market data into clear recommendations that adapt to your business needs and growth strategy.
+              Empower your business with AI driven insights designed to support smarter and faster decision making. Transform complex geospatial and market data into clear recommendations that adapt to your business needs and growth strategy.
             </p>
             <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:40 }} />
           </div>

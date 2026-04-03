@@ -856,7 +856,7 @@ const challenges = [
     problem: "Difficulty Finding the Best Location for New Branches",
     solutionLabel: "Location Intelligence Analysis",
     solutionText:
-      "Identify the most strategic locations for new store openings using geospatial data analysis. Geomarketia evaluates key factors such as demographics, foot traffic patterns, socioeconomic conditions, and land value to pinpoint high-potential areas. This ensures your business targets the right market, maximizes visibility, and invests in locations with strong growth potential.",
+      "Identify the most strategic locations for new store openings using geospatial data analysis. Geomarketia evaluates key factors such as demographics, foot traffic patterns, socioeconomic conditions, and land value to pinpoint high potential areas. This ensures your business targets the right market, maximizes visibility, and invests in locations with strong growth potential.",
     accentColor: "#1A56DB",
     accentBg: "#EFF6FF",
     accentBorder: "#BFDBFE",
@@ -874,7 +874,7 @@ const challenges = [
     problem: "Inefficient Store Network Performance",
     solutionLabel: "Store Network Optimization",
     solutionText:
-      "Analyze and optimize your existing store network using spatial insights. Geomarketia helps evaluate store performance based on location, customer reach, and surrounding market conditions. This enables data-driven decisions for relocating, expanding, or closing stores to improve overall efficiency and profitability.",
+      "Analyze and optimize your existing store network using spatial insights. Geomarketia helps evaluate store performance based on location, customer reach, and surrounding market conditions. This enables data driven decisions for relocating, expanding, or closing stores to improve overall efficiency and profitability.",
     accentColor: "#0891B2",
     accentBg: "#ECFEFF",
     accentBorder: "#A5F3FC",
@@ -1369,7 +1369,7 @@ export default function RetailPage() {
               }}
             >
               Geomarketia enables retail businesses to analyze customer
-              distribution, foot traffic, and location-based factors to choose
+              distribution, foot traffic, and location based factors to choose
               the best store locations, optimize networks, and increase sales
               performance.
             </p>
