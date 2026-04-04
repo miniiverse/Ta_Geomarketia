@@ -9,14 +9,13 @@ interface ProjectCardProps {
   category?: string;
   price?: string;
   layerCount?: number;
-  status?: "Available" | "Popular" | "New";
+  status?: "Newest" | "Oldest";
   image?: string;
 }
 
-const statusConfig = {
-  Available: { color: "#059669", bg: "#ECFDF5", border: "#A7F3D0" },
-  Popular: { color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
-  New: { color: "#1A56DB", bg: "#EBF3FF", border: "#BFDBFE" },
+const statusConfig: Record<"Newest" | "Oldest", { color: string; bg: string; border: string }> = {
+  Newest: { color: "#1A56DB", bg: "#EBF3FF", border: "#BFDBFE" },
+  Oldest: { color: "#6B7280", bg: "#F3F4F6", border: "#D1D5DB" },
 };
 
 export default function ProjectCard({
@@ -26,7 +25,7 @@ export default function ProjectCard({
   category = "Retail",
   price = "Rp 850.000",
   layerCount = 5,
-  status = "Popular",
+  status = "Newest",
   image = "https://source.unsplash.com/400x200/?map,city",
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
@@ -115,11 +114,11 @@ export default function ProjectCard({
           display: "flex", alignItems: "center", gap: 4,
         }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-            <path d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z" stroke="white" strokeWidth="2" />
-            <circle cx="12" cy="11" r="2" fill="white" />
+            <path d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z" stroke="#000000" strokeWidth="2" />
+            <circle cx="12" cy="11" r="2" fill="#000000" />
           </svg>
           <span style={{
-            fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.9)",
+            fontSize: 10, fontWeight: 700, color: "#000000",
             fontFamily: "'JetBrains Mono',monospace", letterSpacing: "0.04em",
           }}>
             {region}

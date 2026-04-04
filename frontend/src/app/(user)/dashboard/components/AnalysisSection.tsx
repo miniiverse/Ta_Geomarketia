@@ -304,7 +304,7 @@ export default function AnalysisSection() {
             My Analysis
           </h2>
         </div>
-        <Link href="/transactions"
+        <Link href="/myanalysis"
           style={{
             display: "inline-flex",
             alignItems: "center",

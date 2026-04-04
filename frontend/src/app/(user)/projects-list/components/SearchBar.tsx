@@ -185,75 +185,6 @@ export default function ProjectsHeader() {
               left: 12,
               top: "50%",
               transform: "translateY(-50%)",
-              color: "#1A56DB",
-              pointerEvents: "none",
-              zIndex: 1,
-            }}
-          >
-            <path
-              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <select
-            style={{
-              padding: "11px 14px 11px 34px",
-              borderRadius: 12,
-              border: "1.5px solid #BFDBFE",
-              background: "#F0F7FF",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "#1A56DB",
-              cursor: "pointer",
-              fontFamily: "'Inter', system-ui, sans-serif",
-              outline: "none",
-              appearance: "none",
-              paddingRight: 32,
-            }}
-          >
-            <option>All Projects</option>
-            <option>Retail</option>
-            <option>Food & Beverage</option>
-            <option>Healthcare</option>
-          </select>
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{
-              position: "absolute",
-              right: 10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-              color: "#1A56DB",
-            }}
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        <div style={{ position: "relative" }}>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
               color: "#64748B",
               pointerEvents: "none",
               zIndex: 1,
@@ -282,10 +213,9 @@ export default function ProjectsHeader() {
               paddingRight: 32,
             }}
           >
-            <option>Most Relevant</option>
-            <option>Newest</option>
-            <option>Oldest</option>
-            <option>Price: Low to High</option>
+            <option>Price</option>
+            <option>Low</option>
+            <option>High</option>
           </select>
           <svg
             width="12"

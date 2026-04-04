@@ -268,66 +268,6 @@ export default function ProjectsFilterSidebar() {
               fontFamily: "'Inter, sans-serif'",
             }}
           >
-            DATE RANGE
-          </p>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={rangeValue}
-            onChange={(e) => setRangeValue(Number(e.target.value))}
-            style={{ width: "100%", accentColor: "#1A56DB", cursor: "pointer" }}
-          />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 6,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: "#1A56DB",
-                fontFamily: "'Inter, system-ui, sans-serif'",
-                background: "#EBF3FF",
-                padding: "2px 7px",
-                borderRadius: 5,
-                border: "1px solid #BFDBFE",
-              }}
-            >
-              Jan 2026
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: "#1A56DB",
-                fontFamily: "'Inter, system-ui, sans-serif'",
-                background: "#EBF3FF",
-                padding: "2px 7px",
-                borderRadius: 5,
-                border: "1px solid #BFDBFE",
-              }}
-            >
-              Mei 2026
-            </span>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 22 }}>
-          <p
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              marginBottom: 10,
-              color: "rgba(26,86,219,0.5)",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontFamily: "'Inter, sans-serif'",
-            }}
-          >
             SORT BY
           </p>
           <div style={{ position: "relative" }}>
@@ -371,7 +311,6 @@ export default function ProjectsFilterSidebar() {
               <option>Most Relevant</option>
               <option>Newest</option>
               <option>Oldest</option>
-              <option>Price: Low to High</option>
             </select>
           </div>
         </div>
