@@ -6,7 +6,11 @@ import TransactionsSection from "./components/TransactionsSection";
 export default function DashboardPage() {
   return (
     <>
-      <div style={{ padding: "32px" }}>
+      <div style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "0 40px 40px",
+      }}>
         <WelcomeCard />
         <StatsSection />
         <AnalysisSection />

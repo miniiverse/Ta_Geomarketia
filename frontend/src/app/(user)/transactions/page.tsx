@@ -8,9 +8,9 @@ export default function TransactionPage() {
   return (
     <div
       style={{
-        minHeight: "100vh",
-        background: "#ffffff",
-        padding: "36px 40px",
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "40px 40px 40px",
         fontFamily:
           "'DM Sans', 'Plus Jakarta Sans', 'Inter', sans-serif",
       }}

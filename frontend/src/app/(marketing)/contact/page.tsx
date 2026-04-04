@@ -386,114 +386,113 @@ function HeroContact() {
         />
       ))}
 
-<div className="ct-hero-grid">
+      <div className="ct-hero-grid">
+        <div
+          style={{
+            animation: "ctFadeUp 0.8s ease both",
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
           <div
             style={{
-              animation: "ctFadeUp 0.8s ease both",
-              position: "relative",
-              zIndex: 2,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "rgba(37,99,235,0.15)",
+              border: "1px solid rgba(37,99,235,0.4)",
+              borderRadius: 100,
+              padding: "5px 14px",
+              marginBottom: 24,
             }}
           >
-            <div
+            <span
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                background: "rgba(37,99,235,0.15)",
-                border: "1px solid rgba(37,99,235,0.4)",
-                borderRadius: 100,
-                padding: "5px 14px",
-                marginBottom: 24,
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "#22D3EE",
+                boxShadow: "0 0 8px #22D3EE",
+                display: "inline-block",
+                animation: "ctBlink 2s infinite",
               }}
-            >
-              <span
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: "#22D3EE",
-                  boxShadow: "0 0 8px #22D3EE",
-                  display: "inline-block",
-                  animation: "ctBlink 2s infinite",
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: "'Inter',sans-serif",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "#93C5FD",
-                  letterSpacing: "0.07em",
-                  textTransform: "uppercase" as const,
-                }}
-              >
-                Support 24/7
-              </span>
-            </div>
-
-            <h1
+            />
+            <span
               style={{
                 fontFamily: "'Inter',sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(2rem,3.4vw,3.2rem)",
-                lineHeight: 1.12,
-                color: "#ffffff",
-                marginBottom: 20,
-                letterSpacing: "-0.03em",
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#93C5FD",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase" as const,
               }}
             >
-              Contact{" "}
-              <span
-                style={{
-                  background: "linear-gradient(90deg,#60A5FA,#34D399)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Our Team
-              </span>
-            </h1>
-
-            <p
-              style={{
-                fontFamily: "'Inter',sans-serif",
-                fontSize: 16,
-                color: "rgba(255,255,255,0.55)",
-                lineHeight: 1.78,
-                maxWidth: 460,
-                marginBottom: 36,
-              }}
-            >
-              Have questions about the platform, features, or services? Reach
-              out to us through WhatsApp for further information and assistance.
-            </p>
-
-            <a
-              href="https://wa.me/6281234567890"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ct-wa-btn"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.077a.75.75 0 0 0 .92.92l5.23-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.694 9.694 0 0 1-4.944-1.352l-.355-.21-3.676 1.043 1.058-3.564-.23-.368A9.692 9.692 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
-              </svg>
-              Chat via WhatsApp →
-            </a>
+              Support 24/7
+            </span>
           </div>
 
-          <div
+          <h1
             style={{
-              animation: "ctFadeUp 0.8s 0.2s ease both",
-              position: "relative",
-              zIndex: 2,
+              fontFamily: "'Inter',sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(2rem,3.4vw,3.2rem)",
+              lineHeight: 1.12,
+              color: "#ffffff",
+              marginBottom: 20,
+              letterSpacing: "-0.03em",
             }}
           >
-            <HeroVisual />
-          </div>
+            Contact{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg,#60A5FA,#34D399)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Our Team
+            </span>
+          </h1>
+
+          <p
+            style={{
+              fontFamily: "'Inter',sans-serif",
+              fontSize: 16,
+              color: "rgba(255,255,255,0.55)",
+              lineHeight: 1.78,
+              maxWidth: 460,
+              marginBottom: 36,
+            }}
+          >
+            Have questions about the platform, features, or services? Reach out
+            to us through WhatsApp for further information and assistance.
+          </p>
+
+          <a
+            href="https://wa.me/6281234567890"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ct-wa-btn"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.077a.75.75 0 0 0 .92.92l5.23-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.694 9.694 0 0 1-4.944-1.352l-.355-.21-3.676 1.043 1.058-3.564-.23-.368A9.692 9.692 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
+            </svg>
+            Chat via WhatsApp →
+          </a>
         </div>
-      
+
+        <div
+          style={{
+            animation: "ctFadeUp 0.8s 0.2s ease both",
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          <HeroVisual />
+        </div>
+      </div>
     </section>
   );
 }
@@ -728,86 +727,96 @@ export default function ContactPage() {
         }
 
         .ct-cards-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 22px;
-          margin-bottom: 40px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 380px));
+        gap: 24px;
+        margin-bottom: 40px;
+        justify-content: center;
         }
+
         .ct-info-card {
-          background: #ffffff;
-          border: 1px solid #E2EEFF;
-          border-radius: 22px;
-          padding: 32px 28px;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          position: relative;
-          overflow: hidden;
-          transition: border-color .25s, box-shadow .25s, transform .25s;
+        background: #ffffff;
+        border: 1px solid #E2EEFF;
+        border-radius: 18px;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color .25s, box-shadow .25s, transform .25s;
+        width: 100%;
+        max-width: 380px;
         }
         .ct-info-card:hover {
-          border-color: #93C5FD;
-          box-shadow: 0 12px 40px rgba(26,86,219,0.12);
-          transform: translateY(-6px);
+        border-color: #93C5FD;
+        box-shadow: 0 12px 40px rgba(26,86,219,0.12);
+        transform: translateY(-6px);
         }
+
         .ct-info-card-accent {
-          position: absolute;
-          left: 0; top: 0; bottom: 0;
-          width: 4px;
-          background: linear-gradient(180deg, #1A56DB 0%, #93C5FD 100%);
-          border-radius: 4px 0 0 4px;
-          opacity: 0;
-          transition: opacity .25s;
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #1A56DB 0%, #93C5FD 100%);
+        border-radius: 4px 0 0 4px;
+        opacity: 0;
+        transition: opacity .25s;
         }
         .ct-info-card:hover .ct-info-card-accent { opacity: 1; }
+
         .ct-info-icon-wrap {
-          width: 52px;
-          height: 52px;
-          border-radius: 14px;
-          background: #EFF6FF;
-          border: 1px solid #BFDBFE;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 4px;
-          transition: background .25s;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #EFF6FF;
+        border: 1px solid #BFDBFE;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2px;
+        transition: background .25s;
         }
         .ct-info-card:hover .ct-info-icon-wrap { background: #DBEAFE; border-color: #93C5FD; }
+
         .ct-info-tag {
-          display: inline-flex;
-          align-items: center;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          border: 1px solid;
-          border-radius: 100px;
-          padding: 3px 10px;
-          align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        border: 1px solid;
+        border-radius: 100px;
+        padding: 2px 9px;
+        align-self: flex-start;
         }
+
         .ct-info-value {
-          font-family: 'Inter', sans-serif;
-          font-size: 17px;
-          font-weight: 800;
-          color: #1A56DB;
-          letter-spacing: -0.01em;
-          line-height: 1.2;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-weight: 800;
+        color: #1A56DB;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
         }
+
         .ct-info-sub {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          color: #94A3B8;
-          line-height: 1.5;
-          flex: 1;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        color: #94A3B8;
+        line-height: 1.5;
+        flex: 1;
         }
+
         .ct-info-cta {
-          display: inline-flex;
-          align-items: center;
-          font-family: 'Inter', sans-serif;
-          font-size: 13px;
-          font-weight: 700;
-          color: #1A56DB;
-          text-decoration: none;
-          margin-top: 6px;
+        display: inline-flex;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: #1A56DB;
+        text-decoration: none;
+        margin-top: 4px;
         }
         .ct-info-cta:hover { text-decoration: underline; }
 
