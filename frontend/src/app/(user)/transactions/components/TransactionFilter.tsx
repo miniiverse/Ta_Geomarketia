@@ -41,7 +41,7 @@ export default function TransactionFilter({
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      {/* Search */}
+
       <div style={{ flex: 1, minWidth: 240, position: "relative" }}>
         <svg
           style={{
@@ -81,7 +81,6 @@ export default function TransactionFilter({
         />
       </div>
 
-      {/* Filter Tabs */}
       <div
         style={{
           display: "flex",
@@ -115,7 +114,7 @@ export default function TransactionFilter({
         ))}
       </div>
 
-      {/* Sort Dropdown */}
+
       <div style={{ position: "relative" }}>
         <button
           onClick={() => setDropdownOpen((v) => !v)}

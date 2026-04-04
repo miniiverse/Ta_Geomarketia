@@ -74,7 +74,6 @@ function PaginationButton({
 export default function TransactionList({ transactions }: TransactionListProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Reset to page 1 whenever the filtered list changes
   useEffect(() => {
     setCurrentPage(1);
   }, [transactions]);
@@ -127,7 +126,6 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             ))}
           </div>
 
-          {/* Pagination */}
           <div
             style={{
               display: "flex",
@@ -137,7 +135,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               marginTop: 24,
             }}
           >
-            {/* Prev */}
+
             <PaginationButton
               onClick={() => setCurrentPage((p) => p - 1)}
               disabled={currentPage === 1}
@@ -147,7 +145,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               </svg>
             </PaginationButton>
 
-            {/* Page numbers */}
+      
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <PaginationButton
                 key={page}
@@ -159,7 +157,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               </PaginationButton>
             ))}
 
-            {/* Next */}
+           
             <PaginationButton
               onClick={() => setCurrentPage((p) => p + 1)}
               disabled={currentPage === totalPages}

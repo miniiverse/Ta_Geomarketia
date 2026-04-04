@@ -55,7 +55,6 @@ export default function TransactionHeader({
         marginBottom: 32,
       }}
     >
-      {/* Left: Title */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <div
           style={{
@@ -121,7 +120,6 @@ export default function TransactionHeader({
         </div>
       </div>
 
-      {/* Right: Stats */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <StatsCard
           count={total}
