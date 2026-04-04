@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const C = {
   blue: "#1A56DB",
@@ -23,11 +23,12 @@ export default function WelcomeCard({
     <div
       style={{
         width: "100%",
-        background: C.dark,
+        background:
+          "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #EFF6FF 100%)",
         borderRadius: 20,
-        border: "1px solid rgba(26,86,219,0.3)",
+        border: "1px solid #BFDBFE",
         boxShadow:
-          "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)",
+          "0 8px 40px rgba(26,86,219,0.08), 0 0 0 1px rgba(26,86,219,0.05)",
         overflow: "hidden",
         position: "relative",
         fontFamily: "'Inter', sans-serif",
@@ -38,7 +39,7 @@ export default function WelcomeCard({
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "radial-gradient(rgba(26,86,219,0.2) 1px, transparent 1px)",
+            "radial-gradient(rgba(26,86,219,0.06) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
           pointerEvents: "none",
         }}
@@ -53,7 +54,7 @@ export default function WelcomeCard({
           height: 300,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(26,86,219,0.22) 0%, transparent 65%)",
+            "radial-gradient(circle, rgba(26,86,219,0.08) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
@@ -67,7 +68,7 @@ export default function WelcomeCard({
           height: 240,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 65%)",
+            "radial-gradient(circle, rgba(26,86,219,0.06) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
@@ -75,7 +76,7 @@ export default function WelcomeCard({
       <div
         style={{
           height: 3,
-          background: "linear-gradient(90deg, #1A56DB, #34D399, #60A5FA)",
+          background: "linear-gradient(90deg, #93C5FD, #1A56DB, #93C5FD)",
           position: "relative",
           zIndex: 2,
         }}
@@ -102,7 +103,7 @@ export default function WelcomeCard({
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
                 lineHeight: 1.15,
-                color: "#fff",
+                color: "#1A56DB",
               }}
             >
               Welcome back,{" "}
@@ -126,15 +127,15 @@ export default function WelcomeCard({
               alignItems: "center",
               gap: 8,
               padding: "8px 14px",
-              background: "rgba(26,86,219,0.12)",
-              border: "1px solid rgba(26,86,219,0.28)",
+              background: "rgba(26,86,219,0.07)",
+              border: "1px solid #BFDBFE",
               borderRadius: 10,
             }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
               <polyline
                 points="22 12 18 12 15 21 9 3 6 12 2 12"
-                stroke="#60A5FA"
+                stroke="#1A56DB"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -144,7 +145,7 @@ export default function WelcomeCard({
               style={{
                 fontSize: 12,
                 fontWeight: 600,
-                color: "#60A5FA",
+                color: "#1A56DB",
                 whiteSpace: "nowrap",
               }}
             >
@@ -156,7 +157,7 @@ export default function WelcomeCard({
             style={{
               width: 1,
               height: 34,
-              background: "rgba(255,255,255,0.08)",
+              background: "#BFDBFE",
             }}
           />
 
@@ -169,9 +170,9 @@ export default function WelcomeCard({
               gap: 10,
               padding: "6px 12px 6px 6px",
               background: userHovered
-                ? "rgba(26,86,219,0.18)"
-                : "rgba(255,255,255,0.05)",
-              border: `1px solid ${userHovered ? "rgba(26,86,219,0.45)" : "rgba(255,255,255,0.08)"}`,
+                ? "rgba(26,86,219,0.1)"
+                : "rgba(26,86,219,0.05)",
+              border: `1px solid ${userHovered ? "#93C5FD" : "#BFDBFE"}`,
               borderRadius: 12,
               cursor: "pointer",
               transition: "all 0.2s ease",
@@ -183,7 +184,7 @@ export default function WelcomeCard({
                 height: 34,
                 borderRadius: "50%",
                 overflow: "hidden",
-                border: "2px solid rgba(26,86,219,0.5)",
+                border: "2px solid #93C5FD",
                 flexShrink: 0,
               }}
             >
@@ -198,7 +199,7 @@ export default function WelcomeCard({
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: "#fff",
+                  color: "#1E3A8A",
                   lineHeight: 1.2,
                 }}
               >
@@ -207,7 +208,7 @@ export default function WelcomeCard({
               <div
                 style={{
                   fontSize: 10,
-                  color: "rgba(96,165,250,0.6)",
+                  color: "#60A5FA",
                   lineHeight: 1.3,
                   fontWeight: 500,
                 }}
@@ -222,8 +223,8 @@ export default function WelcomeCard({
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         @keyframes wcPulse {
-          0%, 100% { opacity: 1; box-shadow: 0 0 6px #34D399; }
-          50%       { opacity: 0.4; box-shadow: 0 0 14px #34D399; }
+          0%, 100% { opacity: 1; box-shadow: 0 0 6px #93C5FD; }
+          50%       { opacity: 0.4; box-shadow: 0 0 14px #93C5FD; }
         }
       `}</style>
     </div>

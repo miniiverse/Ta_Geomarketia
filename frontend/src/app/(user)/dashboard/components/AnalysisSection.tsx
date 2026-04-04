@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/dist/client/link";
 import { useState } from "react";
 
 const data = [
@@ -7,10 +8,6 @@ const data = [
     title: "Shopping Behavior Map",
     region: "Batam Center",
     progress: 45,
-    status: "In Progress",
-    statusColor: "#D97706",
-    statusBg: "#FFFBEB",
-    statusBorder: "#FDE68A",
     image: "https://source.unsplash.com/400x200/?map",
     layerCount: 3,
     lastUpdate: "2h ago",
@@ -19,10 +16,6 @@ const data = [
   {
     title: "Demographic Analysis",
     region: "Tanjung Pinang",
-    status: "Completed",
-    statusColor: "#059669",
-    statusBg: "#ECFDF5",
-    statusBorder: "#A7F3D0",
     image: "https://source.unsplash.com/400x200/?city,map",
     layerCount: 6,
     lastUpdate: "1d ago",
@@ -31,14 +24,19 @@ const data = [
   {
     title: "Market Potential Map",
     region: "Tanjung Balai Karimun",
-    status: "Completed",
-    statusColor: "#059669",
-    statusBg: "#ECFDF5",
-    statusBorder: "#A7F3D0",
     image: "https://source.unsplash.com/400x200/?satellite,map",
     layerCount: 4,
     lastUpdate: "3d ago",
     coords: "-7.7956°S  110.3695°E",
+  },
+  {
+    title: "Population Density Map",
+    region: "Batam Kota",
+    progress: 72,
+    image: "https://source.unsplash.com/400x200/?aerial,map",
+    layerCount: 5,
+    lastUpdate: "5h ago",
+    coords: "-1.1301°N  104.0529°E",
   },
 ];
 
@@ -52,12 +50,12 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
       style={{
         background: "#ffffff",
         border: `1.5px solid ${hovered ? "#BFDBFE" : "#E0ECFF"}`,
-        borderRadius: 18,
+        borderRadius: 14,
         overflow: "hidden",
         transition: "all 0.25s ease",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
         boxShadow: hovered
-          ? "0 12px 40px rgba(26,86,219,0.14), 0 2px 8px rgba(0,0,0,0.06)"
+          ? "0 10px 30px rgba(26,86,219,0.14), 0 2px 8px rgba(0,0,0,0.06)"
           : "0 2px 10px rgba(26,86,219,0.07)",
         cursor: "default",
         animationName: "asCardIn",
@@ -67,7 +65,7 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
         animationTimingFunction: "ease",
       }}
     >
-      <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
+      <div style={{ position: "relative", height: 110, overflow: "hidden" }}>
         <img
           src={item.image}
           alt={item.title}
@@ -89,50 +87,15 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
               "linear-gradient(180deg, rgba(26,86,219,0.08) 0%, rgba(26,86,219,0.4) 100%)",
           }}
         />
-        <div style={{ position: "absolute", top: 10, left: 12 }}>
+        <div style={{ position: "absolute", top: 8, right: 8 }}>
           <span
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 5,
-              padding: "4px 10px",
+              gap: 4,
+              padding: "3px 8px",
               borderRadius: 6,
-              fontSize: 10,
-              fontWeight: 700,
-              background: item.statusBg,
-              color: item.statusColor,
-              border: `1px solid ${item.statusBorder}`,
-              backdropFilter: "blur(8px)",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              fontFamily: "'inter', sans-serif",
-            }}
-          >
-            <span
-              style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: item.statusColor,
-                display: "inline-block",
-                animation:
-                  item.status === "In Progress"
-                    ? "asDot 1.5s ease-in-out infinite"
-                    : "none",
-              }}
-            />
-            {item.status}
-          </span>
-        </div>
-        <div style={{ position: "absolute", top: 10, right: 12 }}>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "4px 10px",
-              borderRadius: 6,
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: 600,
               background: "rgba(255,255,255,0.85)",
               color: "#1A56DB",
@@ -140,7 +103,7 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
               backdropFilter: "blur(8px)",
             }}
           >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                 stroke="#1A56DB"
@@ -155,40 +118,40 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
         <div
           style={{
             position: "absolute",
-            bottom: 10,
-            left: 12,
+            bottom: 7,
+            left: 10,
             display: "flex",
             alignItems: "center",
-            gap: 6,
+            gap: 5,
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
-            fontSize: 9,
-            color: "rgba(255,255,255,0.9)",
+            fontSize: 8,
+            color: "#000",
             fontWeight: 600,
             letterSpacing: "0.04em",
           }}
         >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z"
-              stroke="white"
+              stroke="#000"
               strokeWidth="2"
             />
-            <circle cx="12" cy="11" r="2" fill="white" />
+            <circle cx="12" cy="11" r="2" fill="#000" />
           </svg>
           {item.coords}
         </div>
       </div>
 
-      <div style={{ padding: "16px 18px 18px" }}>
-        <div style={{ marginBottom: 12 }}>
+      <div style={{ padding: "12px 14px 14px" }}>
+        <div style={{ marginBottom: 9 }}>
           <div
             style={{
-              fontSize: 10,
-              color: "#1A56DB",
+              fontSize: 9,
+              color: "#0F172A",
               fontWeight: 700,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              marginBottom: 3,
+              marginBottom: 2,
             }}
           >
             {item.region}
@@ -196,7 +159,7 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
           <p
             style={{
               margin: 0,
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: 700,
               color: "#0F172A",
               letterSpacing: "-0.02em",
@@ -207,63 +170,24 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
           </p>
         </div>
 
-        {item.progress !== undefined && (
-          <div style={{ marginBottom: 12 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 6,
-              }}
-            >
-              <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}>
-                Analysis Progress
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: "#D97706",
-                  fontFamily: "'JetBrains Mono',monospace",
-                }}
-              >
-                {item.progress}%
-              </span>
-            </div>
-            <div
-              style={{ height: 5, background: "#EBF3FF", borderRadius: 999 }}
-            >
-              <div
-                style={{
-                  width: `${item.progress}%`,
-                  height: "100%",
-                  background: "linear-gradient(90deg, #1A56DB, #60A5FA)",
-                  borderRadius: 999,
-                  boxShadow: "0 0 6px rgba(26,86,219,0.35)",
-                }}
-              />
-            </div>
-          </div>
-        )}
-
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 14,
+            marginBottom: 10,
           }}
         >
           <span
             style={{
-              fontSize: 11,
+              fontSize: 10,
               color: "#94A3B8",
               display: "flex",
               alignItems: "center",
               gap: 4,
             }}
           >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 stroke="#94A3B8"
@@ -275,92 +199,45 @@ function MapCard({ item, i }: { item: (typeof data)[0]; i: number }) {
           </span>
         </div>
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            style={{
-              flex: 1,
-              padding: "9px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "#1A56DB",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              boxShadow: "0 4px 14px rgba(26,86,219,0.3)",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#1036A0";
-              (e.currentTarget as HTMLElement).style.transform =
-                "translateY(-1px)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#1A56DB";
-              (e.currentTarget as HTMLElement).style.transform =
-                "translateY(0)";
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Open Map
-          </button>
-
-          {item.status === "Completed" && (
-            <button
-              style={{
-                flex: 1,
-                padding: "9px 0",
-                borderRadius: 10,
-                border: "1.5px solid #A7F3D0",
-                background: "#ECFDF5",
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#059669",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#D1FAE5";
-                (e.currentTarget as HTMLElement).style.transform =
-                  "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#ECFDF5";
-                (e.currentTarget as HTMLElement).style.transform =
-                  "translateY(0)";
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  stroke="#059669"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Export
-            </button>
-          )}
-        </div>
+        <button
+          style={{
+            width: "100%",
+            padding: "8px 0",
+            borderRadius: 8,
+            border: "none",
+            background: "#1A56DB",
+            color: "#fff",
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            boxShadow: "0 4px 14px rgba(26,86,219,0.3)",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "#1036A0";
+            (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "#1A56DB";
+            (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Open Map
+        </button>
       </div>
     </div>
   );
@@ -372,10 +249,9 @@ export default function AnalysisSection() {
       style={{
         marginTop: 28,
         fontFamily: "'Inter', system-ui, sans-serif",
-        background:
-          "linear-gradient(135deg, #EBF3FF 0%, #F0F7FF 50%, #E8F1FF 100%)",
+        background: "linear-gradient(135deg, #EBF3FF 0%, #F0F7FF 50%, #E8F1FF 100%)",
         borderRadius: 20,
-        padding: "24px",
+        padding: "20px",
         border: "1px solid #DBEAFE",
         position: "relative",
         overflow: "hidden",
@@ -385,8 +261,7 @@ export default function AnalysisSection() {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "radial-gradient(rgba(26,86,219,0.08) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(rgba(26,86,219,0.08) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
           pointerEvents: "none",
           borderRadius: 20,
@@ -400,7 +275,7 @@ export default function AnalysisSection() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          marginBottom: 20,
+          marginBottom: 16,
         }}
       >
         <div>
@@ -429,12 +304,12 @@ export default function AnalysisSection() {
             My Analysis
           </h2>
         </div>
-        <button
+        <Link href="/transactions"
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
-            padding: "8px 16px",
+            padding: "7px 14px",
             background: "#1A56DB",
             border: "none",
             borderRadius: 10,
@@ -455,7 +330,7 @@ export default function AnalysisSection() {
           }
         >
           View All
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
             <path
               d="M9 18l6-6-6-6"
               stroke="currentColor"
@@ -464,7 +339,7 @@ export default function AnalysisSection() {
               strokeLinejoin="round"
             />
           </svg>
-        </button>
+        </Link>
       </div>
 
       <div
@@ -472,8 +347,8 @@ export default function AnalysisSection() {
           position: "relative",
           zIndex: 1,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 16,
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 12,
         }}
       >
         {data.map((item, i) => (
