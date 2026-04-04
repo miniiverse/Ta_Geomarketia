@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 
 const transactions = [
-  { id: "INV-001", project: "Retail Site Selection", category: "Retail", payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp70.000" },
-  { id: "INV-002", project: "F&B Market Mapping", category: "Food & Beverage", payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp30.000" },
-  { id: "INV-003", project: "Healthcare Facility Planning", category: "Healthcare", payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp60.000" },
-  { id: "INV-004", project: "Healthcare Access Gap", category: "Healthcare", payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp40.000" },
+  { id: "INV-001", project: "Retail Site Selection",       category: "Retail",          payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp70.000" },
+  { id: "INV-002", project: "F&B Market Mapping",           category: "Food & Beverage", payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp30.000" },
+  { id: "INV-003", project: "Healthcare Facility Planning", category: "Healthcare",      payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp60.000" },
+  { id: "INV-004", project: "Healthcare Access Gap",        category: "Healthcare",      payment: "QRIS", status: "Paid", date: "Mar 10, 2026", amount: "Rp40.000" },
 ];
 
 const statusConfig: Record<string, { color: string; bg: string; dot: string }> = {
@@ -23,14 +22,6 @@ const categoryConfig: Record<string, { color: string; bg: string }> = {
 };
 
 export default function RecentTransactions() {
-  const [syncing, setSyncing] = useState(false);
-  const [dateFilter, setDateFilter] = useState("Today");
-
-  const handleSync = () => {
-    setSyncing(true);
-    setTimeout(() => setSyncing(false), 2000);
-  };
-
   return (
     <div
       style={{
@@ -38,7 +29,6 @@ export default function RecentTransactions() {
         borderRadius: "18px",
         border: "1px solid #f1f5f9",
         boxShadow: "0 1px 8px rgba(26,86,219,0.05)",
-        marginBottom: "24px",
         overflow: "hidden",
       }}
     >
@@ -49,8 +39,6 @@ export default function RecentTransactions() {
           justifyContent: "space-between",
           padding: "20px 22px 16px",
           borderBottom: "1px solid #f8fafc",
-          flexWrap: "wrap",
-          gap: "12px",
         }}
       >
         <div>
@@ -70,89 +58,14 @@ export default function RecentTransactions() {
             {transactions.length} transaksi ditemukan
           </p>
         </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ position: "relative" }}>
-            <select
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              style={{
-                appearance: "none",
-                background: "#F8FAFF",
-                border: "1px solid #BFDBFE",
-                borderRadius: "10px",
-                padding: "7px 32px 7px 12px",
-                fontSize: "12.5px",
-                fontWeight: 500,
-                fontFamily: "'Inter', sans-serif",
-                color: "#1A56DB",
-                cursor: "pointer",
-                outline: "none",
-              }}
-            >
-              <option>Today</option>
-              <option>This Week</option>
-              <option>This Month</option>
-            </select>
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#1A56DB"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
-
-          <button
-            onClick={handleSync}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              padding: "7px 16px",
-              borderRadius: "10px",
-              background: syncing ? "#1036A0" : "#1A56DB",
-              border: "none",
-              color: "white",
-              fontSize: "12.5px",
-              fontWeight: 600,
-              fontFamily: "'Inter', sans-serif",
-              cursor: syncing ? "not-allowed" : "pointer",
-              transition: "background 0.2s",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ animation: syncing ? "spin 1s linear infinite" : "none" }}
-            >
-              <path d="M23 4v6h-6" />
-              <path d="M1 20v-6h6" />
-              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-            </svg>
-            {syncing ? "Syncing..." : "Sync Midtrans"}
-          </button>
-        </div>
       </div>
 
+ 
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#F8FAFF" }}>
-              {["Invoice ID", "Project Name", "Category", "Payment", "Amount", "Status", "Date", "Actions"].map((col) => (
+              {["Invoice ID", "Project Name", "Category", "Payment", "Amount", "Status", "Date"].map((col) => (
                 <th
                   key={col}
                   style={{
@@ -238,32 +151,6 @@ export default function RecentTransactions() {
                   <td style={{ padding: "13px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", color: "#64748b", whiteSpace: "nowrap" }}>
                     {tx.date}
                   </td>
-                  <td style={{ padding: "13px 18px", whiteSpace: "nowrap" }}>
-                    <button
-                      style={{
-                        background: "#EBF3FF",
-                        color: "#1A56DB",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "6px 14px",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
-                        cursor: "pointer",
-                        transition: "all 0.15s",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "#1A56DB";
-                        (e.currentTarget as HTMLElement).style.color = "#fff";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "#EBF3FF";
-                        (e.currentTarget as HTMLElement).style.color = "#1A56DB";
-                      }}
-                    >
-                      Detail
-                    </button>
-                  </td>
                 </tr>
               );
             })}
@@ -312,10 +199,6 @@ export default function RecentTransactions() {
           </svg>
         </Link>
       </div>
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 }

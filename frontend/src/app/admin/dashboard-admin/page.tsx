@@ -3,6 +3,8 @@
 import StatsCard from "./components/StatsCard";
 import RecentTransactions from "./components/RecentTransactions";
 import ProjectList from "./components/ProjectList";
+import MonthlyIncomeCard from "./components/MonthlyIncomeCard";
+import ProductSalesCard from "./components/ProductSalesCard";
 
 export default function DashboardAdminPage() {
   return (
@@ -112,12 +114,21 @@ export default function DashboardAdminPage() {
           </span>
         </div>
       </div>
+      
 
       <StatsCard />
 
-      <RecentTransactions />
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginBottom: "24px" }}>
+  <MonthlyIncomeCard />
+  <ProductSalesCard />
+</div>
 
-      <ProjectList />
+    
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+  <ProjectList />
+  <RecentTransactions />
+</div>
     </div>
   );
 }
