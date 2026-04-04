@@ -1,129 +1,157 @@
-const IconReceipt = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#1A56DB"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-    <path d="M16 8H8M16 12H8M12 16H8" />
-  </svg>
-);
+"use client";
 
-export default function TransactionHeader() {
-  const chips = [
-    { label: "Total", value: "12", color: "#1A56DB", bg: "#EFF6FF" },
-    { label: "Paid", value: "7", color: "#16A34A", bg: "#F0FDF4" },
-    { label: "Pending", value: "3", color: "#D97706", bg: "#FFFBEB" },
-    { label: "Failed", value: "2", color: "#DC2626", bg: "#FEF2F2" },
-  ];
+import React from "react";
 
+interface StatsCardProps {
+  count: number;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+}
+
+function StatsCard({ count, label, color, bg, border }: StatsCardProps) {
   return (
-    <div style={{ marginBottom: 32 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          flexWrap: "wrap",
-          gap: 16,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 20px",
+        borderRadius: 10,
+        background: bg,
+        border: `1.5px solid ${border}`,
+        fontSize: 14,
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      <span style={{ fontWeight: 700, fontSize: 18, color }}>{count}</span>
+      <span style={{ color: "#64748B", fontWeight: 500 }}>{label}</span>
+    </div>
+  );
+}
+
+interface TransactionHeaderProps {
+  total: number;
+  paid: number;
+  pending: number;
+  failed: number;
+}
+
+export default function TransactionHeader({
+  total,
+  paid,
+  pending,
+  failed,
+}: TransactionHeaderProps) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 16,
+        marginBottom: 32,
+      }}
+    >
+      {/* Left: Title */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: 14,
+            background: "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "1.5px solid #BFDBFE",
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect
+              x="3"
+              y="4"
+              width="18"
+              height="16"
+              rx="3"
+              stroke="#1A56DB"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M7 9h10M7 13h6"
+              stroke="#1A56DB"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 14,
-              background: "#EFF6FF",
-              border: "1.5px solid #BFDBFE",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
+              margin: 0,
+              fontSize: 24,
+              fontWeight: 800,
+              fontFamily: "'Inter', sans-serif",
+              letterSpacing: "-0.5px",
             }}
           >
-            <IconReceipt />
-          </div>
-          <div>
-            <h1
+            <span style={{ color: "#1A56DB" }}>My</span>{" "}
+            <span
               style={{
-                fontSize: 28,
-                fontWeight: 800,
-                color: "#1A56DB",
-                letterSpacing: "-0.02em",
-                lineHeight: 1.2,
-                margin: 0,
+                background: "linear-gradient(90deg, #60A5FA, #34D399)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
-              My{" "}
-              <span
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.2,
-                  background: "linear-gradient(90deg, #60A5FA, #34D399)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Transactions
-              </span>
-            </h1>
-
-            <p
-              style={{
-                marginTop: 4,
-                color: "#64748B",
-                fontSize: 14,
-                fontWeight: 400,
-                margin: "4px 0 0",
-              }}
-            >
-              Track all your purchases and download invoices
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {chips.map((chip) => (
-            <div
-              key={chip.label}
-              style={{
-                background: chip.bg,
-                border: `1px solid ${chip.color}22`,
-                borderRadius: 10,
-                padding: "6px 14px",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <span
-                style={{ fontSize: 15, fontWeight: 700, color: chip.color }}
-              >
-                {chip.value}
-              </span>
-              <span style={{ fontSize: 12, color: chip.color, opacity: 0.8 }}>
-                {chip.label}
-              </span>
-            </div>
-          ))}
+              Transactions
+            </span>
+          </h1>
+          <p
+            style={{
+              margin: "2px 0 0",
+              fontSize: 13,
+              color: "#94A3B8",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            Track all your purchases and download invoices
+          </p>
         </div>
       </div>
 
-      <div
-        style={{
-          marginTop: 24,
-          height: 1,
-          background: "linear-gradient(to right, #E2E8F0, transparent)",
-        }}
-      />
+      {/* Right: Stats */}
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <StatsCard
+          count={total}
+          label="Total"
+          color="#1A56DB"
+          bg="#EFF6FF"
+          border="#BFDBFE"
+        />
+        <StatsCard
+          count={paid}
+          label="Paid"
+          color="#16A34A"
+          bg="#F0FDF4"
+          border="#BBF7D0"
+        />
+        <StatsCard
+          count={pending}
+          label="Pending"
+          color="#D97706"
+          bg="#FFFBEB"
+          border="#FDE68A"
+        />
+        <StatsCard
+          count={failed}
+          label="Failed"
+          color="#DC2626"
+          bg="#FEF2F2"
+          border="#FECACA"
+        />
+      </div>
     </div>
   );
 }
