@@ -575,51 +575,6 @@ export default function UserNavbar() {
               flexShrink: 0,
             }}
           >
-            <Link
-              href="/cart"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 36,
-                height: 36,
-                borderRadius: 9,
-                background: "transparent",
-                border: `0.5px solid ${C.border}`,
-                color: C.textMuted,
-                textDecoration: "none",
-                transition: "background 0.15s, color 0.15s, border-color 0.15s",
-                flexShrink: 0,
-                position: "relative",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = C.activeBg;
-                (e.currentTarget as HTMLElement).style.color = C.blue;
-                (e.currentTarget as HTMLElement).style.borderColor = "#BFDBFE";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background =
-                  "transparent";
-                (e.currentTarget as HTMLElement).style.color = C.textMuted;
-                (e.currentTarget as HTMLElement).style.borderColor = C.border;
-              }}
-              aria-label="Cart"
-            >
-              <CartIcon />
-              <span
-                style={{
-                  position: "absolute",
-                  top: 4,
-                  right: 4,
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: C.blue,
-                  border: "1.5px solid #fff",
-                }}
-              />
-            </Link>
-
             <ProfileDropdown />
 
             <button
