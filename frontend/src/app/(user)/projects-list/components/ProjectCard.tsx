@@ -1,35 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ProjectCardProps {
+  id?: string | number;
   title?: string;
   description?: string;
   region?: string;
   category?: string;
   price?: string;
   layerCount?: number;
-  status?: "Newest" | "Oldest";
+  status?: "Available" | "Popular" | "New";
   image?: string;
 }
 
-const statusConfig: Record<"Newest" | "Oldest", { color: string; bg: string; border: string }> = {
-  Newest: { color: "#1A56DB", bg: "#EBF3FF", border: "#BFDBFE" },
-  Oldest: { color: "#6B7280", bg: "#F3F4F6", border: "#D1D5DB" },
+const statusConfig = {
+  Available: { color: "#059669", bg: "#ECFDF5", border: "#A7F3D0" },
+  Popular:   { color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+  New:       { color: "#1A56DB", bg: "#EBF3FF", border: "#BFDBFE" },
 };
 
 export default function ProjectCard({
+  id = 1,
   title = "Retail Site Selection Analysis",
   description = "Analyze potential retail locations based on geospatial and demographic data.",
   region = "Jakarta",
   category = "Retail",
   price = "Rp 850.000",
   layerCount = 5,
-  status = "Newest",
+  status = "Popular",
   image = "https://source.unsplash.com/400x200/?map,city",
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
   const cfg = statusConfig[status];
+
+  const handleBuyNow = () => {
+    router.push(
+      `/checkout?id=${id}&title=${encodeURIComponent(title ?? "")}&price=${encodeURIComponent(price ?? "")}&category=${encodeURIComponent(category ?? "")}&region=${encodeURIComponent(region ?? "")}&description=${encodeURIComponent(description ?? "")}`
+    );
+  };
 
   return (
     <div
@@ -49,6 +60,7 @@ export default function ProjectCard({
         fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >
+
       <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
         <img
           src={image}
@@ -73,6 +85,7 @@ export default function ProjectCard({
           transition: "opacity 0.3s",
         }} />
 
+       
         <div style={{ position: "absolute", top: 10, left: 12 }}>
           <span style={{
             display: "inline-flex", alignItems: "center", gap: 5,
@@ -84,14 +97,12 @@ export default function ProjectCard({
             letterSpacing: "0.06em", textTransform: "uppercase",
             fontFamily: "'JetBrains Mono',monospace",
           }}>
-            <span style={{
-              width: 5, height: 5, borderRadius: "50%",
-              background: cfg.color, display: "inline-block",
-            }} />
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: cfg.color, display: "inline-block" }} />
             {status}
           </span>
         </div>
 
+   
         <div style={{ position: "absolute", top: 10, right: 12 }}>
           <span style={{
             display: "inline-flex", alignItems: "center", gap: 5,
@@ -109,16 +120,14 @@ export default function ProjectCard({
           </span>
         </div>
 
-        <div style={{
-          position: "absolute", bottom: 10, left: 12,
-          display: "flex", alignItems: "center", gap: 4,
-        }}>
+  
+        <div style={{ position: "absolute", bottom: 10, left: 12, display: "flex", alignItems: "center", gap: 4 }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-            <path d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z" stroke="#000000" strokeWidth="2" />
-            <circle cx="12" cy="11" r="2" fill="#000000" />
+            <path d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z" stroke="white" strokeWidth="2" />
+            <circle cx="12" cy="11" r="2" fill="white" />
           </svg>
           <span style={{
-            fontSize: 10, fontWeight: 700, color: "#000000",
+            fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.9)",
             fontFamily: "'JetBrains Mono',monospace", letterSpacing: "0.04em",
           }}>
             {region}
@@ -126,27 +135,19 @@ export default function ProjectCard({
         </div>
       </div>
 
+    
       <div style={{ padding: "16px 18px 18px" }}>
         <div style={{ marginBottom: 8 }}>
-          <span style={{
-            fontSize: 10, fontWeight: 700, color: "#1A56DB",
-            letterSpacing: "0.08em", textTransform: "uppercase",
-          }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "#1A56DB", letterSpacing: "0.08em", textTransform: "uppercase" }}>
             {category}
           </span>
         </div>
 
-        <h3 style={{
-          margin: "0 0 8px", fontSize: 14, fontWeight: 800,
-          color: "#0F172A", letterSpacing: "-0.02em", lineHeight: 1.35,
-        }}>
+        <h3 style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em", lineHeight: 1.35 }}>
           {title}
         </h3>
 
-        <p style={{
-          margin: "0 0 14px", fontSize: 12, color: "#64748B",
-          lineHeight: 1.55,
-        }}>
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#64748B", lineHeight: 1.55 }}>
           {description}
         </p>
 
@@ -154,20 +155,14 @@ export default function ProjectCard({
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <div>
-            <div style={{
-              fontSize: 10, color: "#94A3B8", fontWeight: 500, marginBottom: 1,
-            }}>
-              Starting from
-            </div>
-            <div style={{
-              fontSize: 16, fontWeight: 800, color: "#1A56DB",
-              letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums",
-            }}>
+            <div style={{ fontSize: 10, color: "#94A3B8", fontWeight: 500, marginBottom: 1 }}>Starting from</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#1A56DB", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
               {price}
             </div>
           </div>
 
           <button
+            onClick={handleBuyNow}
             style={{
               padding: "9px 18px",
               borderRadius: 10,

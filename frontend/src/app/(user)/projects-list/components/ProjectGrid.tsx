@@ -11,7 +11,7 @@ const projects = [
     category: "Retail",
     price: "Rp 850.000",
     layerCount: 5,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?city,map",
   },
   {
@@ -21,7 +21,7 @@ const projects = [
     category: "Food & Beverage",
     price: "Rp 650.000",
     layerCount: 4,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?restaurant,city",
   },
   {
@@ -31,7 +31,7 @@ const projects = [
     category: "Healthcare",
     price: "Rp 1.200.000",
     layerCount: 7,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?hospital,map",
   },
   {
@@ -41,7 +41,7 @@ const projects = [
     category: "Retail",
     price: "Rp 750.000",
     layerCount: 6,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?shopping,city",
   },
   {
@@ -51,7 +51,7 @@ const projects = [
     category: "Food & Beverage",
     price: "Rp 700.000",
     layerCount: 5,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?cafe,map",
   },
   {
@@ -61,11 +61,11 @@ const projects = [
     category: "Healthcare",
     price: "Rp 1.150.000",
     layerCount: 6,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?clinic,aerial",
   },
 
-  // tambahan
+
   {
     title: "Retail Demand Heatmap",
     description: "Visualize retail demand concentration in Lubuk Baja using consumer spending patterns.",
@@ -73,7 +73,7 @@ const projects = [
     category: "Retail",
     price: "Rp 900.000",
     layerCount: 6,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?mall,city",
   },
   {
@@ -83,7 +83,7 @@ const projects = [
     category: "Food & Beverage",
     price: "Rp 720.000",
     layerCount: 5,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?food,market",
   },
   {
@@ -93,7 +93,7 @@ const projects = [
     category: "Healthcare",
     price: "Rp 1.300.000",
     layerCount: 8,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?healthcare,map",
   },
   {
@@ -103,7 +103,7 @@ const projects = [
     category: "Retail",
     price: "Rp 880.000",
     layerCount: 5,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?shopping,street",
   },
   {
@@ -113,7 +113,7 @@ const projects = [
     category: "Food & Beverage",
     price: "Rp 780.000",
     layerCount: 6,
-    status: "Newest" as const,
+    status: "New" as const,
     image: "https://source.unsplash.com/400x200/?cafe,people",
   },
   {
@@ -123,7 +123,7 @@ const projects = [
     category: "Healthcare",
     price: "Rp 1.250.000",
     layerCount: 7,
-    status: "Oldest" as const,
+    status: "Available" as const,
     image: "https://source.unsplash.com/400x200/?medical,city",
   },
 ];
@@ -155,23 +155,20 @@ export default function ProjectGrid() {
 
   return (
     <div>
-      {/* Result count */}
+   
       <div style={{ marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
           Showing <strong style={{ color: "#0F172A" }}>{paginated.length}</strong> of {projects.length} results
         </span>
       </div>
 
-      {/* Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 18 }}>
         {paginated.map((project, i) => (
           <ProjectCard key={`${page}-${i}`} {...project} />
         ))}
       </div>
 
-      {/* Pagination */}
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
-        {/* Prev */}
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
@@ -184,7 +181,6 @@ export default function ProjectGrid() {
           </svg>
         </button>
 
-        {/* Page numbers */}
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
           <button
             key={p}
@@ -197,7 +193,6 @@ export default function ProjectGrid() {
           </button>
         ))}
 
-        {/* Next */}
         <button
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page === totalPages}

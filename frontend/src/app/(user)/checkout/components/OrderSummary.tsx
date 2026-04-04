@@ -3,14 +3,11 @@ interface OrderSummaryProps {
   tax: number;
   total: number;
   formatRp: (n: number) => string;
+  title?: string;
+  category?: string;
 }
 
-const orderItems = [
-  { name: "Retail Site Selection", price: 250000 },
-  { name: "Market Potential Mapping", price: 300000 },
-];
-
-export function OrderSummary({ subtotal, tax, total, formatRp }: OrderSummaryProps) {
+export function OrderSummary({ subtotal, tax, total, formatRp, title, category }: OrderSummaryProps) {
   return (
     <div style={{
       background: "#fff", borderRadius: 16,
@@ -47,27 +44,38 @@ export function OrderSummary({ subtotal, tax, total, formatRp }: OrderSummaryPro
 
       <div style={{ padding: "1.15rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", paddingBottom: "0.75rem", borderBottom: "1px dashed #E5E7EB" }}>
-          {orderItems.map((item) => (
-            <div key={item.name} style={{
-              display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8,
-              padding: "8px 10px", borderRadius: 8,
-              background: "#F8FAFF", border: "1px solid #EEF2FF",
-            }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1 }}>
-                <div style={{
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: "#1A56DB", flexShrink: 0, marginTop: 5,
-                }} />
-                <span style={{ fontSize: "0.76rem", color: "#374151", fontWeight: 600, flex: 1, lineHeight: 1.5 }}>
-                  {item.name}
+        <div style={{ paddingBottom: "0.75rem", borderBottom: "1px dashed #E5E7EB" }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8,
+            padding: "8px 10px", borderRadius: 8,
+            background: "#F8FAFF", border: "1px solid #EEF2FF",
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1 }}>
+              <div style={{
+                width: 6, height: 6, borderRadius: "50%",
+                background: "#1A56DB", flexShrink: 0, marginTop: 5,
+              }} />
+              <div style={{ flex: 1 }}>
+                <span style={{ fontSize: "0.76rem", color: "#374151", fontWeight: 600, lineHeight: 1.5, display: "block" }}>
+                  {title ?? "Geospatial Analysis Package"}
                 </span>
+                {category && (
+                  <span style={{
+                    fontSize: "10px", fontWeight: 700, color: "#1A56DB",
+                    background: "#EBF3FF", border: "1px solid #BFDBFE",
+                    padding: "1px 7px", borderRadius: 4,
+                    textTransform: "uppercase", letterSpacing: "0.05em",
+                    display: "inline-block", marginTop: 3,
+                  }}>
+                    {category}
+                  </span>
+                )}
               </div>
-              <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0 }}>
-                {formatRp(item.price)}
-              </span>
             </div>
-          ))}
+            <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0 }}>
+              {formatRp(subtotal)}
+            </span>
+          </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
