@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 
-const GRAD = "linear-gradient(90deg, #60A5FA, #34D399)";
-const GRAD_135 = "linear-gradient(135deg, #60A5FA 0%, #34D399 100%)";
-const GRAD_SHIELD = "linear-gradient(135deg, #60A5FA, #34D399)";
+const BLUE = "#1A56DB";
+const BLUE_LIGHT = "#EBF3FF";
+const BLUE_BORDER = "#BFDBFE";
+const BLUE_DARK = "#1340B0";
+
+const GRAD = `linear-gradient(90deg, ${BLUE}, ${BLUE_DARK})`;
+const GRAD_135 = `linear-gradient(135deg, ${BLUE} 0%, ${BLUE_DARK} 100%)`;
 
 function UserIcon() {
   return (
@@ -154,8 +158,8 @@ function ShieldIcon() {
       />
       <defs>
         <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#60A5FA" />
-          <stop offset="100%" stopColor="#34D399" />
+          <stop offset="0%" stopColor={BLUE} />
+          <stop offset="100%" stopColor={BLUE_DARK} />
         </linearGradient>
       </defs>
     </svg>
@@ -257,51 +261,50 @@ export default function ProfilePage() {
         style={{
           background: "#fff",
           borderBottom: "1px solid #E5E7EB",
-          padding: "1.4rem 2.5rem",
         }}
       >
-        <h1
+        <div
           style={{
-            margin: 0,
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: "#1A56DB",
-            letterSpacing: "-0.025em",
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "40px 40px",
           }}
         >
-          My{" "}
-          <span
+          <h1
             style={{
-              background: "linear-gradient(90deg, #60A5FA, #34D399)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              margin: 0,
+              fontSize: "2rem",
+              fontWeight: 700,
+              color: "#1A56DB",
+              letterSpacing: "-0.025em",
             }}
           >
-            Profile
-          </span>
-        </h1>
-        <nav
-          style={{
-            marginTop: 4,
-            fontSize: "0.82rem",
-            color: "#9CA3AF",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        ></nav>
+            My{" "}
+            <span
+              style={{
+                background: "linear-gradient(90deg, #60A5FA, #34D399)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Profile
+            </span>
+          </h1>
+        </div>
       </div>
 
       <div
         className="profile-grid"
         style={{
-          width: "100%",
-          padding: "2rem 2.5rem",
-          boxSizing: "border-box",
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "0 40px 40px",
           display: "grid",
           gridTemplateColumns: "300px 1fr",
           gap: "1.5rem",
           alignItems: "start",
+          paddingTop: "2rem",
+          boxSizing: "border-box",
         }}
       >
         <div
@@ -340,9 +343,9 @@ export default function ProfilePage() {
                     width: 92,
                     height: 92,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #DBEAFE, #D1FAE5)",
+                    background: BLUE_LIGHT,
                     border: "4px solid #fff",
-                    boxShadow: "0 4px 16px rgba(96,165,250,0.25)",
+                    boxShadow: `0 4px 16px ${BLUE}40`,
                     overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
@@ -356,10 +359,10 @@ export default function ProfilePage() {
                     fill="none"
                     style={{ opacity: 0.3 }}
                   >
-                    <circle cx="12" cy="8" r="5" fill="#60A5FA" />
+                    <circle cx="12" cy="8" r="5" fill={BLUE} />
                     <path
                       d="M3 21c0-5 4-8.5 9-8.5s9 3.5 9 8.5"
-                      fill="#34D399"
+                      fill={BLUE_DARK}
                     />
                   </svg>
                 </div>
@@ -378,7 +381,7 @@ export default function ProfilePage() {
                       alignItems: "center",
                       justifyContent: "center",
                       cursor: "pointer",
-                      boxShadow: "0 2px 8px rgba(96,165,250,0.4)",
+                      boxShadow: `0 2px 8px ${BLUE}40`,
                     }}
                     aria-label="Ganti foto"
                   >
@@ -392,7 +395,7 @@ export default function ProfilePage() {
                   margin: "12px 0 0",
                   fontWeight: 700,
                   fontSize: "1.1rem",
-                  color: "#1A56DB",
+                  color: BLUE,
                   letterSpacing: "-0.02em",
                   textAlign: "center",
                 }}
@@ -418,8 +421,8 @@ export default function ProfilePage() {
                   gap: 5,
                   padding: "5px 14px",
                   borderRadius: 999,
-                  background: "linear-gradient(90deg, #EFF6FF, #ECFDF5)",
-                  border: "1px solid #A7F3D0",
+                  background: BLUE_LIGHT,
+                  border: `1px solid ${BLUE_BORDER}`,
                 }}
               >
                 <ShieldIcon />
@@ -464,7 +467,7 @@ export default function ProfilePage() {
                     fontSize: "0.88rem",
                     fontWeight: 600,
                     cursor: "pointer",
-                    boxShadow: "0 2px 10px rgba(96,165,250,0.35)",
+                    boxShadow: `0 2px 10px ${BLUE}40`,
                     transition: "opacity 0.15s, transform 0.15s",
                   }}
                   onMouseEnter={(e) => {
@@ -488,64 +491,7 @@ export default function ProfilePage() {
                     gap: 8,
                     width: "100%",
                   }}
-                >
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    style={{
-                      width: "100%",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 7,
-                      padding: "10px 0",
-                      borderRadius: 999,
-                      background: isSaving
-                        ? "linear-gradient(90deg, #93C5FD, #6EE7B7)"
-                        : GRAD_135,
-                      border: "none",
-                      color: "#fff",
-                      fontSize: "0.88rem",
-                      fontWeight: 600,
-                      cursor: isSaving ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 10px rgba(96,165,250,0.32)",
-                      transition: "opacity 0.15s",
-                    }}
-                  >
-                    <SaveIcon /> {isSaving ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    style={{
-                      width: "100%",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 7,
-                      padding: "10px 0",
-                      borderRadius: 999,
-                      background: "transparent",
-                      border: "1.5px solid #E5E7EB",
-                      color: "#6B7280",
-                      fontSize: "0.88rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "border-color 0.15s, color 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor =
-                        "#D1D5DB";
-                      (e.currentTarget as HTMLElement).style.color = "#111827";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor =
-                        "#E5E7EB";
-                      (e.currentTarget as HTMLElement).style.color = "#6B7280";
-                    }}
-                  >
-                    <CancelIcon /> Cancel
-                  </button>
-                </div>
+                ></div>
               )}
             </div>
           </div>
@@ -582,15 +528,15 @@ export default function ProfilePage() {
                 icon={<CalendarIcon />}
                 label="Member since"
                 value="Jan 2024"
-                color="#60A5FA"
-                bg="#EFF6FF"
+                color={BLUE}
+                bg={BLUE_LIGHT}
               />
               <StatRow
                 icon={<FolderIcon />}
                 label="Projects"
                 value="12 Projects"
-                color="#34D399"
-                bg="#ECFDF5"
+                color={BLUE_DARK}
+                bg={BLUE_LIGHT}
               />
             </div>
           </div>
@@ -628,7 +574,7 @@ export default function ProfilePage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 2px 6px rgba(96,165,250,0.3)",
+                  boxShadow: `0 2px 6px ${BLUE}30`,
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -653,7 +599,7 @@ export default function ProfilePage() {
                     margin: 0,
                     fontWeight: 700,
                     fontSize: "1rem",
-                    color: "#1A56DB",
+                    color: BLUE,
                   }}
                 >
                   Account Information
@@ -678,7 +624,7 @@ export default function ProfilePage() {
                 value={isEditing ? draft.fullName : profile.fullName}
                 isEditing={isEditing}
                 onChange={(v) => setDraft((d) => ({ ...d, fullName: v }))}
-                placeholder="Masukkan nama lengkap"
+                placeholder="Enter full name"
               />
               <Field
                 label="Username"
@@ -686,7 +632,7 @@ export default function ProfilePage() {
                 value={isEditing ? draft.username : profile.username}
                 isEditing={isEditing}
                 onChange={(v) => setDraft((d) => ({ ...d, username: v }))}
-                placeholder="Masukkan username"
+                placeholder="Enter username"
               />
               <Field
                 label="Email"
@@ -694,7 +640,7 @@ export default function ProfilePage() {
                 value={isEditing ? draft.email : profile.email}
                 isEditing={isEditing}
                 onChange={(v) => setDraft((d) => ({ ...d, email: v }))}
-                placeholder="Masukkan email"
+                placeholder="Enter email"
                 type="email"
               />
 
@@ -741,15 +687,13 @@ export default function ProfilePage() {
                       gap: 6,
                       padding: "9px 20px",
                       borderRadius: 8,
-                      background: isSaving
-                        ? "linear-gradient(90deg, #93C5FD, #6EE7B7)"
-                        : GRAD_135,
+                      background: isSaving ? `${BLUE}99` : GRAD_135,
                       border: "none",
                       color: "#fff",
                       fontSize: "0.85rem",
                       fontWeight: 600,
                       cursor: isSaving ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 8px rgba(96,165,250,0.25)",
+                      boxShadow: `0 2px 8px ${BLUE}25`,
                       transition: "opacity 0.15s",
                     }}
                   >
@@ -789,7 +733,7 @@ export default function ProfilePage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 2px 6px rgba(96,165,250,0.3)",
+                  boxShadow: `0 2px 6px ${BLUE}30`,
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -826,7 +770,7 @@ export default function ProfilePage() {
                     margin: 0,
                     fontWeight: 700,
                     fontSize: "0.92rem",
-                    color: "#1A56DB",
+                    color: BLUE,
                   }}
                 >
                   Account Details
@@ -887,9 +831,9 @@ export default function ProfilePage() {
                 }
                 label="Joined since"
                 value="January, 12 2026"
-                color="#60A5FA"
-                bg="#EFF6FF"
-                borderColor="#BFDBFE"
+                color="#059669"
+                bg="#ECFDF5"
+                borderColor="#A7F3D0"
               />
               <InfoItem
                 icon={
@@ -923,9 +867,9 @@ export default function ProfilePage() {
                 }
                 label="Last login"
                 value="Today, 09:42"
-                color="#34D399"
-                bg="#ECFDF5"
-                borderColor="#A7F3D0"
+                color={BLUE_DARK}
+                bg={BLUE_LIGHT}
+                borderColor={BLUE_BORDER}
               />
             </div>
           </div>
@@ -1098,16 +1042,7 @@ function Field({
           letterSpacing: "-0.01em",
         }}
       >
-        <span
-          style={{
-            display: "flex",
-            background: "linear-gradient(90deg, #60A5FA, #34D399)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          {icon}
-        </span>
+        <span style={{ display: "flex", color: "#1A56DB" }}>{icon}</span>
         {label}
       </label>
       <input
@@ -1120,8 +1055,8 @@ function Field({
           width: "100%",
           padding: "10px 14px",
           borderRadius: 8,
-          border: isEditing ? "1.5px solid #60A5FA" : "1.5px solid #E5E7EB",
-          background: isEditing ? "#F0FDF4" : "#F9FAFB",
+          border: isEditing ? `1.5px solid ${BLUE}` : "1.5px solid #E5E7EB",
+          background: isEditing ? BLUE_LIGHT : "#F9FAFB",
           fontSize: "0.9rem",
           color: "#111827",
           outline: "none",
@@ -1129,17 +1064,17 @@ function Field({
           boxSizing: "border-box" as const,
           transition: "border-color 0.15s, box-shadow 0.15s",
           cursor: isEditing ? "text" : "default",
-          boxShadow: isEditing ? "0 0 0 3px rgba(96,165,250,0.1)" : "none",
+          boxShadow: isEditing ? `0 0 0 3px ${BLUE}18` : "none",
         }}
         onFocus={(e) => {
           if (isEditing)
             (e.currentTarget as HTMLElement).style.boxShadow =
-              "0 0 0 3px rgba(52,211,153,0.15)";
+              `0 0 0 3px ${BLUE}22`;
         }}
         onBlur={(e) => {
           if (isEditing)
             (e.currentTarget as HTMLElement).style.boxShadow =
-              "0 0 0 3px rgba(96,165,250,0.1)";
+              `0 0 0 3px ${BLUE}18`;
         }}
       />
     </div>
