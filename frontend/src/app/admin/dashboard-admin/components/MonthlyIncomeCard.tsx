@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-
 const incomeData: Record<number, { month: string; amount: number }[]> = {
   2024: [
     { month: "Jan 2024", amount: 620000000 },
@@ -219,9 +217,6 @@ export default function MonthlyIncomeCard() {
             ))}
           </div>
         </div>
-
-        
-
       
         <LineChart year={selectedYear} />
       </div>

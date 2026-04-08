@@ -5,6 +5,8 @@ import RecentTransactions from "./components/RecentTransactions";
 import ProjectList from "./components/ProjectList";
 import MonthlyIncomeCard from "./components/MonthlyIncomeCard";
 import ProductSalesCard from "./components/ProductSalesCard";
+import MonthlySalesSummary from "./components/MonthlySalesSummary";
+import TopSellingServices from "./components/TopSellingService";
 
 export default function DashboardAdminPage() {
   return (
@@ -70,8 +72,8 @@ export default function DashboardAdminPage() {
               color: "#64748b",
             }}
           >
-            Kelola project dan transaksi platform analisis pasar geospasial
-            Anda.
+            Manage projects and transactions for your geospatial market analysis
+            platform.
           </p>
         </div>
 
@@ -110,25 +112,31 @@ export default function DashboardAdminPage() {
               color: "#374151",
             }}
           >
-            Senin, 10 Maret 2026
+            Monday, March 10, 2026
           </span>
         </div>
       </div>
-      
 
       <StatsCard />
 
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginBottom: "24px" }}>
-  <MonthlyIncomeCard />
-  <ProductSalesCard />
-</div>
-
-    
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "24px",
+        }}
+      >
+        <MonthlyIncomeCard />
+        <ProductSalesCard />
+      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-  <ProjectList />
-  <RecentTransactions />
-</div>
+        <ProjectList />
+        <RecentTransactions />
+        <MonthlySalesSummary />
+        <TopSellingServices />
+      </div>
     </div>
   );
 }
