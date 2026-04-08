@@ -11,6 +11,7 @@ export interface Transaction {
   category: string;
   date: string;
   payment: string;
+  totalData: string; 
   amount: string;
   status: TransactionStatus;
 }
@@ -60,6 +61,16 @@ function CalendarIcon() {
   );
 }
 
+function DatabaseIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+      <ellipse cx="12" cy="5" rx="9" ry="3" stroke="#94A3B8" strokeWidth="1.8" />
+      <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" stroke="#94A3B8" strokeWidth="1.8" />
+      <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" stroke="#94A3B8" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 function MapIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -98,6 +109,7 @@ export default function TransactionCard({ data }: TransactionCardProps) {
         fontFamily: "'Inter', sans-serif",
       }}
     >
+
       <div
         style={{
           display: "flex",
@@ -170,6 +182,7 @@ export default function TransactionCard({ data }: TransactionCardProps) {
           marginBottom: 12,
         }}
       >
+
         <div>
           <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, marginBottom: 4 }}>
             Location
@@ -188,6 +201,7 @@ export default function TransactionCard({ data }: TransactionCardProps) {
             {data.location}
           </div>
         </div>
+
         <div>
           <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, marginBottom: 4 }}>
             Date
@@ -206,19 +220,50 @@ export default function TransactionCard({ data }: TransactionCardProps) {
             {data.date}
           </div>
         </div>
+
+        <div>
+          <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, marginBottom: 4 }}>
+            Total Data
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#334155",
+            }}
+          >
+            <DatabaseIcon />
+            {data.totalData}
+          </div>
+        </div>
+
         <div>
           <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, marginBottom: 4 }}>
             Payment
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#334155",
+            }}
+          >
             <PaymentIcon />
             {data.payment}
           </div>
         </div>
+
+        
       </div>
 
-      <div style={{ height: 1, background: "#F1F5F9", marginBottom: 10 }} />
 
+      <div style={{ height: 1, background: "#F1F5F9", marginBottom: 10 }} />
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 10, color: "#94A3B8", fontWeight: 600, marginBottom: 3 }}>
           Total

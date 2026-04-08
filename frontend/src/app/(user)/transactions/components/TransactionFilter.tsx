@@ -60,7 +60,7 @@ export default function TransactionFilter({
         </svg>
         <input
           type="text"
-          placeholder="Search by title, location, or ID..."
+          placeholder="Search by title or location"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           style={{
