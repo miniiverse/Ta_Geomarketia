@@ -129,22 +129,20 @@ export default function TransactionTable() {
     useState<Transaction | null>(null);
 
   const filtered = allTransactions.filter((t) => {
-    const matchStatus =
-      filterStatus === "All" || t.status === filterStatus;
+    const matchStatus = filterStatus === "All" || t.status === filterStatus;
     const matchCategory =
       filterCategory === "All" || t.category === filterCategory;
-    const matchPayment =
-      filterPayment === "All" || t.payment === filterPayment;
-    const matchSearch = t.projectName
-      .toLowerCase()
-      .includes(search.toLowerCase()) || t.invoiceId.toLowerCase().includes(search.toLowerCase());
+    const matchPayment = filterPayment === "All" || t.payment === filterPayment;
+    const matchSearch =
+      t.projectName.toLowerCase().includes(search.toLowerCase()) ||
+      t.invoiceId.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchCategory && matchPayment && matchSearch;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
     (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
+    page * ITEMS_PER_PAGE,
   );
 
   const selectStyle = {
@@ -202,7 +200,6 @@ export default function TransactionTable() {
           overflow: "hidden",
         }}
       >
-        
         <div
           style={{
             padding: "18px 22px",
@@ -222,43 +219,6 @@ export default function TransactionTable() {
               flexWrap: "wrap",
             }}
           >
-           
-            <div style={{ position: "relative" }}>
-              <select
-                value={filterStatus}
-                onChange={(e) => {
-                  setFilterStatus(e.target.value);
-                  setPage(1);
-                }}
-                style={selectStyle}
-              >
-                <option value="All">All Status</option>
-                <option value="Paid">Paid</option>
-                <option value="Pending">Pending</option>
-                <option value="Failed">Failed</option>
-              </select>
-              <svg
-                width="11"
-                height="11"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#1A56DB"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  position: "absolute",
-                  right: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  pointerEvents: "none",
-                }}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-
-           
             <div style={{ position: "relative" }}>
               <select
                 value={filterCategory}
@@ -306,8 +266,8 @@ export default function TransactionTable() {
                 <option value="All">All Payments</option>
                 <option value="Credit Card">Credit Card</option>
                 <option value="Bank Transfer">Bank Transfer</option>
-                <option value="E Wallet">E Wallet </option>
-                <option value="Qris">Qris </option>
+                <option value="E Wallet">E Wallet</option>
+                <option value="Qris">Qris</option>
               </select>
               <svg
                 width="11"
@@ -330,7 +290,6 @@ export default function TransactionTable() {
               </svg>
             </div>
 
-          
             <div style={{ position: "relative" }}>
               <input
                 type="text"
@@ -384,8 +343,7 @@ export default function TransactionTable() {
             >
               Showing {paginated.length} of {filtered.length} transactions
             </span>
-            
-           
+
             <button
               style={{
                 display: "flex",
@@ -422,7 +380,6 @@ export default function TransactionTable() {
           </div>
         </div>
 
-      
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -436,8 +393,6 @@ export default function TransactionTable() {
                   "Status",
                   "Date",
                   "Actions",
-            
-
                 ].map((col) => (
                   <th
                     key={col}
@@ -467,9 +422,7 @@ export default function TransactionTable() {
                     key={trx.id}
                     style={{
                       borderBottom:
-                        i < paginated.length - 1
-                          ? "1px solid #f8fafc"
-                          : "none",
+                        i < paginated.length - 1 ? "1px solid #f8fafc" : "none",
                       transition: "background 0.15s",
                     }}
                     onMouseEnter={(e) =>
@@ -481,7 +434,6 @@ export default function TransactionTable() {
                         "transparent")
                     }
                   >
-                 
                     <td
                       style={{
                         padding: "14px 18px",
@@ -495,7 +447,6 @@ export default function TransactionTable() {
                       {trx.invoiceId}
                     </td>
 
-                  
                     <td
                       style={{
                         padding: "14px 18px",
@@ -514,24 +465,36 @@ export default function TransactionTable() {
                     </td>
 
                     <td
-                    style={{
-                      padding: "14px 18px",
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: "12px",
-                      whiteSpace: "nowrap",}}>
-                        <span
+                      style={{
+                        padding: "14px 18px",
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "12px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <span
                         style={{
                           padding: "4px 10px",
                           borderRadius: "12px",
                           fontWeight: 600,
-                          background:trx.category === "Retail"? "#EBF3FF": trx.category === "Food & Beverage"? "#FFF7ED": "#ECFDF5",
-                          color:trx.category === "Retail"? "#1A56DB": trx.category === "Food & Beverage"? "#C2410C" : "#059669",}}>
-                            {trx.category}
-                            </span>
-                            </td>
+                          background:
+                            trx.category === "Retail"
+                              ? "#EBF3FF"
+                              : trx.category === "Food & Beverage"
+                                ? "#FFF7ED"
+                                : "#ECFDF5",
+                          color:
+                            trx.category === "Retail"
+                              ? "#1A56DB"
+                              : trx.category === "Food & Beverage"
+                                ? "#C2410C"
+                                : "#059669",
+                        }}
+                      >
+                        {trx.category}
+                      </span>
+                    </td>
 
-
-                 
                     <td
                       style={{
                         padding: "14px 18px",
@@ -558,8 +521,7 @@ export default function TransactionTable() {
                       </span>
                     </td>
 
-                 
-                     <td
+                    <td
                       style={{
                         padding: "14px 18px",
                         fontFamily: "'Inter', sans-serif",
@@ -571,8 +533,7 @@ export default function TransactionTable() {
                     >
                       {trx.amount}
                     </td>
-                    
-                  
+
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <span
                         style={{
@@ -601,7 +562,6 @@ export default function TransactionTable() {
                       </span>
                     </td>
 
-                
                     <td
                       style={{
                         padding: "14px 18px",
@@ -661,13 +621,22 @@ export default function TransactionTable() {
               }}
             >
               <div style={{ fontSize: "32px", marginBottom: "8px" }}>🔍</div>
-              Tidak ada transaksi ditemukan.
+              No transactions found.
             </div>
           )}
         </div>
 
         {totalPages > 1 && (
-          <div style={{ padding: "16px 22px", borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <div
+            style={{
+              padding: "16px 22px",
+              borderTop: "1px solid #f1f5f9",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+            }}
+          >
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}

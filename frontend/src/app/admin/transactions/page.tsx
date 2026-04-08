@@ -8,7 +8,6 @@ const stats = [
   {
     label: "Total Transactions",
     value: "10",
-    sub: "4 this month",
     icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
     color: "#1A56DB",
     bg: "#EBF3FF",
@@ -16,7 +15,6 @@ const stats = [
   {
     label: "Paid",
     value: "8",
-    sub: "80% dari total",
     icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
     color: "#059669",
     bg: "#ECFDF5",
@@ -24,7 +22,6 @@ const stats = [
   {
     label: "Pending",
     value: "1",
-    sub: "Menunggu pembayaran",
     icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
     color: "#d97706",
     bg: "#FFFBEB",
@@ -32,7 +29,6 @@ const stats = [
   {
     label: "Total Revenue",
     value: "Rp335K",
-    sub: "Dari semua transaksi",
     icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     color: "#7c3aed",
     bg: "#F5F3FF",
@@ -48,7 +44,6 @@ export default function TransactionPage() {
         fontFamily: "'Inter', sans-serif",
       }}
     >
-  
       <div
         style={{
           background: "#fff",
@@ -83,7 +78,6 @@ export default function TransactionPage() {
       </div>
 
       <div style={{ padding: "32px" }}>
-   
         <div style={{ marginBottom: "28px" }}>
           <h1
             style={{
@@ -97,11 +91,10 @@ export default function TransactionPage() {
             Transactions
           </h1>
           <p style={{ margin: 0, fontSize: "13.5px", color: "#64748b" }}>
-            Kelola dan pantau seluruh transaksi pembayaran di sini.
+            Manage and monitor all payment transactions here.
           </p>
         </div>
 
-       
         <div
           style={{
             display: "grid",
@@ -177,14 +170,12 @@ export default function TransactionPage() {
                     marginTop: "4px",
                   }}
                 >
-                  {s.sub}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        
         <TransactionTable />
       </div>
     </div>
