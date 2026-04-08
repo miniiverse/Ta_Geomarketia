@@ -13,6 +13,8 @@ const projects = [
     layerCount: 5,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?city,map",
+    totalData: 100,
+    lastUpdate: "Apr 2, 2025",
   },
   {
     title: "F&B Hotspot Analysis",
@@ -20,9 +22,10 @@ const projects = [
     region: "Nagoya",
     category: "Food & Beverage",
     price: "Rp 650.000",
-    layerCount: 4,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?restaurant,city",
+    totalData: 250,
+    lastUpdate: "Mar 28, 2025",
   },
   {
     title: "Healthcare Access Gap",
@@ -30,9 +33,10 @@ const projects = [
     region: "Batu Aji",
     category: "Healthcare",
     price: "Rp 1.200.000",
-    layerCount: 7,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?hospital,map",
+    totalData: 150,
+    lastUpdate: "Jan 15, 2025",
   },
   {
     title: "Retail Expansion Analysis",
@@ -40,9 +44,10 @@ const projects = [
     region: "Bengkong",
     category: "Retail",
     price: "Rp 750.000",
-    layerCount: 6,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?shopping,city",
+    totalData: 320,
+    lastUpdate: "Feb 10, 2025",
   },
   {
     title: "F&B Market Mapping",
@@ -50,9 +55,10 @@ const projects = [
     region: "Nongsa",
     category: "Food & Beverage",
     price: "Rp 700.000",
-    layerCount: 5,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?cafe,map",
+    totalData: 80,
+    lastUpdate: "Apr 1, 2025",
   },
   {
     title: "Healthcare Facility Planning",
@@ -60,21 +66,21 @@ const projects = [
     region: "Sekupang",
     category: "Healthcare",
     price: "Rp 1.150.000",
-    layerCount: 6,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?clinic,aerial",
+    totalData: 200,
+    lastUpdate: "Dec 20, 2024",
   },
-
-
   {
     title: "Retail Demand Heatmap",
     description: "Visualize retail demand concentration in Lubuk Baja using consumer spending patterns.",
     region: "Lubuk Baja",
     category: "Retail",
     price: "Rp 900.000",
-    layerCount: 6,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?mall,city",
+    totalData: 450,
+    lastUpdate: "Mar 31, 2025",
   },
   {
     title: "F&B Competitor Density",
@@ -82,9 +88,10 @@ const projects = [
     region: "Batam Center",
     category: "Food & Beverage",
     price: "Rp 720.000",
-    layerCount: 5,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?food,market",
+    totalData: 600,
+    lastUpdate: "Jan 5, 2025",
   },
   {
     title: "Healthcare Coverage Optimization",
@@ -92,9 +99,10 @@ const projects = [
     region: "Tiban",
     category: "Healthcare",
     price: "Rp 1.300.000",
-    layerCount: 8,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?healthcare,map",
+    totalData: 90,
+    lastUpdate: "Apr 3, 2025",
   },
   {
     title: "Retail Foot Traffic Analysis",
@@ -102,9 +110,10 @@ const projects = [
     region: "Nagoya",
     category: "Retail",
     price: "Rp 880.000",
-    layerCount: 5,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?shopping,street",
+    totalData: 400,
+    lastUpdate: "Feb 22, 2025",
   },
   {
     title: "F&B Revenue Potential Map",
@@ -112,9 +121,10 @@ const projects = [
     region: "Nongsa",
     category: "Food & Beverage",
     price: "Rp 780.000",
-    layerCount: 6,
     status: "New" as const,
     image: "https://source.unsplash.com/400x200/?cafe,people",
+    totalData: 120,
+    lastUpdate: "Mar 19, 2025",
   },
   {
     title: "Healthcare Service Demand",
@@ -122,9 +132,10 @@ const projects = [
     region: "Sei Beduk",
     category: "Healthcare",
     price: "Rp 1.250.000",
-    layerCount: 7,
-    status: "Available" as const,
+    status: "Oldest" as const,
     image: "https://source.unsplash.com/400x200/?medical,city",
+    totalData: 180,
+    lastUpdate: "Nov 30, 2024",
   },
 ];
 
@@ -155,7 +166,6 @@ export default function ProjectGrid() {
 
   return (
     <div>
-   
       <div style={{ marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
           Showing <strong style={{ color: "#0F172A" }}>{paginated.length}</strong> of {projects.length} results

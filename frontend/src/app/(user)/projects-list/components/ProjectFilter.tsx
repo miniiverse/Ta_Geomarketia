@@ -3,10 +3,12 @@
 import { useState } from "react";
 
 const categories = ["ALL", "Retail", "Food & Beverage", "Healthcare"];
+const years = ["All Years", "2025", "2024", "2023", "2022"];
 
 export default function ProjectsFilterSidebar() {
   const [category, setCategory] = useState("ALL");
   const [rangeValue, setRangeValue] = useState(60);
+  const [selectedYear, setSelectedYear] = useState("All Years");
 
   return (
     <div
@@ -140,6 +142,48 @@ export default function ProjectsFilterSidebar() {
                 }}
               >
                 {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 22 }}>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              marginBottom: 10,
+              color: "rgba(26,86,219,0.5)",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              fontFamily: "'Inter, sans-serif'",
+            }}
+          >
+            YEAR
+          </p>
+          <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+            {years.map((year) => (
+              <button
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                style={{
+                  padding: "6px 11px",
+                  borderRadius: 8,
+                  border: `1.5px solid ${selectedYear === year ? "#1A56DB" : "rgba(26,86,219,0.2)"}`,
+                  background:
+                    selectedYear === year ? "#1A56DB" : "rgba(255,255,255,0.7)",
+                  color: selectedYear === year ? "#fff" : "#374151",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                  boxShadow:
+                    selectedYear === year
+                      ? "0 3px 10px rgba(26,86,219,0.28)"
+                      : "none",
+                }}
+              >
+                {year}
               </button>
             ))}
           </div>
@@ -325,6 +369,10 @@ export default function ProjectsFilterSidebar() {
 
         <div style={{ display: "flex", gap: 8 }}>
           <button
+            onClick={() => {
+              setCategory("ALL");
+              setSelectedYear("All Years");
+            }}
             style={{
               flex: 1,
               padding: "10px 0",
