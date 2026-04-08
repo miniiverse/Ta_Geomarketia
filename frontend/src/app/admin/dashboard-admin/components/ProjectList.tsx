@@ -58,7 +58,6 @@ export default function ProjectList() {
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            {projects.length} project aktif
           </p>
         </div>
       </div>

@@ -55,7 +55,6 @@ export default function RecentTransactions() {
             Recent Transactions
           </h2>
           <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#94a3b8", fontFamily: "'Inter', sans-serif" }}>
-            {transactions.length} transaksi ditemukan
           </p>
         </div>
       </div>
