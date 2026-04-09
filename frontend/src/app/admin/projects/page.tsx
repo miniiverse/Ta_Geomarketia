@@ -234,28 +234,31 @@ export default function ProjectsPage() {
 
       {showAdd && (
   <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(15,23,42,0.45)",
-      zIndex: 50,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
-    }}
-    onClick={(e) => e.target === e.currentTarget && setShowAdd(false)}
-  >
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: "20px",
-        width: "100%",
-        maxWidth: "540px",
-        overflow: "hidden",
-        boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
-      }}
-    >
+  style={{
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15,23,42,0.45)",
+    zIndex: 50,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "24px",
+    paddingTop: "80px",
+  }}
+  onClick={(e) => e.target === e.currentTarget && setShowAdd(false)}
+>
+<div
+  style={{
+    background: "#fff",
+    borderRadius: "20px",
+    width: "100%",
+    maxWidth: "540px",
+    maxHeight: "90vh",
+    overflowY: "auto",     
+    boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
+    marginBottom: "24px",
+  }}
+>
 
       <div style={{ background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)", padding: "22px 28px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -275,7 +278,7 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: "14px" }}>
+      <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: "14px", overflowY: "auto", maxHeight: "75vh" }}>
 
         <div>
           <label style={labelStyle}>Project Name <span style={{ color: "#E24B4A" }}>*</span></label>
@@ -302,14 +305,47 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        <div>
-          <label style={labelStyle}>Description</label>
-          <textarea
-            placeholder="Describe the project scope, objectives, or notes..."
-            rows={3}
-            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
-          />
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div>
+            <label style={labelStyle}>Description</label>
+            <textarea
+              placeholder="Describe the project scope, objectives, or notes..."
+              rows={3}
+              style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>API <span style={{ color: "#E24B4A" }}>*</span></label>
+            <input type="text" placeholder="e.g. https://api.example.com/v1/data" style={inputStyle} />
+          </div>
         </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={labelStyle}>Date <span style={{ color: "#E24B4A" }}>*</span></label>
+              <input type="date" style={inputStyle} />
+            </div>
+            <div>
+            <label style={labelStyle}>Thumbnail</label>
+            <label
+              style={{
+                ...inputStyle,
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                cursor: "pointer",
+                color: "#64748b",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+              </svg>
+              Select File
+              <input type="file" accept="image/*" style={{ display: "none" }} />
+            </label>
+          </div>
+          </div>
 
         <div>
           <label style={labelStyle}>Location <span style={{ color: "#E24B4A" }}>*</span></label>

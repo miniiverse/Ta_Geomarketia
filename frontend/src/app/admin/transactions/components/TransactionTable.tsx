@@ -391,7 +391,7 @@ export default function TransactionTable() {
                   "Payment",
                   "Amount",
                   "Status",
-                  "Date",
+                  "Payment Date",
                   "Actions",
                 ].map((col) => (
                   <th

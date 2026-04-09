@@ -55,7 +55,7 @@ const regularStats = [
     border: "#A7F3D0",
   },
   {
-    label: "Active Users",
+    label: "Registered Users",
     value: "12",
     href: null,
     positive: true,

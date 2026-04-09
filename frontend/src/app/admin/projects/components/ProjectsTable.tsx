@@ -7,18 +7,18 @@ type Project = {
   id: number;
   name: string;
   category: string;
-  status: string;
+  totalData: number;
   price: string;
   date: string;
 };
 
 const allProjects: Project[] = [
-  { id: 1, name: "Retail Site Selection",       category: "Retail",          status: "Active",   price: "Rp70.000", date: "Mar 10, 2026" },
-  { id: 2, name: "F&B Market Mapping",           category: "Food & Beverage", status: "Active",   price: "Rp30.000", date: "Mar 10, 2026" },
-  { id: 3, name: "Healthcare Facility Planning", category: "Healthcare",      status: "Active",   price: "Rp60.000", date: "Mar 10, 2026" },
-  { id: 4, name: "Healthcare Access Gap",        category: "Healthcare",      status: "Inactive", price: "Rp40.000", date: "Mar 8, 2026"  },
-  { id: 5, name: "Commercial Zone Study",        category: "Retail",          status: "Active",   price: "Rp55.000", date: "Mar 5, 2026"  },
-  { id: 6, name: "Hospital Coverage Map",        category: "Healthcare",      status: "Active",   price: "Rp80.000", date: "Mar 1, 2026"  },
+  { id: 1, name: "Retail Site Selection",       category: "Retail",          totalData: 100, price: "Rp70.000", date: "Mar 10, 2026" },
+  { id: 2, name: "F&B Market Mapping",           category: "Food & Beverage", totalData: 80,  price: "Rp30.000", date: "Mar 10, 2026" },
+  { id: 3, name: "Healthcare Facility Planning", category: "Healthcare",      totalData: 50,  price: "Rp60.000", date: "Mar 10, 2026" },
+  { id: 4, name: "Healthcare Access Gap",        category: "Healthcare",      totalData: 150, price: "Rp40.000", date: "Mar 8, 2026"  },
+  { id: 5, name: "Commercial Zone Study",        category: "Retail",          totalData: 90,  price: "Rp55.000", date: "Mar 5, 2026"  },
+  { id: 6, name: "Hospital Coverage Map",        category: "Healthcare",      totalData: 200, price: "Rp80.000", date: "Mar 1, 2026"  },
 ];
 
 const categoryColors: Record<string, { color: string; bg: string }> = {
@@ -31,7 +31,6 @@ const ITEMS_PER_PAGE = 4;
 
 export default function ProjectsTable({ onAdd }: { onAdd: () => void }) {
   const [projects, setProjects] = useState(allProjects);
-  const [filterStatus, setFilterStatus] = useState("All");
   const [filterCategory, setFilterCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -39,10 +38,9 @@ export default function ProjectsTable({ onAdd }: { onAdd: () => void }) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const filtered = projects.filter((p) => {
-    const matchStatus   = filterStatus === "All"   || p.status === filterStatus;
     const matchCategory = filterCategory === "All" || p.category === filterCategory;
     const matchSearch   = p.name.toLowerCase().includes(search.toLowerCase());
-    return matchStatus && matchCategory && matchSearch;
+    return matchCategory && matchSearch;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -113,7 +111,11 @@ export default function ProjectsTable({ onAdd }: { onAdd: () => void }) {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <div style={{ position: "relative" }}>
-              <select value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }} style={selectStyle}>
+              <select
+                value={filterCategory}
+                onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }}
+                style={selectStyle}
+              >
                 <option value="All">All Categories</option>
                 <option value="Retail">Retail</option>
                 <option value="Food & Beverage">Food & Beverage</option>
@@ -157,8 +159,22 @@ export default function ProjectsTable({ onAdd }: { onAdd: () => void }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F8FAFF" }}>
-                {["Project Name", "Category", "Status", "Price", "Date Added", "Actions"].map((col) => (
-                  <th key={col} style={{ padding: "11px 18px", textAlign: "left", fontSize: "11.5px", fontWeight: 600, fontFamily: "'Inter', sans-serif", color: "#64748b", letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap", borderBottom: "1px solid #f1f5f9" }}>
+                {["Project Name", "Category", "Total Data", "Price", "Last Updated", "Actions"].map((col) => (
+                  <th
+                    key={col}
+                    style={{
+                      padding: "11px 18px",
+                      textAlign: "left",
+                      fontSize: "11.5px",
+                      fontWeight: 600,
+                      fontFamily: "'Inter', sans-serif",
+                      color: "#64748b",
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      whiteSpace: "nowrap",
+                      borderBottom: "1px solid #f1f5f9",
+                    }}
+                  >
                     {col}
                   </th>
                 ))}
@@ -167,31 +183,43 @@ export default function ProjectsTable({ onAdd }: { onAdd: () => void }) {
             <tbody>
               {paginated.map((project, i) => {
                 const cat = categoryColors[project.category] || { color: "#1A56DB", bg: "#EBF3FF" };
-                const isActive  = project.status === "Active";
                 const isDeleting = deletingId === project.id;
                 return (
                   <tr
                     key={project.id}
-                    style={{ borderBottom: i < paginated.length - 1 ? "1px solid #f8fafc" : "none", opacity: isDeleting ? 0 : 1, transition: "background 0.15s, opacity 0.35s" }}
+                    style={{
+                      borderBottom: i < paginated.length - 1 ? "1px solid #f8fafc" : "none",
+                      opacity: isDeleting ? 0 : 1,
+                      transition: "background 0.15s, opacity 0.35s",
+                    }}
                     onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#FAFBFF")}
                     onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
                   >
-                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13.5px", fontWeight: 600, color: "#0f172a", cursor: "pointer" }} onClick={() => setSelectedProject(project)}>
+                    <td
+                      style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13.5px", fontWeight: 600, color: "#0f172a", cursor: "pointer" }}
+                      onClick={() => setSelectedProject(project)}
+                    >
                       <span style={{ borderBottom: "1px dashed #BFDBFE" }}>{project.name}</span>
                     </td>
+
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <span style={{ background: cat.bg, color: cat.color, fontSize: "11.5px", fontWeight: 600, fontFamily: "'Inter', sans-serif", padding: "3px 10px", borderRadius: "6px" }}>
                         {project.category}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: isActive ? "#ECFDF5" : "#F1F5F9", color: isActive ? "#059669" : "#64748b", fontSize: "12px", fontWeight: 600, fontFamily: "'Inter', sans-serif", padding: "4px 10px", borderRadius: "20px" }}>
-                        <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: isActive ? "#10b981" : "#94a3b8", display: "inline-block" }} />
-                        {project.status}
-                      </span>
+
+                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", textAlign: "left" }}>
+                      {project.totalData}
                     </td>
-                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap" }}>{project.price}</td>
-                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", color: "#64748b", whiteSpace: "nowrap" }}>{project.date}</td>
+
+                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap" }}>
+                      {project.price}
+                    </td>
+
+                    <td style={{ padding: "14px 18px", fontFamily: "'Inter', sans-serif", fontSize: "13px", color: "#64748b", whiteSpace: "nowrap" }}>
+                      {project.date}
+                    </td>
+
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <div style={{ display: "flex", gap: "8px" }}>
                         <button

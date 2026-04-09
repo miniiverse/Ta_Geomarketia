@@ -64,7 +64,7 @@ export default function RecentTransactions() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#F8FAFF" }}>
-              {["Invoice ID", "Project Name", "Category", "Payment", "Amount", "Status", "Date"].map((col) => (
+              {["Invoice ID", "Project Name", "Category", "Payment", "Amount", "Status", "Payment Date"].map((col) => (
                 <th
                   key={col}
                   style={{

@@ -3,10 +3,10 @@
 import Link from "next/link";
 
 const projects = [
-  { id: 1, name: "Retail Site Selection",       category: "Retail",          status: "Active", price: "Rp70.000", date: "Mar 10, 2026" },
-  { id: 2, name: "F&B Market Mapping",           category: "Food & Beverage", status: "Active", price: "Rp30.000", date: "Mar 10, 2026" },
-  { id: 3, name: "Healthcare Facility Planning", category: "Healthcare",      status: "Active", price: "Rp60.000", date: "Mar 10, 2026" },
-  { id: 4, name: "Healthcare Access Gap",        category: "Healthcare",      status: "Active", price: "Rp40.000", date: "Mar 10, 2026" },
+  { id: 1, name: "Retail Site Selection",       category: "Retail",          totalData: "100", price: "Rp70.000", date: "Mar 10, 2026" },
+  { id: 2, name: "F&B Market Mapping",           category: "Food & Beverage", totalData:"120",   price: "Rp30.000", date: "Mar 10, 2026" },
+  { id: 3, name: "Healthcare Facility Planning", category: "Healthcare",      totalData: "110",  price: "Rp60.000", date: "Mar 10, 2026" },
+  { id: 4, name: "Healthcare Access Gap",        category: "Healthcare",      totalData: "150",   price: "Rp40.000", date: "Mar 10, 2026" },
 ];
 
 const categoryColors: Record<string, { color: string; bg: string }> = {
@@ -50,24 +50,14 @@ export default function ProjectList() {
           >
             Project List
           </h2>
-          <p
-            style={{
-              margin: "2px 0 0",
-              fontSize: "12px",
-              color: "#94a3b8",
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-          </p>
         </div>
       </div>
 
- 
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#F8FAFF" }}>
-              {["Project Name", "Category", "Status", "Price", "Date Added"].map((col) => (
+              {["Project Name", "Category", "Total Data", "Price", "Last Updated"].map((col) => (
                 <th
                   key={col}
                   style={{
@@ -91,7 +81,6 @@ export default function ProjectList() {
           <tbody>
             {projects.map((project, i) => {
               const cat = categoryColors[project.category] || { color: "#1A56DB", bg: "#EBF3FF" };
-              const isActive = project.status === "Active";
 
               return (
                 <tr
@@ -131,32 +120,20 @@ export default function ProjectList() {
                     </span>
                   </td>
 
+                  {/* Kolom Total Data — menggantikan Status */}
                   <td style={{ padding: "13px 18px", whiteSpace: "nowrap" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        background: isActive ? "#ECFDF5" : "#F1F5F9",
-                        color: isActive ? "#059669" : "#64748b",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
-                        padding: "4px 10px",
-                        borderRadius: "20px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          background: isActive ? "#10b981" : "#94a3b8",
-                          display: "inline-block",
-                        }}
-                      />
-                      {project.status}
-                    </span>
+                  <td
+                    style={{
+                      padding: "13px 18px",
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#0f172a",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {project.totalData}
+                  </td>
                   </td>
 
                   <td
