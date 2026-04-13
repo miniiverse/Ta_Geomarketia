@@ -25,7 +25,7 @@ interface ProfileCardProps {
   profileSaved: boolean;
   onEdit: () => void;
   onCancel: () => void;
-  onSave: () => void;
+  onSave: () => void | Promise<void>;
   onDraftChange: (draft: ProfileForm) => void;
 }
 

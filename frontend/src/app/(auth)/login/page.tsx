@@ -101,12 +101,14 @@ function InputField({
   value,
   onChange,
   icon,
+  onKeyDown,
 }: {
   type: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
   icon: React.ReactNode;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -140,6 +142,7 @@ function InputField({
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onKeyDown={onKeyDown}
         style={{
           flex: 1,
           border: "none",
@@ -155,14 +158,165 @@ function InputField({
   );
 }
 
+function PasswordField({
+  placeholder,
+  value,
+  onChange,
+  onKeyDown,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}) {
+  const [focused, setFocused] = useState(false);
+  const [show, setShow] = useState(false);
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        background: focused ? "#fff" : "#F0F7FF",
+        border: `1.5px solid ${focused ? C.blue : C.border}`,
+        borderRadius: 10,
+        padding: "0 14px",
+        height: 48,
+        transition: "all 0.2s ease",
+        boxShadow: focused ? `0 0 0 3px rgba(26,86,219,0.12)` : "none",
+      }}
+    >
+      <span
+        style={{
+          color: focused ? C.blue : "#93C5FD",
+          flexShrink: 0,
+          display: "flex",
+        }}
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect
+            x="5"
+            y="11"
+            width="14"
+            height="10"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M8 11V7a4 4 0 018 0v4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <circle cx="12" cy="16" r="1.5" fill="currentColor" />
+        </svg>
+      </span>
+      <input
+        type={show ? "text" : "password"}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        onKeyDown={onKeyDown}
+        style={{
+          flex: 1,
+          border: "none",
+          outline: "none",
+          background: "transparent",
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontSize: 14,
+          color: C.text,
+          letterSpacing: "-0.01em",
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => setShow(!show)}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          color: "#93C5FD",
+          padding: 0,
+          flexShrink: 0,
+        }}
+      >
+        {show ? (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+            <line x1="2" x2="22" y1="2" y2="22" />
+          </svg>
+        ) : (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!username || !password) return;
     setLoading(true);
-    setTimeout(() => setLoading(false), 1600);
+    try {
+      const res = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+      if (data.user.role === "admin") {
+        window.location.href = "/admin/dashboard-admin";
+      } else {
+        window.location.href = "/dashboard";
+      }
+    } catch (err) {
+      alert("Gagal terhubung ke server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSubmit();
   };
 
   return (
@@ -227,7 +381,6 @@ export default function LoginPage() {
           pointerEvents: "none",
         }}
       />
-
       <BgDots />
 
       <div
@@ -265,7 +418,7 @@ export default function LoginPage() {
           >
             <CubeIcon size={36} />
             <Link
-                href="/"
+              href="/"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 fontWeight: 700,
@@ -340,6 +493,10 @@ export default function LoginPage() {
                 placeholder="Enter your username"
                 value={username}
                 onChange={setUsername}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter")
+                    document.getElementById("login-password")?.focus();
+                }}
                 icon={
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
                     <circle
@@ -400,32 +557,14 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <InputField
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={setPassword}
-                icon={
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                    <rect
-                      x="5"
-                      y="11"
-                      width="14"
-                      height="10"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <path
-                      d="M8 11V7a4 4 0 018 0v4"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="12" cy="16" r="1.5" fill="currentColor" />
-                  </svg>
-                }
-              />
+              <div id="login-password">
+                <PasswordField
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={setPassword}
+                  onKeyDown={handleEnter}
+                />
+              </div>
             </div>
 
             <div

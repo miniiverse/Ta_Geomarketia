@@ -3,16 +3,44 @@
 import Link from "next/link";
 
 const projects = [
-  { id: 1, name: "Retail Site Selection",       category: "Retail",          totalData: "100", price: "Rp70.000", date: "Mar 10, 2026" },
-  { id: 2, name: "F&B Market Mapping",           category: "Food & Beverage", totalData:"120",   price: "Rp30.000", date: "Mar 10, 2026" },
-  { id: 3, name: "Healthcare Facility Planning", category: "Healthcare",      totalData: "110",  price: "Rp60.000", date: "Mar 10, 2026" },
-  { id: 4, name: "Healthcare Access Gap",        category: "Healthcare",      totalData: "150",   price: "Rp40.000", date: "Mar 10, 2026" },
+  {
+    id: 1,
+    name: "Retail Site Selection",
+    category: "Retail",
+    totalData: "100",
+    price: "Rp70.000",
+    date: "Mar 10, 2026",
+  },
+  {
+    id: 2,
+    name: "F&B Market Mapping",
+    category: "Food & Beverage",
+    totalData: "120",
+    price: "Rp30.000",
+    date: "Mar 10, 2026",
+  },
+  {
+    id: 3,
+    name: "Healthcare Facility Planning",
+    category: "Healthcare",
+    totalData: "110",
+    price: "Rp60.000",
+    date: "Mar 10, 2026",
+  },
+  {
+    id: 4,
+    name: "Healthcare Access Gap",
+    category: "Healthcare",
+    totalData: "150",
+    price: "Rp40.000",
+    date: "Mar 10, 2026",
+  },
 ];
 
 const categoryColors: Record<string, { color: string; bg: string }> = {
-  "Retail":          { color: "#1A56DB", bg: "#EBF3FF" },
+  Retail: { color: "#1A56DB", bg: "#EBF3FF" },
   "Food & Beverage": { color: "#d97706", bg: "#FFFBEB" },
-  "Healthcare":      { color: "#059669", bg: "#ECFDF5" },
+  Healthcare: { color: "#059669", bg: "#ECFDF5" },
 };
 
 export default function ProjectList() {
@@ -57,7 +85,13 @@ export default function ProjectList() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "#F8FAFF" }}>
-              {["Project Name", "Category", "Total Data", "Price", "Last Updated"].map((col) => (
+              {[
+                "Project Name",
+                "Category",
+                "Total Data",
+                "Price",
+                "Last Updated",
+              ].map((col) => (
                 <th
                   key={col}
                   style={{
@@ -80,17 +114,27 @@ export default function ProjectList() {
           </thead>
           <tbody>
             {projects.map((project, i) => {
-              const cat = categoryColors[project.category] || { color: "#1A56DB", bg: "#EBF3FF" };
+              const cat = categoryColors[project.category] || {
+                color: "#1A56DB",
+                bg: "#EBF3FF",
+              };
 
               return (
                 <tr
                   key={project.id}
                   style={{
-                    borderBottom: i < projects.length - 1 ? "1px solid #f8fafc" : "none",
+                    borderBottom:
+                      i < projects.length - 1 ? "1px solid #f8fafc" : "none",
                     transition: "background 0.15s",
                   }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#FAFBFF")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "#FAFBFF")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "transparent")
+                  }
                 >
                   <td
                     style={{
@@ -120,8 +164,6 @@ export default function ProjectList() {
                     </span>
                   </td>
 
-                  {/* Kolom Total Data — menggantikan Status */}
-                  <td style={{ padding: "13px 18px", whiteSpace: "nowrap" }}>
                   <td
                     style={{
                       padding: "13px 18px",
@@ -133,7 +175,6 @@ export default function ProjectList() {
                     }}
                   >
                     {project.totalData}
-                  </td>
                   </td>
 
                   <td
@@ -216,7 +257,16 @@ export default function ProjectList() {
           }}
         >
           View All Projects
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>

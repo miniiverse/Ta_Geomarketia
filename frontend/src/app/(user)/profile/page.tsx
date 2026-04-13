@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const BLUE = "#1A56DB";
 const BLUE_LIGHT = "#EBF3FF";
 const BLUE_BORDER = "#BFDBFE";
 const BLUE_DARK = "#1340B0";
-
 const GRAD = `linear-gradient(90deg, ${BLUE}, ${BLUE_DARK})`;
 const GRAD_135 = `linear-gradient(135deg, ${BLUE} 0%, ${BLUE_DARK} 100%)`;
 
@@ -97,31 +96,6 @@ function SaveIcon() {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CancelIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <line
-        x1="18"
-        y1="6"
-        x2="6"
-        y2="18"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <line
-        x1="6"
-        y1="6"
-        x2="18"
-        y2="18"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
       />
     </svg>
   );
@@ -221,33 +195,188 @@ function FolderIcon() {
   );
 }
 
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+// Ambil inisial dari nama
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState({
-    fullName: "Cassandra Lee",
-    username: "cassandra_123",
-    email: "cassandralee13@gmail.com",
+    fullName: "",
+    username: "",
+    email: "",
+    createdAt: null as string | null,
+    photoUrl: null as string | null,
   });
 
-  const [draft, setDraft] = useState({ ...profile });
+  const [draft, setDraft] = useState({ fullName: "", username: "", email: "" });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:8000/api/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          window.location.href = "/login";
+          return;
+        }
+
+        setProfile({
+          fullName: data.user.fullname ?? "",
+          username: data.user.username ?? "",
+          email: data.user.email ?? "",
+          createdAt: data.user.created_at,
+          photoUrl: data.user.profile_photo ?? null,
+        });
+        setDraft({
+          fullName: data.user.fullname ?? "",
+          username: data.user.username ?? "",
+          email: data.user.email ?? "",
+        });
+      } catch {
+        window.location.href = "/login";
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
-    setDraft({ ...profile });
+    setDraft({
+      fullName: profile.fullName,
+      username: profile.username,
+      email: profile.email,
+    });
     setIsEditing(true);
   };
+
   const handleCancel = () => {
-    setDraft({ ...profile });
+    setDraft({
+      fullName: profile.fullName,
+      username: profile.username,
+      email: profile.email,
+    });
     setIsEditing(false);
   };
+
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setProfile({ ...draft });
-    setIsEditing(false);
-    setIsSaving(false);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("http://localhost:8000/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fullname: draft.fullName,
+          username: draft.username,
+          email: draft.email,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      setProfile((p) => ({
+        ...p,
+        fullName: draft.fullName,
+        username: draft.username,
+        email: draft.email,
+      }));
+      setIsEditing(false);
+    } catch {
+      alert("Gagal menyimpan profil.");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validasi ukuran max 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran foto maksimal 2MB.");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    try {
+      const res = await fetch("http://localhost:8000/api/profile/photo", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+      setProfile((p) => ({ ...p, photoUrl: data.photo_url }));
+    } catch {
+      alert("Gagal upload foto.");
+    } finally {
+      setUploadingPhoto(false);
+      // Reset input agar bisa upload file yang sama lagi
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  if (loading) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          background: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}
+      >
+        <p style={{ color: "#94a3b8", fontSize: 14 }}>Loading...</p>
+      </main>
+    );
+  }
 
   return (
     <main
@@ -257,19 +386,8 @@ export default function ProfilePage() {
         fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >
-      <div
-        style={{
-          background: "#fff",
-          borderBottom: "1px solid #E5E7EB",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "40px 40px",
-          }}
-        >
+      <div style={{ background: "#fff", borderBottom: "1px solid #E5E7EB" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 40px" }}>
           <h1
             style={{
               margin: 0,
@@ -298,15 +416,15 @@ export default function ProfilePage() {
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: "0 40px 40px",
+          padding: "2rem 40px 40px",
           display: "grid",
           gridTemplateColumns: "300px 1fr",
           gap: "1.5rem",
           alignItems: "start",
-          paddingTop: "2rem",
           boxSizing: "border-box",
         }}
       >
+        {/* Kolom Kiri */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >
@@ -319,15 +437,7 @@ export default function ProfilePage() {
               overflow: "hidden",
             }}
           >
-            <div
-              style={{
-                height: 100,
-                background: GRAD_135,
-                position: "relative",
-                overflow: "hidden",
-              }}
-            />
-
+            <div style={{ height: 100, background: GRAD_135 }} />
             <div
               style={{
                 display: "flex",
@@ -337,6 +447,7 @@ export default function ProfilePage() {
                 marginTop: -46,
               }}
             >
+              {/* Avatar + tombol kamera */}
               <div style={{ position: "relative" }}>
                 <div
                   style={{
@@ -352,42 +463,86 @@ export default function ProfilePage() {
                     justifyContent: "center",
                   }}
                 >
-                  <svg
-                    width="46"
-                    height="46"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ opacity: 0.3 }}
-                  >
-                    <circle cx="12" cy="8" r="5" fill={BLUE} />
-                    <path
-                      d="M3 21c0-5 4-8.5 9-8.5s9 3.5 9 8.5"
-                      fill={BLUE_DARK}
+                  {profile.photoUrl ? (
+                    <img
+                      src={profile.photoUrl}
+                      alt="Profile"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
-                  </svg>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: 28,
+                        fontWeight: 800,
+                        color: BLUE,
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {profile.fullName ? getInitials(profile.fullName) : "?"}
+                    </span>
+                  )}
                 </div>
-                {isEditing && (
-                  <button
-                    style={{
-                      position: "absolute",
-                      bottom: 2,
-                      right: 2,
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      background: GRAD_135,
-                      border: "2.5px solid #fff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      boxShadow: `0 2px 8px ${BLUE}40`,
-                    }}
-                    aria-label="Ganti foto"
-                  >
+
+                {/* Tombol kamera — selalu tampil, bukan hanya saat editing */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  style={{
+                    position: "absolute",
+                    bottom: 2,
+                    right: 2,
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    background: uploadingPhoto ? "#93C5FD" : GRAD_135,
+                    border: "2.5px solid #fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: uploadingPhoto ? "not-allowed" : "pointer",
+                    boxShadow: `0 2px 8px ${BLUE}40`,
+                  }}
+                  aria-label="Ganti foto"
+                >
+                  {uploadingPhoto ? (
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      style={{ animation: "spin 0.8s linear infinite" }}
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke="rgba(255,255,255,0.35)"
+                        strokeWidth="2.5"
+                      />
+                      <path
+                        d="M12 3a9 9 0 019 9"
+                        stroke="white"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  ) : (
                     <CameraIcon />
-                  </button>
-                )}
+                  )}
+                </button>
+
+                {/* Input file tersembunyi */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpg,image/jpeg,image/png,image/webp"
+                  onChange={handlePhotoChange}
+                  style={{ display: "none" }}
+                />
               </div>
 
               <p
@@ -400,7 +555,7 @@ export default function ProfilePage() {
                   textAlign: "center",
                 }}
               >
-                {profile.fullName}
+                {profile.fullName || "-"}
               </p>
               <p
                 style={{
@@ -491,11 +646,12 @@ export default function ProfilePage() {
                     gap: 8,
                     width: "100%",
                   }}
-                ></div>
+                />
               )}
             </div>
           </div>
 
+          {/* Activity */}
           <div
             style={{
               background: "#fff",
@@ -527,14 +683,14 @@ export default function ProfilePage() {
               <StatRow
                 icon={<CalendarIcon />}
                 label="Member since"
-                value="Jan 2024"
+                value={formatDate(profile.createdAt)}
                 color={BLUE}
                 bg={BLUE_LIGHT}
               />
               <StatRow
                 icon={<FolderIcon />}
                 label="Projects"
-                value="12 Projects"
+                value="—"
                 color={BLUE_DARK}
                 bg={BLUE_LIGHT}
               />
@@ -542,6 +698,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Kolom Kanan */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >
@@ -665,7 +822,6 @@ export default function ProfilePage() {
                       fontSize: "0.85rem",
                       fontWeight: 600,
                       cursor: "pointer",
-                      transition: "border-color 0.15s",
                     }}
                     onMouseEnter={(e) =>
                       ((e.currentTarget as HTMLElement).style.borderColor =
@@ -694,7 +850,6 @@ export default function ProfilePage() {
                       fontWeight: 600,
                       cursor: isSaving ? "not-allowed" : "pointer",
                       boxShadow: `0 2px 8px ${BLUE}25`,
-                      transition: "opacity 0.15s",
                     }}
                   >
                     <SaveIcon /> {isSaving ? "Saving..." : "Save Changes"}
@@ -704,6 +859,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Account Details */}
           <div
             style={{
               background: "#fff",
@@ -781,14 +937,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div
-              style={{
-                padding: "1.25rem 2rem",
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "1rem",
-              }}
-            >
+            <div style={{ padding: "1.25rem 2rem" }}>
               <InfoItem
                 icon={
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
@@ -830,46 +979,10 @@ export default function ProfilePage() {
                   </svg>
                 }
                 label="Joined since"
-                value="January, 12 2026"
+                value={formatDate(profile.createdAt)}
                 color="#059669"
                 bg="#ECFDF5"
                 borderColor="#A7F3D0"
-              />
-              <InfoItem
-                icon={
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <line
-                      x1="12"
-                      y1="6"
-                      x2="12"
-                      y2="12"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                    <line
-                      x1="12"
-                      y1="12"
-                      x2="16"
-                      y2="14"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                }
-                label="Last login"
-                value="Today, 09:42"
-                color={BLUE_DARK}
-                bg={BLUE_LIGHT}
-                borderColor={BLUE_BORDER}
               />
             </div>
           </div>
@@ -878,6 +991,7 @@ export default function ProfilePage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .profile-grid { grid-template-columns: 1fr !important; padding: 1.5rem 1rem !important; }
         }
@@ -1061,7 +1175,7 @@ function Field({
           color: "#111827",
           outline: "none",
           fontFamily: "'Inter', system-ui, sans-serif",
-          boxSizing: "border-box" as const,
+          boxSizing: "border-box",
           transition: "border-color 0.15s, box-shadow 0.15s",
           cursor: isEditing ? "text" : "default",
           boxShadow: isEditing ? `0 0 0 3px ${BLUE}18` : "none",

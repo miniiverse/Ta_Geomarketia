@@ -14,18 +14,9 @@ const C = {
 } as const;
 
 const navLinks = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-  },
-  {
-    label: "Projects",
-    href: "/projects-list",
-  },
-  {
-    label: "My Transactions",
-    href: "/transactions",
-  },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Projects", href: "/projects-list" },
+  { label: "My Transactions", href: "/transactions" },
 ];
 
 function CubeIcon({ size = 32 }: { size?: number }) {
@@ -106,6 +97,127 @@ function ProfileIcon() {
   );
 }
 
+const menuItems = [
+  {
+    label: "My Profile",
+    href: "/profile",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4v-6H9v6H5a2 2 0 01-2-2z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Projects",
+    href: "/projects-list",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <rect
+          x="3"
+          y="4"
+          width="18"
+          height="16"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Transactions",
+    href: "/transactions",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <rect
+          x="2"
+          y="6"
+          width="20"
+          height="12"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <line
+          x1="2"
+          y1="10"
+          x2="22"
+          y2="10"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "My Analysis",
+    href: "/myanalysis",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 19V5M10 19V9M16 19V13M22 19V3"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Logout",
+    href: "/dashboard",
+    danger: true,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <polyline
+          points="16 17 21 12 16 7"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <line
+          x1="21"
+          y1="12"
+          x2="9"
+          y2="12"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    ),
+  },
+];
+
 function ProfileDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -119,129 +231,25 @@ function ProfileDropdown() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const menuItems = [
-    {
-      label: "My Profile",
-      href: "/profile",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <circle
-            cx="12"
-            cy="8"
-            r="4"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <path
-            d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4v-6H9v6H5a2 2 0 01-2-2z"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
-    },
-    {
-      label: "Projects",
-      href: "/projects-list",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <rect
-            x="3"
-            y="4"
-            width="18"
-            height="16"
-            rx="2"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-        </svg>
-      ),
-    },
-    {
-      label: "Transactions",
-      href: "/transactions",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <rect
-            x="2"
-            y="6"
-            width="20"
-            height="12"
-            rx="2"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <line
-            x1="2"
-            y1="10"
-            x2="22"
-            y2="10"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-        </svg>
-      ),
-    },
-    {
-      label: "My Analysis",
-      href: "/myanalysis",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M4 19V5M10 19V9M16 19V13M22 19V3"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-
-    {
-      label: "Logout",
-      href: "/logout",
-      danger: true,
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <polyline
-            points="16 17 21 12 16 7"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-          <line
-            x1="21"
-            y1="12"
-            x2="9"
-            y2="12"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
-        </svg>
-      ),
-    },
-  ];
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await fetch("http://localhost:8000/api/logout", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (e) {
+      // tetap logout meski API gagal
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      document.cookie = "token=; path=/; max-age=0";
+      window.location.href = "/login";
+    }
+  };
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -395,7 +403,6 @@ function ProfileDropdown() {
                   }}
                 />
               )}
-
               {item.label === "Logout" && (
                 <div
                   style={{
@@ -406,23 +413,63 @@ function ProfileDropdown() {
                 />
               )}
 
-              <Link
-                href={item.href}
-                onClick={() => setOpen(false)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "9px 16px",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: item.danger ? "#DC2626" : C.textMuted,
-                  textDecoration: "none",
-                }}
-              >
-                <span style={{ opacity: 0.7 }}>{item.icon}</span>
-                {item.label}
-              </Link>
+              {item.label === "Logout" ? (
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "9px 16px",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: "#DC2626",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "'Inter', sans-serif",
+                    textAlign: "left",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "#fff5f5")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background = "none")
+                  }
+                >
+                  <span style={{ opacity: 0.7 }}>{item.icon}</span>
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "9px 16px",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: C.textMuted,
+                    textDecoration: "none",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background =
+                      "#f8faff")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.background = "none")
+                  }
+                >
+                  <span style={{ opacity: 0.7 }}>{item.icon}</span>
+                  {item.label}
+                </Link>
+              )}
             </Fragment>
           ))}
         </div>
@@ -536,7 +583,6 @@ export default function UserNavbar() {
                     letterSpacing: "-0.01em",
                     whiteSpace: "nowrap",
                     transition: "color 0.15s, background 0.15s",
-                    position: "relative",
                   }}
                   onMouseEnter={(e) => {
                     if (!on) {
@@ -554,13 +600,6 @@ export default function UserNavbar() {
                     }
                   }}
                 >
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      opacity: on ? 1 : 0.55,
-                      transition: "opacity 0.15s",
-                    }}
-                  ></span>
                   {label}
                 </Link>
               );
@@ -576,7 +615,6 @@ export default function UserNavbar() {
             }}
           >
             <ProfileDropdown />
-
             <button
               className="gm-burger"
               onClick={() => setMenuOpen((v) => !v)}
@@ -658,7 +696,6 @@ export default function UserNavbar() {
             >
               Navigation
             </p>
-
             {navLinks.map(({ label, href }) => {
               const on = pathname === href || pathname.startsWith(href + "/");
               return (
@@ -681,7 +718,6 @@ export default function UserNavbar() {
                     letterSpacing: "-0.01em",
                   }}
                 >
-                  <span style={{ opacity: on ? 1 : 0.5 }}></span>
                   {label}
                   {on && (
                     <span
@@ -737,8 +773,7 @@ export default function UserNavbar() {
                   textDecoration: "none",
                 }}
               >
-                <CartIcon />
-                Cart
+                <CartIcon /> Cart
               </Link>
               <Link
                 href="/profile"
@@ -758,8 +793,7 @@ export default function UserNavbar() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                <ProfileIcon />
-                Profile
+                <ProfileIcon /> Profile
               </Link>
             </div>
           </div>
