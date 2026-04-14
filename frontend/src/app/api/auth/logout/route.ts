@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch {
-      // lanjut logout meski Laravel tidak bisa dihubungi
     }
   }
 

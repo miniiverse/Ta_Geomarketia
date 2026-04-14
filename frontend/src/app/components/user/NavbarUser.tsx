@@ -107,7 +107,6 @@ function Avatar({
   size?: number;
 }) {
   const [imgError, setImgError] = useState(false);
-
   if (photoUrl && !imgError) {
     return (
       <img
@@ -126,7 +125,6 @@ function Avatar({
       />
     );
   }
-
   return (
     <div
       style={{
@@ -157,7 +155,6 @@ function AvatarDropdownHeader({
   initials: string;
 }) {
   const [imgError, setImgError] = useState(false);
-
   if (photoUrl && !imgError) {
     return (
       <img
@@ -176,7 +173,6 @@ function AvatarDropdownHeader({
       />
     );
   }
-
   return (
     <div
       style={{
@@ -328,6 +324,7 @@ function ProfileDropdown() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
+  // ① Fetch data user saat pertama kali mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -339,7 +336,6 @@ function ProfileDropdown() {
 
         const data = await res.json();
         const user = data.user;
-
         const name = user.fullname ?? "User";
         setFullname(name);
 
@@ -349,20 +345,43 @@ function ProfileDropdown() {
             ? (parts[0][0] + parts[1][0]).toUpperCase()
             : name.slice(0, 2).toUpperCase();
         setInitials(ini);
-
         setEmail(user.email ?? "");
-
-        if (user.profile_photo) {
-          setPhotoUrl(user.profile_photo);
-        }
+        if (user.profile_photo) setPhotoUrl(user.profile_photo);
       } catch {
-        // gagal fetch — biarkan default value
       }
     };
-
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const url = (e as CustomEvent).detail?.photoUrl;
+      if (url) setPhotoUrl(url);
+    };
+    window.addEventListener("profile-photo-updated", handler);
+    return () => window.removeEventListener("profile-photo-updated", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail) return;
+      if (detail.fullname) {
+        setFullname(detail.fullname);
+        const parts = detail.fullname.trim().split(" ");
+        const ini =
+          parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : detail.fullname.slice(0, 2).toUpperCase();
+        setInitials(ini);
+      }
+      if (detail.email) setEmail(detail.email);
+    };
+    window.addEventListener("profile-updated", handler);
+    return () => window.removeEventListener("profile-updated", handler);
+  }, []);
+
+  // ④ Tutup dropdown kalau klik di luar
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
@@ -381,7 +400,7 @@ function ProfileDropdown() {
     } catch {
       // lanjut logout meski request gagal
     } finally {
-      window.location.href = "/";
+      window.location.href = "/login";
     }
   };
 
@@ -547,8 +566,7 @@ function ProfileDropdown() {
                     ((e.currentTarget as HTMLElement).style.background = "none")
                   }
                 >
-                  <span style={{ opacity: 0.7 }}>{item.icon}</span>
-                  Logout
+                  <span style={{ opacity: 0.7 }}>{item.icon}</span>Logout
                 </button>
               ) : (
                 <Link
@@ -911,6 +929,7 @@ export default function UserNavbar() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .gm-desktop { display: none !important; }
           .gm-burger  { display: inline-flex !important; }

@@ -180,9 +180,7 @@ class AuthController extends Controller
         $folder = $user->role_id === 1 ? 'photos/admin' : 'photos';
         $path = $request->file('photo')->store($folder, 'public');
 
-        DB::table('users')
-            ->where('user_id', $user->user_id)
-            ->update(['profile_photo' => $path]);
+        $user->update(['profile_photo' => $path]); 
 
         return response()->json([
             'success'   => true,

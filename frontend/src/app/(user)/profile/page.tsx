@@ -234,6 +234,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        // ✅ Pakai Next.js API route — token dibaca server-side dari HttpOnly cookie
         const res = await fetch("/api/me", {
           credentials: "include",
           headers: { Accept: "application/json" },
@@ -261,7 +262,6 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -308,6 +308,15 @@ export default function ProfilePage() {
         email: draft.email,
       }));
       setIsEditing(false);
+
+      window.dispatchEvent(
+        new CustomEvent("profile-updated", {
+          detail: {
+            fullname: draft.fullName,
+            email: draft.email,
+          },
+        }),
+      );
     } catch {
       alert("Gagal menyimpan profil.");
     } finally {
@@ -318,7 +327,6 @@ export default function ProfilePage() {
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > 2 * 1024 * 1024) {
       alert("Ukuran foto maksimal 2MB.");
       return;
@@ -336,10 +344,17 @@ export default function ProfilePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message);
+        alert(data.message ?? `Upload gagal (${res.status})`);
         return;
       }
       setProfile((p) => ({ ...p, photoUrl: data.photo_url }));
+
+      // ✅ Beritahu navbar ada foto baru
+      window.dispatchEvent(
+        new CustomEvent("profile-photo-updated", {
+          detail: { photoUrl: data.photo_url },
+        }),
+      );
     } catch {
       alert("Gagal upload foto.");
     } finally {
@@ -347,23 +362,6 @@ export default function ProfilePage() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
-
-  if (loading) {
-    return (
-      <main
-        style={{
-          minHeight: "100vh",
-          background: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "'Inter', system-ui, sans-serif",
-        }}
-      >
-        <p style={{ color: "#94a3b8", fontSize: 14 }}>Loading...</p>
-      </main>
-    );
-  }
 
   return (
     <main
@@ -635,7 +633,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Activity */}
           <div
             style={{
               background: "#fff",
@@ -843,7 +840,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Account Details */}
           <div
             style={{
               background: "#fff",
@@ -920,7 +916,6 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
-
             <div style={{ padding: "1.25rem 2rem" }}>
               <InfoItem
                 icon={

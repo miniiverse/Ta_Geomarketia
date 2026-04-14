@@ -117,6 +117,7 @@ export default function AdminNavbar({
   const [role, setRole] = useState<string>("Administrator");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
+  // ① Fetch data user saat pertama kali mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -155,6 +156,36 @@ export default function AdminNavbar({
     };
 
     fetchUser();
+  }, []);
+
+  // ② ✅ Dengerin update FOTO dari profile page
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const url = (e as CustomEvent).detail?.photoUrl;
+      if (url) setPhotoUrl(url);
+    };
+    window.addEventListener("profile-photo-updated", handler);
+    return () => window.removeEventListener("profile-photo-updated", handler);
+  }, []);
+
+  // ③ ✅ Dengerin update NAMA & EMAIL dari profile page
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail) return;
+      if (detail.fullname) {
+        setFullname(detail.fullname);
+        const parts = detail.fullname.trim().split(" ");
+        const ini =
+          parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : detail.fullname.slice(0, 2).toUpperCase();
+        setInitials(ini);
+      }
+      if (detail.email) setEmail(detail.email);
+    };
+    window.addEventListener("profile-updated", handler);
+    return () => window.removeEventListener("profile-updated", handler);
   }, []);
 
   const handleLogout = async () => {

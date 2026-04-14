@@ -3,50 +3,6 @@
 import { useState, useEffect } from "react";
 import ProfileCard, { type ProfileForm } from "./components/ProfileCard";
 
-const PencilIcon = (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-    <path d="m15 5 4 4" />
-  </svg>
-);
-const CheckIcon = (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 6 9 17l-5-5" />
-  </svg>
-);
-const XIcon = (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M18 6 6 18M6 6l12 12" />
-  </svg>
-);
-
 function MiniCalendar() {
   const now = new Date();
   const year = now.getFullYear();
@@ -185,6 +141,7 @@ export default function AdminProfilePage() {
     setFormDraft({ ...form });
     setIsEditingProfile(true);
   };
+
   const handleCancelProfile = () => {
     setFormDraft({ ...form });
     setIsEditingProfile(false);
@@ -211,6 +168,16 @@ export default function AdminProfilePage() {
       setIsEditingProfile(false);
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2500);
+
+      // ✅ Beritahu navbar ada perubahan nama & email
+      window.dispatchEvent(
+        new CustomEvent("profile-updated", {
+          detail: {
+            fullname: formDraft.fullName,
+            email: formDraft.email,
+          },
+        }),
+      );
     } catch {
       alert("Gagal menyimpan profil.");
     }
@@ -231,6 +198,13 @@ export default function AdminProfilePage() {
         return;
       }
       setPhotoUrl(data.photo_url);
+
+      // ✅ Beritahu navbar ada foto baru
+      window.dispatchEvent(
+        new CustomEvent("profile-photo-updated", {
+          detail: { photoUrl: data.photo_url },
+        }),
+      );
     } catch {
       alert("Gagal mengupload foto.");
     }
