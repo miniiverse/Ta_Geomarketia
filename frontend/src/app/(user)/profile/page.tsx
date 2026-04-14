@@ -205,7 +205,6 @@ function formatDate(dateStr: string | null) {
   });
 }
 
-// Ambil inisial dari nama
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -234,22 +233,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "/login";
-        return;
-      }
-
       try {
-        const res = await fetch("http://localhost:8000/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
         });
-        const data = await res.json();
         if (!res.ok) {
           window.location.href = "/login";
           return;
         }
-
+        const data = await res.json();
         setProfile({
           fullName: data.user.fullname ?? "",
           username: data.user.username ?? "",
@@ -292,14 +285,11 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:8000/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullname: draft.fullName,
           username: draft.username,
@@ -329,21 +319,19 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validasi ukuran max 2MB
     if (file.size > 2 * 1024 * 1024) {
       alert("Ukuran foto maksimal 2MB.");
       return;
     }
 
     setUploadingPhoto(true);
-    const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("photo", file);
 
     try {
-      const res = await fetch("http://localhost:8000/api/profile/photo", {
+      const res = await fetch("/api/profile/photo", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
         body: formData,
       });
       const data = await res.json();
@@ -356,7 +344,6 @@ export default function ProfilePage() {
       alert("Gagal upload foto.");
     } finally {
       setUploadingPhoto(false);
-      // Reset input agar bisa upload file yang sama lagi
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -447,7 +434,6 @@ export default function ProfilePage() {
                 marginTop: -46,
               }}
             >
-              {/* Avatar + tombol kamera */}
               <div style={{ position: "relative" }}>
                 <div
                   style={{
@@ -487,7 +473,6 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Tombol kamera — selalu tampil, bukan hanya saat editing */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingPhoto}
@@ -535,7 +520,6 @@ export default function ProfilePage() {
                   )}
                 </button>
 
-                {/* Input file tersembunyi */}
                 <input
                   ref={fileInputRef}
                   type="file"

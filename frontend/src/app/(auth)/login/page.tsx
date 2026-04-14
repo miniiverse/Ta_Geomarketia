@@ -290,25 +290,27 @@ export default function LoginPage() {
     if (!username || !password) return;
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/login", {
+      const res = await fetch("/api/auth/login", {
+        // ← ke Next.js, bukan Laravel langsung
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.message);
         return;
       }
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+
+      // ✅ Tidak perlu set cookie manual — sudah di-handle HttpOnly oleh server
       if (data.user.role === "admin") {
         window.location.href = "/admin/dashboard-admin";
       } else {
         window.location.href = "/dashboard";
       }
-    } catch (err) {
+    } catch {
       alert("Gagal terhubung ke server.");
     } finally {
       setLoading(false);

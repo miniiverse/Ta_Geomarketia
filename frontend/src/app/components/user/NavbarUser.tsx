@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react";
@@ -94,6 +94,108 @@ function ProfileIcon() {
         strokeLinecap="round"
       />
     </svg>
+  );
+}
+
+function Avatar({
+  photoUrl,
+  initials,
+  size = 32,
+}: {
+  photoUrl: string | null;
+  initials: string;
+  size?: number;
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  if (photoUrl && !imgError) {
+    return (
+      <img
+        src={photoUrl}
+        alt="Profile"
+        onError={() => setImgError(true)}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          objectFit: "cover",
+          flexShrink: 0,
+          border: "2px solid rgba(255,255,255,0.3)",
+          display: "block",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "rgba(255,255,255,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        fontSize: size <= 24 ? 10 : 12,
+        fontWeight: 700,
+        color: "#fff",
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      {size <= 24 ? <ProfileIcon /> : initials}
+    </div>
+  );
+}
+
+function AvatarDropdownHeader({
+  photoUrl,
+  initials,
+}: {
+  photoUrl: string | null;
+  initials: string;
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  if (photoUrl && !imgError) {
+    return (
+      <img
+        src={photoUrl}
+        alt="Profile"
+        onError={() => setImgError(true)}
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: "50%",
+          objectFit: "cover",
+          marginBottom: 6,
+          border: "2px solid #BFDBFE",
+          display: "block",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: 32,
+        height: 32,
+        borderRadius: "50%",
+        background: C.blue,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 6,
+        fontSize: 12,
+        fontWeight: 700,
+        color: "#fff",
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      {initials || <ProfileIcon />}
+    </div>
   );
 }
 
@@ -191,7 +293,7 @@ const menuItems = [
   },
   {
     label: "Logout",
-    href: "/dashboard",
+    href: "/",
     danger: true,
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -220,7 +322,46 @@ const menuItems = [
 
 function ProfileDropdown() {
   const [open, setOpen] = useState(false);
+  const [fullname, setFullname] = useState<string>("User");
+  const [initials, setInitials] = useState<string>("U");
+  const [email, setEmail] = useState<string>("");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const user = data.user;
+
+        const name = user.fullname ?? "User";
+        setFullname(name);
+
+        const parts = name.trim().split(" ");
+        const ini =
+          parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : name.slice(0, 2).toUpperCase();
+        setInitials(ini);
+
+        setEmail(user.email ?? "");
+
+        if (user.profile_photo) {
+          setPhotoUrl(user.profile_photo);
+        }
+      } catch {
+        // gagal fetch — biarkan default value
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -232,22 +373,15 @@ function ProfileDropdown() {
   }, []);
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
     try {
-      await fetch("http://localhost:8000/api/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
       });
-    } catch (e) {
-      // tetap logout meski API gagal
+    } catch {
+      // lanjut logout meski request gagal
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      document.cookie = "token=; path=/; max-age=0";
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 
@@ -259,7 +393,7 @@ function ProfileDropdown() {
           display: "inline-flex",
           alignItems: "center",
           gap: 7,
-          padding: "7px 16px 7px 10px",
+          padding: "7px 16px 7px 7px",
           borderRadius: 100,
           background: open ? C.blueHover : C.blue,
           border: "none",
@@ -291,20 +425,7 @@ function ProfileDropdown() {
         aria-label="Profile menu"
         aria-expanded={open}
       >
-        <span
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.2)",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <ProfileIcon />
-        </span>
+        <Avatar photoUrl={photoUrl} initials={initials} size={24} />
         Profile
         <svg
           width="11"
@@ -354,20 +475,7 @@ function ProfileDropdown() {
             background: "#F8FBFF",
           }}
         >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: C.blue,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 6,
-            }}
-          >
-            <ProfileIcon />
-          </div>
+          <AvatarDropdownHeader photoUrl={photoUrl} initials={initials} />
           <p
             style={{
               margin: 0,
@@ -377,7 +485,7 @@ function ProfileDropdown() {
               color: "#0F172A",
             }}
           >
-            User Name
+            {fullname}
           </p>
           <p
             style={{
@@ -387,7 +495,7 @@ function ProfileDropdown() {
               color: C.textMuted,
             }}
           >
-            user@geomarketia.com
+            {email}
           </p>
         </div>
 
@@ -412,7 +520,6 @@ function ProfileDropdown() {
                   }}
                 />
               )}
-
               {item.label === "Logout" ? (
                 <button
                   onClick={handleLogout}

@@ -1,47 +1,201 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProfileCard, { type ProfileForm } from "./components/ProfileCard";
-import SecurityCard, { type PasswordFields } from "./components/SecurityCard";
+
+const PencilIcon = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    <path d="m15 5 4 4" />
+  </svg>
+);
+const CheckIcon = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
+const XIcon = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M18 6 6 18M6 6l12 12" />
+  </svg>
+);
+
+function MiniCalendar() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+
+  const monthName = now.toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div style={{ width: "100%" }}>
+      <p
+        style={{
+          margin: "0 0 12px",
+          fontSize: "13px",
+          fontWeight: 700,
+          color: "#1A56DB",
+          textAlign: "center",
+          textTransform: "capitalize",
+        }}
+      >
+        {monthName}
+      </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "2px",
+          marginBottom: "6px",
+        }}
+      >
+        {days.map((d) => (
+          <div
+            key={d}
+            style={{
+              textAlign: "center",
+              fontSize: "10px",
+              fontWeight: 700,
+              color: "#94a3b8",
+              padding: "3px 0",
+            }}
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "2px",
+        }}
+      >
+        {cells.map((d, i) => (
+          <div
+            key={i}
+            style={{
+              textAlign: "center",
+              fontSize: "12px",
+              padding: "5px 2px",
+              borderRadius: "6px",
+              fontWeight: d === today ? 700 : 400,
+              background: d === today ? "#1A56DB" : "transparent",
+              color: d === today ? "#fff" : d ? "#374151" : "transparent",
+            }}
+          >
+            {d ?? ""}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function AdminProfilePage() {
   const [form, setForm] = useState<ProfileForm>({
-    fullName: "Admin Geomarketia",
-    email: "admin@geomarketia.com",
-    username: "admin_geomarketia",
+    fullName: "",
+    email: "",
+    username: "",
   });
-  const [formDraft, setFormDraft] = useState<ProfileForm>({ ...form });
+  const [formDraft, setFormDraft] = useState<ProfileForm>({
+    fullName: "",
+    email: "",
+    username: "",
+  });
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
-  const [passwords, setPasswords] = useState<PasswordFields>({
-    old: "",
-    new: "",
-    confirm: "",
-  });
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSaved, setPasswordSaved] = useState(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+          window.location.href = "/login";
+          return;
+        }
+
+        const data = await res.json();
+        const u = data.user;
+        const synced = {
+          fullName: u.fullname,
+          email: u.email,
+          username: u.username,
+        };
+        setForm(synced);
+        setFormDraft(synced);
+        setPhotoUrl(u.profile_photo ?? null);
+        setCreatedAt(u.created_at ?? null);
+      } catch {
+        window.location.href = "/login";
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEditProfile = () => {
     setFormDraft({ ...form });
     setIsEditingProfile(true);
   };
-
   const handleCancelProfile = () => {
     setFormDraft({ ...form });
     setIsEditingProfile(false);
   };
 
   const handleSaveProfile = async () => {
-    const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:8000/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullname: formDraft.fullName,
           username: formDraft.username,
@@ -62,50 +216,44 @@ export default function AdminProfilePage() {
     }
   };
 
-  const handleStartPasswordChange = () => setIsChangingPassword(true);
-
-  const handleCancelPassword = () => {
-    setIsChangingPassword(false);
-    setPasswords({ old: "", new: "", confirm: "" });
-    setPasswordError("");
-  };
-
-  const handleSavePassword = async () => {
-    setPasswordError("");
-    if (!passwords.old || !passwords.new || !passwords.confirm)
-      return setPasswordError("All fields are required.");
-    if (passwords.new !== passwords.confirm)
-      return setPasswordError("Passwords do not match.");
-    if (passwords.new.length < 8)
-      return setPasswordError("Minimum 8 characters.");
-
-    const token = localStorage.getItem("token");
+  const handleSavePhoto = async (file: File) => {
+    const formData = new FormData();
+    formData.append("photo", file);
     try {
-      const res = await fetch("http://localhost:8000/api/password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          old_password: passwords.old,
-          new_password: passwords.new,
-          confirm_password: passwords.confirm,
-        }),
+      const res = await fetch("/api/profile/photo", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) {
-        setPasswordError(data.message);
+        alert(data.message);
         return;
       }
-      setIsChangingPassword(false);
-      setPasswords({ old: "", new: "", confirm: "" });
-      setPasswordSaved(true);
-      setTimeout(() => setPasswordSaved(false), 2500);
+      setPhotoUrl(data.photo_url);
     } catch {
-      alert("Gagal mengubah password.");
+      alert("Gagal mengupload foto.");
     }
   };
+
+  if (loadingProfile && !form.fullName) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+          color: "#94a3b8",
+          fontSize: "15px",
+          background: "#fff",
+        }}
+      >
+        Memuat data profil...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -122,11 +270,7 @@ export default function AdminProfilePage() {
         .card { background:#fff;border-radius:16px;border:1px solid #e8edf5;padding:28px;box-shadow:0 1px 6px rgba(26,86,219,0.06); }
         .input-focus:focus { border-color:#1A56DB !important;background:#fff !important;box-shadow:0 0 0 3px rgba(26,86,219,0.08) !important; }
         .profile-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
-        .stats-row { display:flex; gap:14px; flex-wrap:wrap; }
-        @media (max-width: 900px) {
-          .profile-grid { grid-template-columns: 1fr; }
-          .stats-row { flex-direction: column; }
-        }
+        @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
       `}</style>
 
       <div
@@ -176,47 +320,7 @@ export default function AdminProfilePage() {
               Kelola informasi akun dan keamanan Anda.
             </p>
           </div>
-          <div
-            style={{
-              background: "#fff",
-              border: "1px solid #e8edf5",
-              borderRadius: "12px",
-              padding: "10px 16px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              boxShadow: "0 1px 4px rgba(26,86,219,0.06)",
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#1A56DB"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            <span
-              style={{ fontSize: "13px", fontWeight: 700, color: "#374151" }}
-            >
-              {new Date().toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-          </div>
         </div>
-
-        <div className="stats-row" style={{ marginBottom: "20px" }} />
 
         <div className="profile-grid">
           <ProfileCard
@@ -224,25 +328,29 @@ export default function AdminProfilePage() {
             formDraft={formDraft}
             isEditing={isEditingProfile}
             profileSaved={profileSaved}
+            photoUrl={photoUrl}
+            createdAt={createdAt}
             onEdit={handleEditProfile}
             onCancel={handleCancelProfile}
             onSave={handleSaveProfile}
             onDraftChange={setFormDraft}
+            onSavePhoto={handleSavePhoto}
           />
 
           <div
             style={{ display: "flex", flexDirection: "column", gap: "20px" }}
           >
-            <SecurityCard
-              isChangingPassword={isChangingPassword}
-              passwords={passwords}
-              passwordError={passwordError}
-              passwordSaved={passwordSaved}
-              onStartChange={handleStartPasswordChange}
-              onCancel={handleCancelPassword}
-              onSave={handleSavePassword}
-              onPasswordChange={setPasswords}
-            />
+            <div className="card">
+              <div
+                style={{
+                  height: "3px",
+                  background: "linear-gradient(90deg, #1A56DB, #60A5FA)",
+                  borderRadius: "99px",
+                  marginBottom: "20px",
+                }}
+              />
+              <MiniCalendar />
+            </div>
           </div>
         </div>
       </div>

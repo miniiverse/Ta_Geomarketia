@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import StatsCard from "./components/StatsCard";
 import RecentTransactions from "./components/RecentTransactions";
 import ProjectList from "./components/ProjectList";
@@ -9,6 +10,48 @@ import MonthlySalesSummary from "./components/MonthlySalesSummary";
 import TopSellingServices from "./components/TopSellingService";
 
 export default function DashboardAdminPage() {
+  const [fullname, setFullname] = useState<string>("Admin");
+  const [currentDate, setCurrentDate] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          method: "GET",
+          credentials: "include", // supaya cookie token ikut dikirim
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        setFullname(data.user?.fullname ?? "Admin");
+      } catch {
+        // Gagal fetch, biarkan default "Admin"
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const updateDate = () => {
+      const now = new Date();
+      const formatted = now.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      setCurrentDate(formatted);
+    };
+    updateDate();
+    const interval = setInterval(updateDate, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div
       style={{
@@ -60,7 +103,7 @@ export default function DashboardAdminPage() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Andi Kim
+              {fullname}
             </span>
             ! 👋
           </h1>
@@ -112,7 +155,7 @@ export default function DashboardAdminPage() {
               color: "#374151",
             }}
           >
-            Monday, March 10, 2026
+            {currentDate}
           </span>
         </div>
       </div>

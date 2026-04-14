@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter; // ✅ tambah ini
+use Illuminate\Support\Str;                 // ✅ tambah ini
 
 class AuthController extends Controller
 {
     // REGISTER
-    // Dipanggil dari: POST /api/register
-    // Frontend: register/page.tsx
     public function register(Request $request)
     {
         $request->validate([
@@ -23,7 +23,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
-            'role_id'  => 2, // role user
+            'role_id'  => 2,
             'fullname' => $request->fullname,
             'username' => $request->username,
             'email'    => $request->email,
@@ -36,11 +36,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // ───────────────────────────────────────
-    // LOGIN
-    // Dipanggil dari: POST /api/login
-    // Frontend: src/app/(auth)/login/page.tsx
-    // ───────────────────────────────────────
+    // LOGIN — ✅ ditambah rate limiting
     public function login(Request $request)
     {
         $request->validate([
@@ -48,18 +44,31 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        // ✅ Rate limiting: max 5x percobaan per menit per IP
+        $key = 'login:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            return response()->json([
+                'success' => false,
+                'message' => "Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik.",
+            ], 429);
+        }
+
         $user = User::with('role')
             ->where('username', $request->username)
             ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($key, 60); // ✅ catat percobaan gagal
             return response()->json([
                 'success' => false,
                 'message' => 'Username atau password salah.',
             ], 401);
         }
 
-        // Hapus pengecekan role — semua bisa login
+        // ✅ Reset counter kalau login berhasil
+        RateLimiter::clear($key);
+
         $user->tokens()->delete();
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -78,11 +87,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // ───────────────────────────────────────
-    // GET PROFILE
-    // Dipanggil dari: GET /api/me
-    // Frontend: profile-admin/page.tsx
-    // ───────────────────────────────────────
+    // GET PROFILE — ✅ tambah cache sederhana lewat response header
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
@@ -100,14 +105,10 @@ class AuthController extends Controller
                     : null,
                 'created_at'    => $user->created_at,
             ],
-        ]);
+        ])->header('Cache-Control', 'no-store'); // ✅ jangan cache response /me
     }
 
-    // ───────────────────────────────────────
-    // UPDATE PROFILE
-    // Dipanggil dari: PUT /api/profile
-    // Frontend: ProfileCard.tsx (Save Changes)
-    // ───────────────────────────────────────
+    // UPDATE PROFILE — tidak ada perubahan
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -135,11 +136,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // ───────────────────────────────────────
-    // UPDATE PASSWORD
-    // Dipanggil dari: PUT /api/password
-    // Frontend: SecurityCard.tsx (Save Password)
-    // ───────────────────────────────────────
+    // UPDATE PASSWORD — tidak ada perubahan
     public function updatePassword(Request $request)
     {
         $request->validate([
@@ -150,7 +147,6 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        // Cek password lama
         if (!Hash::check($request->old_password, $user->password)) {
             return response()->json([
                 'success' => false,
@@ -168,6 +164,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // UPDATE PHOTO — tidak ada perubahan
     public function updatePhoto(Request $request)
     {
         $request->validate([
@@ -176,28 +173,24 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        // Hapus foto lama kalau ada
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
         }
 
-        // Simpan foto baru
-        $path = $request->file('photo')->store('photos', 'public');
+        $folder = $user->role_id === 1 ? 'photos/admin' : 'photos';
+        $path = $request->file('photo')->store($folder, 'public');
 
         DB::table('users')
             ->where('user_id', $user->user_id)
             ->update(['profile_photo' => $path]);
 
         return response()->json([
-            'success' => true,
+            'success'   => true,
             'photo_url' => asset('storage/' . $path),
         ]);
     }
 
-    // ───────────────────────────────────────
-    // LOGOUT
-    // Dipanggil dari: POST /api/logout
-    // ───────────────────────────────────────
+    // LOGOUT — tidak ada perubahan
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

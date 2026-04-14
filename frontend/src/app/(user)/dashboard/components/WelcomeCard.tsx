@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const C = {
   blue: "#1A56DB",
@@ -12,12 +12,50 @@ const C = {
   white: "#ffffff",
 } as const;
 
-export default function WelcomeCard({
-  userName = "John",
-}: {
-  userName?: string;
-}) {
+export default function WelcomeCard() {
   const [userHovered, setUserHovered] = useState(false);
+  const [fullname, setFullname] = useState<string>("User");
+  const [role, setRole] = useState<string>("User");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [initials, setInitials] = useState<string>("U");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const user = data.user;
+
+        const name = user.fullname ?? "User";
+        setFullname(name);
+
+        const parts = name.trim().split(" ");
+        const ini =
+          parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : name.slice(0, 2).toUpperCase();
+        setInitials(ini);
+
+        const roleName = user.role
+          ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+          : "User";
+        setRole(roleName);
+
+        if (user.profile_photo) {
+          setPhotoUrl(user.profile_photo);
+        }
+      } catch {
+        // gagal fetch — biarkan default value
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <div
@@ -44,7 +82,6 @@ export default function WelcomeCard({
           pointerEvents: "none",
         }}
       />
-
       <div
         style={{
           position: "absolute",
@@ -58,7 +95,6 @@ export default function WelcomeCard({
           pointerEvents: "none",
         }}
       />
-
       <div
         style={{
           position: "absolute",
@@ -114,7 +150,7 @@ export default function WelcomeCard({
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                {userName}
+                {fullname}
               </span>
             </h1>
           </div>
@@ -153,13 +189,7 @@ export default function WelcomeCard({
             </span>
           </div>
 
-          <div
-            style={{
-              width: 1,
-              height: 34,
-              background: "#BFDBFE",
-            }}
-          />
+          <div style={{ width: 1, height: 34, background: "#BFDBFE" }} />
 
           <div
             onMouseEnter={() => setUserHovered(true)}
@@ -186,13 +216,34 @@ export default function WelcomeCard({
                 overflow: "hidden",
                 border: "2px solid #93C5FD",
                 flexShrink: 0,
+                background: "linear-gradient(135deg, #1A56DB, #34D399)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <img
-                src="https://i.pravatar.cc/150?img=12"
-                alt="user"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={fullname}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display =
+                      "none";
+                  }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: "#fff",
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
+                  {initials}
+                </span>
+              )}
             </div>
             <div>
               <div
@@ -203,7 +254,7 @@ export default function WelcomeCard({
                   lineHeight: 1.2,
                 }}
               >
-                {userName}
+                {fullname}
               </div>
               <div
                 style={{
@@ -213,7 +264,7 @@ export default function WelcomeCard({
                   fontWeight: 500,
                 }}
               >
-                User
+                {role}
               </div>
             </div>
           </div>

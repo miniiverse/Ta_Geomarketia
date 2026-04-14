@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AdminNavbarProps {
   sidebarOpen: boolean;
@@ -55,11 +55,120 @@ function CubeIcon({ size = 32 }: { size?: number }) {
   );
 }
 
+function Avatar({
+  photoUrl,
+  initials,
+  size = 32,
+}: {
+  photoUrl: string | null;
+  initials: string;
+  size?: number;
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  if (photoUrl && !imgError) {
+    return (
+      <img
+        src={photoUrl}
+        alt="Profile"
+        onError={() => setImgError(true)}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          objectFit: "cover",
+          flexShrink: 0,
+          border: "2px solid #BFDBFE",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "linear-gradient(135deg, #1A56DB, #34D399)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: size === 32 ? "12px" : "13px",
+        fontWeight: 700,
+        color: "white",
+        fontFamily: "'Inter', sans-serif",
+        flexShrink: 0,
+      }}
+    >
+      {initials}
+    </div>
+  );
+}
+
 export default function AdminNavbar({
   sidebarOpen,
   onToggleSidebar,
 }: AdminNavbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [fullname, setFullname] = useState<string>("Admin");
+  const [initials, setInitials] = useState<string>("AD");
+  const [email, setEmail] = useState<string>("");
+  const [role, setRole] = useState<string>("Administrator");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const user = data.user;
+
+        const name = user.fullname ?? "Admin";
+        setFullname(name);
+
+        const parts = name.trim().split(" ");
+        const ini =
+          parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : name.slice(0, 2).toUpperCase();
+        setInitials(ini);
+
+        setEmail(user.email ?? "");
+
+        const roleName = user.role
+          ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+          : "Administrator";
+        setRole(roleName);
+
+        if (user.profile_photo) {
+          setPhotoUrl(user.profile_photo);
+        }
+      } catch {
+        // gagal fetch — biarkan default value
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // lanjut logout meski request gagal
+    } finally {
+      window.location.href = "/login";
+    }
+  };
 
   return (
     <>
@@ -153,7 +262,7 @@ export default function AdminNavbar({
             <CubeIcon size={32} />
             <span
               style={{
-                fontFamily: "'Inter', 'Inter', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
                 fontWeight: 700,
                 fontSize: "19px",
                 letterSpacing: "-0.03em",
@@ -216,24 +325,7 @@ export default function AdminNavbar({
                 }
               }}
             >
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg, #1A56DB, #34D399)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "white",
-                  fontFamily: "'Inter', sans-serif",
-                  flexShrink: 0,
-                }}
-              >
-                AK
-              </div>
+              <Avatar photoUrl={photoUrl} initials={initials} size={32} />
               <div style={{ textAlign: "left" }}>
                 <p
                   style={{
@@ -245,7 +337,7 @@ export default function AdminNavbar({
                     lineHeight: 1.3,
                   }}
                 >
-                  Andi Kim
+                  {fullname}
                 </p>
                 <p
                   style={{
@@ -255,7 +347,7 @@ export default function AdminNavbar({
                     fontFamily: "'Inter', sans-serif",
                   }}
                 >
-                  Administrator
+                  {role}
                 </p>
               </div>
               <svg
@@ -296,23 +388,8 @@ export default function AdminNavbar({
                     background: "#F8FBFF",
                   }}
                 >
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      background: "linear-gradient(135deg, #1A56DB, #34D399)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      color: "white",
-                      fontFamily: "'Inter', sans-serif",
-                      marginBottom: 6,
-                    }}
-                  >
-                    AK
+                  <div style={{ marginBottom: 6 }}>
+                    <Avatar photoUrl={photoUrl} initials={initials} size={36} />
                   </div>
                   <p
                     style={{
@@ -323,7 +400,7 @@ export default function AdminNavbar({
                       color: "#0F172A",
                     }}
                   >
-                    Andi Kim
+                    {fullname}
                   </p>
                   <p
                     style={{
@@ -333,12 +410,11 @@ export default function AdminNavbar({
                       color: "#64748b",
                     }}
                   >
-                    admin@geomarketia.com
+                    {email}
                   </p>
                 </div>
 
                 <div style={{ padding: "6px 0" }}>
-                  {/* My Profile */}
                   <button
                     onClick={() =>
                       (window.location.href = "/admin/profile-admin")
@@ -384,28 +460,8 @@ export default function AdminNavbar({
                     My Profile
                   </button>
 
-                  {/* Logout */}
                   <button
-                    onClick={async () => {
-                      const token = localStorage.getItem("token");
-                      try {
-                        await fetch("http://localhost:8000/api/logout", {
-                          method: "POST",
-                          headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                          },
-                        });
-                      } catch (e) {
-                      } finally {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("user");
-
-                        document.cookie = "token=; path=/; max-age=0";
-
-                        window.location.href = "/login";
-                      }
-                    }}
+                    onClick={handleLogout}
                     style={{
                       width: "100%",
                       display: "flex",
