@@ -221,6 +221,7 @@ export default function ProfilePage() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // State untuk menyimpan data profil yang ditampilkan
   const [profile, setProfile] = useState({
     fullName: "",
     username: "",
@@ -234,7 +235,6 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // ✅ Pakai Next.js API route — token dibaca server-side dari HttpOnly cookie
         const res = await fetch("/api/me", {
           credentials: "include",
           headers: { Accept: "application/json" },
@@ -349,7 +349,6 @@ export default function ProfilePage() {
       }
       setProfile((p) => ({ ...p, photoUrl: data.photo_url }));
 
-      // ✅ Beritahu navbar ada foto baru
       window.dispatchEvent(
         new CustomEvent("profile-photo-updated", {
           detail: { photoUrl: data.photo_url },
@@ -409,7 +408,6 @@ export default function ProfilePage() {
           boxSizing: "border-box",
         }}
       >
-        {/* Kolom Kiri */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >
@@ -679,7 +677,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Kolom Kanan */}
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >

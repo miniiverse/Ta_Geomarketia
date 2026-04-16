@@ -337,6 +337,7 @@ export default function RegisterPage() {
   const [confirmPass, setConfirmPass] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle registration form submission
   const handleSubmit = async () => {
     if (!fullName || !username || !email || !password || !confirmPass) return;
     if (password !== confirmPass) {

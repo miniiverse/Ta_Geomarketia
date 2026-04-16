@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\RateLimiter; // ✅ tambah ini
-use Illuminate\Support\Str;                 // ✅ tambah ini
+use Illuminate\Support\Facades\RateLimiter; 
+use Illuminate\Support\Str;                 
 
 class AuthController extends Controller
 {
@@ -36,7 +36,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // LOGIN — ✅ ditambah rate limiting
+    // LOGIN 
     public function login(Request $request)
     {
         $request->validate([
@@ -44,7 +44,6 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // ✅ Rate limiting: max 5x percobaan per menit per IP
         $key = 'login:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
@@ -59,14 +58,14 @@ class AuthController extends Controller
             ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            RateLimiter::hit($key, 60); // ✅ catat percobaan gagal
+            RateLimiter::hit($key, 60); 
             return response()->json([
                 'success' => false,
                 'message' => 'Username atau password salah.',
             ], 401);
         }
 
-        // ✅ Reset counter kalau login berhasil
+        // Reset counter
         RateLimiter::clear($key);
 
         $user->tokens()->delete();
@@ -87,7 +86,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // GET PROFILE — ✅ tambah cache sederhana lewat response header
+    // GET PROFILE 
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
@@ -105,10 +104,10 @@ class AuthController extends Controller
                     : null,
                 'created_at'    => $user->created_at,
             ],
-        ])->header('Cache-Control', 'no-store'); // ✅ jangan cache response /me
+        ])->header('Cache-Control', 'no-store'); 
     }
 
-    // UPDATE PROFILE — tidak ada perubahan
+    // UPDATE PROFILE 
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -136,35 +135,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // UPDATE PASSWORD — tidak ada perubahan
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'old_password'     => 'required|string',
-            'new_password'     => 'required|string|min:8',
-            'confirm_password' => 'required|same:new_password',
-        ]);
-
-        $user = $request->user();
-
-        if (!Hash::check($request->old_password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password lama salah.',
-            ], 422);
-        }
-
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password updated successfully.',
-        ]);
-    }
-
-    // UPDATE PHOTO — tidak ada perubahan
+    // UPDATE PHOTO 
     public function updatePhoto(Request $request)
     {
         $request->validate([
@@ -188,7 +159,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // LOGOUT — tidak ada perubahan
+    // LOGOUT 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

@@ -286,12 +286,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle login form submission
   const handleSubmit = async () => {
     if (!username || !password) return;
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
-        // ← ke Next.js, bukan Laravel langsung
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -304,7 +304,6 @@ export default function LoginPage() {
         return;
       }
 
-      // ✅ Tidak perlu set cookie manual — sudah di-handle HttpOnly oleh server
       if (data.user.role === "admin") {
         window.location.href = "/admin/dashboard-admin";
       } else {

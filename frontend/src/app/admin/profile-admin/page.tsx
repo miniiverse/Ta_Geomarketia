@@ -169,7 +169,6 @@ export default function AdminProfilePage() {
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2500);
 
-      // ✅ Beritahu navbar ada perubahan nama & email
       window.dispatchEvent(
         new CustomEvent("profile-updated", {
           detail: {
@@ -199,7 +198,6 @@ export default function AdminProfilePage() {
       }
       setPhotoUrl(data.photo_url);
 
-      // ✅ Beritahu navbar ada foto baru
       window.dispatchEvent(
         new CustomEvent("profile-photo-updated", {
           detail: { photoUrl: data.photo_url },

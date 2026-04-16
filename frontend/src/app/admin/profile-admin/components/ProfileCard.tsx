@@ -190,7 +190,6 @@ export default function ProfileCard({
         }}
       />
 
-      {/* ── Avatar + Info ── */}
       <div
         style={{
           display: "flex",
@@ -204,7 +203,6 @@ export default function ProfileCard({
         }}
       >
         <div style={{ position: "relative" }}>
-          {/* Foto jika ada, fallback ke inisial */}
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -237,7 +235,6 @@ export default function ProfileCard({
             </div>
           )}
 
-          {/* Tombol upload foto — muncul saat edit mode */}
           {isEditing && (
             <>
               <input
@@ -300,7 +297,6 @@ export default function ProfileCard({
           >
             Admin
           </span>
-          {/* ── Member since pakai created_at ── */}
           <p style={{ margin: "6px 0 0", fontSize: "12px", color: "#94a3b8" }}>
             Member since{" "}
             {createdAt
@@ -313,7 +309,6 @@ export default function ProfileCard({
         </div>
       </div>
 
-      {/* ── Fields ── */}
       {fields.map(({ icon, label, key, type }) => (
         <div key={key} className="field-row">
           <div
@@ -370,7 +365,6 @@ export default function ProfileCard({
         </div>
       ))}
 
-      {/* ── Role ── */}
       <div className="field-row">
         <div
           style={{
@@ -413,7 +407,6 @@ export default function ProfileCard({
         </div>
       </div>
 
-      {/* ── Action Buttons ── */}
       <div
         style={{
           display: "flex",

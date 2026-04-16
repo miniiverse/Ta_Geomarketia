@@ -67,22 +67,6 @@ function CubeIcon({ size = 32 }: { size?: number }) {
   );
 }
 
-function CartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <circle cx="9" cy="20" r="1.5" fill="currentColor" />
-      <circle cx="17" cy="20" r="1.5" fill="currentColor" />
-      <path
-        d="M3 4h2l2.4 9.6a2 2 0 002 1.4h7.5a2 2 0 002-1.6L21 8H7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function ProfileIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -324,7 +308,7 @@ function ProfileDropdown() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  // ① Fetch data user saat pertama kali mount
+  // Ambil data user saat komponen mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -381,7 +365,6 @@ function ProfileDropdown() {
     return () => window.removeEventListener("profile-updated", handler);
   }, []);
 
-  // ④ Tutup dropdown kalau klik di luar
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
@@ -398,9 +381,8 @@ function ProfileDropdown() {
         credentials: "include",
       });
     } catch {
-      // lanjut logout meski request gagal
     } finally {
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 
@@ -883,23 +865,6 @@ export default function UserNavbar() {
               >
                 Account
               </p>
-              <Link
-                href="/cart"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 14px",
-                  borderRadius: 9,
-                  fontFamily: "'Inter', system-ui, sans-serif",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: C.textMuted,
-                  textDecoration: "none",
-                }}
-              >
-                <CartIcon /> Cart
-              </Link>
               <Link
                 href="/profile"
                 style={{
