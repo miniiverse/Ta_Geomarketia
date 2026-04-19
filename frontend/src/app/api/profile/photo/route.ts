@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const server = process.env.NEXT_PUBLIC_SERVER;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
   // Ambil FormData dari request, forward langsung ke Laravel
   const formData = await request.formData();
 
-  const res = await fetch("http://localhost:8000/api/profile/photo", {
+  const res = await fetch(`${server}/api/profile/photo`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

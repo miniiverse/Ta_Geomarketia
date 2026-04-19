@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const server = process.env.NEXT_PUBLIC_SERVER;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
@@ -9,7 +10,7 @@ export async function PUT(request: NextRequest) {
 
   const body = await request.json();
 
-  const res = await fetch("http://localhost:8000/api/profile", {
+  const res = await fetch(`${server}/api/profile`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,

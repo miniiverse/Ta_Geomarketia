@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const server = process.env.NEXT_PUBLIC_SERVER;
 
   if (token) {
     try {
-      await fetch("http://localhost:8000/api/logout", {
+      await fetch(`${server}/api/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

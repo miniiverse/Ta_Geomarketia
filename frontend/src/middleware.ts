@@ -23,7 +23,8 @@ export async function middleware(request: NextRequest) {
   let role: string | null = null;
   if (token) {
     try {
-      const res = await fetch("http://localhost:8000/api/me", {
+      const server = process.env.NEXT_PUBLIC_SERVER;
+      const res = await fetch(`${server}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
