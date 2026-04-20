@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useToast } from "../../components/user/Toast";
 
 const BLUE = "#1A56DB";
 const BLUE_LIGHT = "#EBF3FF";
@@ -220,6 +221,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showToast, ToastContainer } = useToast();
 
   // State untuk menyimpan data profil yang ditampilkan
   const [profile, setProfile] = useState({
@@ -318,7 +320,7 @@ export default function ProfilePage() {
         }),
       );
     } catch {
-      alert("Failed to save profile.");
+      showToast("Failed to save profile.");
     } finally {
       setIsSaving(false);
     }
@@ -328,7 +330,7 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("Maximum photo size is 10MB.");
+      showToast("Maximum photo size is 10MB.");
       return;
     }
 
@@ -562,6 +564,7 @@ export default function ProfilePage() {
                   border: `1px solid ${BLUE_BORDER}`,
                 }}
               >
+                <ToastContainer />
                 <ShieldIcon />
                 <span
                   style={{

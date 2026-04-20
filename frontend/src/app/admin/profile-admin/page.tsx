@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import ProfileCard, { type ProfileForm } from "./components/ProfileCard";
+import { useToast } from "../../components/admin/ToastAdmin";
+import { Toast } from "../../components/user/Toast";
 
 function MiniCalendar() {
   const now = new Date();
@@ -102,6 +104,7 @@ export default function AdminProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const { showToast, ToastContainer } = useToast();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -161,7 +164,7 @@ export default function AdminProfilePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message);
+        showToast(data.message, "error");
         return;
       }
       setForm({ ...formDraft });
@@ -178,14 +181,14 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      alert("Failed to save profile.");
+      showToast("Failed to save profile.");
     }
   };
 
   const handleSavePhoto = async (file: File) => {
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert("Maximum photo size is 10MB.");
+      showToast("Maximum photo size is 10MB.");
       return;
     }
 
@@ -199,7 +202,7 @@ export default function AdminProfilePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message);
+        showToast(data.message, "error");
         return;
       }
       setPhotoUrl(data.photo_url);
@@ -210,7 +213,7 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      alert("Failed to upload photo.");
+      showToast("Failed to upload photo.");
     }
   };
 
@@ -328,6 +331,7 @@ export default function AdminProfilePage() {
                 }}
               />
               <MiniCalendar />
+              <ToastContainer />
             </div>
           </div>
         </div>
