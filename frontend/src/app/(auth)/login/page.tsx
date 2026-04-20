@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useToast } from "../../components/user/Toast";
 
 const C = {
   blue: "#1A56DB",
@@ -285,6 +286,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showToast, ToastContainer } = useToast();
 
   // Handle login form submission
   const handleSubmit = async () => {
@@ -300,7 +302,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message);
+        showToast(data.message, "error");
         return;
       }
 
@@ -310,7 +312,7 @@ export default function LoginPage() {
         window.location.href = "/dashboard";
       }
     } catch {
-      alert("Failed to connect to the server.");
+      showToast("Failed to connect to the server.", "error");
     } finally {
       setLoading(false);
     }
@@ -383,6 +385,8 @@ export default function LoginPage() {
         }}
       />
       <BgDots />
+
+      <ToastContainer />
 
       <div
         style={{

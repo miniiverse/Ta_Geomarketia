@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useToast } from "../../components/user/Toast";
 
 const C = {
   blue: "#1A56DB",
@@ -336,17 +337,18 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showToast, ToastContainer } = useToast();
 
   // Handle registration form submission
   const handleSubmit = async () => {
     if (!fullName || !username || !email || !password || !confirmPass) return;
     if (password !== confirmPass) {
-      alert("Password tidak cocok.");
+      showToast("Password doesn't match.");
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/register", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -359,12 +361,12 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message);
+        showToast(data.message);
         return;
       }
       window.location.href = "/login";
     } catch (err) {
-      alert("Failed to connect to the server.");
+      showToast("Failed to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -439,6 +441,7 @@ export default function RegisterPage() {
         }}
       />
       <BgDots />
+      <ToastContainer />
 
       <div
         style={{
