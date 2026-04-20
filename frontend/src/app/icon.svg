@@ -1,0 +1,19 @@
+<svg width="1024" height="1024" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M18 23L5 16V25L18 32L31 25V16L18 23Z" fill="#0A4D3C" />
+  <path d="M18 23L5 16V7L18 14V23Z" fill="#16A34A" />
+  <path d="M18 23L31 16V7L18 14V23Z" fill="#2563EB" />
+  <path d="M18 5L5 12L18 19L31 12L18 5Z" fill="#0EA5E9" />
+  <path d="M18 5L31 12L25 15.2L12 8.2L18 5Z" fill="#BAE6FD" opacity="0.6" />
+  <path d="M18 23L5 16V7L18 14V23Z" fill="url(#gm-a)" opacity="0.4" />
+  <path d="M18 23L31 16V7L18 14V23Z" fill="url(#gm-b)" opacity="0.25" />
+  <defs>
+    <linearGradient id="gm-a" x1="5" y1="7" x2="18" y2="23" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="gm-b" x1="31" y1="7" x2="18" y2="23" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16A34A" />
+      <stop offset="1" stop-color="#16A34A" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+</svg>

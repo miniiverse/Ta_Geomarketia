@@ -364,7 +364,7 @@ export default function RegisterPage() {
       }
       window.location.href = "/login";
     } catch (err) {
-      alert("Gagal terhubung ke server.");
+      alert("Failed to connect to the server.");
     } finally {
       setLoading(false);
     }

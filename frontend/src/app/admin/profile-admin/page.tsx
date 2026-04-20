@@ -178,11 +178,17 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      alert("Gagal menyimpan profil.");
+      alert("Failed to save profile.");
     }
   };
 
   const handleSavePhoto = async (file: File) => {
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("Maximum photo size is 10MB.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("photo", file);
     try {
@@ -204,7 +210,7 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      alert("Gagal mengupload foto.");
+      alert("Failed to upload photo.");
     }
   };
 

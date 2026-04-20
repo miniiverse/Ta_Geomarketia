@@ -310,7 +310,7 @@ export default function LoginPage() {
         window.location.href = "/dashboard";
       }
     } catch {
-      alert("Gagal terhubung ke server.");
+      alert("Failed to connect to the server.");
     } finally {
       setLoading(false);
     }

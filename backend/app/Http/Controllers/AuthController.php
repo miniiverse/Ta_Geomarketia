@@ -32,7 +32,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Registrasi berhasil. Silakan login.',
+            'message' => 'Registration successful. Please log in.',
         ], 201);
     }
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
             return response()->json([
                 'success' => false,
-                'message' => "Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik.",
+                'message' => "Too many login attempts. Please try again in {$seconds} seconds.",
             ], 429);
         }
 
@@ -61,7 +61,7 @@ class AuthController extends Controller
             RateLimiter::hit($key, 60); 
             return response()->json([
                 'success' => false,
-                'message' => 'Username atau password salah.',
+                'message' => 'Username or password is incorrect.',
             ], 401);
         }
 
@@ -139,7 +139,7 @@ class AuthController extends Controller
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
         $user = $request->user();
@@ -166,7 +166,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout berhasil.',
+            'message' => 'Logout successful.',
         ]);
     }
 }

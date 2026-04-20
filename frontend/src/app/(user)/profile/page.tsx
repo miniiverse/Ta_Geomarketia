@@ -318,7 +318,7 @@ export default function ProfilePage() {
         }),
       );
     } catch {
-      alert("Gagal menyimpan profil.");
+      alert("Failed to save profile.");
     } finally {
       setIsSaving(false);
     }
@@ -327,8 +327,8 @@ export default function ProfilePage() {
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Ukuran foto maksimal 2MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Maximum photo size is 10MB.");
       return;
     }
 
@@ -344,7 +344,7 @@ export default function ProfilePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message ?? `Upload gagal (${res.status})`);
+        alert(data.message ?? `Upload failed (${res.status})`);
         return;
       }
       setProfile((p) => ({ ...p, photoUrl: data.photo_url }));
@@ -355,7 +355,7 @@ export default function ProfilePage() {
         }),
       );
     } catch {
-      alert("Gagal upload foto.");
+      alert("Failed to upload photo.");
     } finally {
       setUploadingPhoto(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -469,52 +469,54 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingPhoto}
-                  style={{
-                    position: "absolute",
-                    bottom: 2,
-                    right: 2,
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    background: uploadingPhoto ? "#93C5FD" : GRAD_135,
-                    border: "2.5px solid #fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: uploadingPhoto ? "not-allowed" : "pointer",
-                    boxShadow: `0 2px 8px ${BLUE}40`,
-                  }}
-                  aria-label="Ganti foto"
-                >
-                  {uploadingPhoto ? (
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      style={{ animation: "spin 0.8s linear infinite" }}
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        stroke="rgba(255,255,255,0.35)"
-                        strokeWidth="2.5"
-                      />
-                      <path
-                        d="M12 3a9 9 0 019 9"
-                        stroke="white"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  ) : (
-                    <CameraIcon />
-                  )}
-                </button>
+                {isEditing && (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    style={{
+                      position: "absolute",
+                      bottom: 2,
+                      right: 2,
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      background: uploadingPhoto ? "#93C5FD" : GRAD_135,
+                      border: "2.5px solid #fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: uploadingPhoto ? "not-allowed" : "pointer",
+                      boxShadow: `0 2px 8px ${BLUE}40`,
+                    }}
+                    aria-label="Ganti foto"
+                  >
+                    {uploadingPhoto ? (
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        style={{ animation: "spin 0.8s linear infinite" }}
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          stroke="rgba(255,255,255,0.35)"
+                          strokeWidth="2.5"
+                        />
+                        <path
+                          d="M12 3a9 9 0 019 9"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    ) : (
+                      <CameraIcon />
+                    )}
+                  </button>
+                )}
 
                 <input
                   ref={fileInputRef}
