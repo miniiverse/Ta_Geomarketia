@@ -1,22 +1,20 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import TransactionHeader from "./components/TransactionHeader";
-import TransactionFilter from "./components/TransactionFilter";
-import TransactionList from "./components/TransactionList";
-import { Transaction } from "./components/TransactionCard";
+import CollectionHeader from "./components/CollectionHeader";
+import CollectionFilter, { SortDate, SortAmount, SortCategory } from "./components/CollectionFilter";
+import CollectionList from "./components/CollectionList";
+import { Collection } from "./components/CollectionCard";
 
 export type StatusFilter = "All" | "Paid" | "Pending" | "Failed";
-export type SortOption = "Newest First" | "Oldest First" | "Highest Amount" | "Lowest Amount";
 
-const ALL_TRANSACTIONS: Transaction[] = [
+const ALL_TRANSACTIONS: Collection[] = [
   {
     id: "INV-001",
     title: "Restaurant Location Analysis",
     location: "Batu Ampar",
     category: "Food & Beverage",
     date: "Apr 20, 2024",
-    payment: "QRIS",
     totalData: "50",
     amount: "Rp 400.000",
     status: "Paid",
@@ -27,7 +25,6 @@ const ALL_TRANSACTIONS: Transaction[] = [
     location: "Bengkong",
     category: "Retail",
     date: "Apr 15, 2024",
-    payment: "Bank Transfer",
     totalData: "22",
     amount: "Rp 950.000",
     status: "Paid",
@@ -38,7 +35,6 @@ const ALL_TRANSACTIONS: Transaction[] = [
     location: "Batam Centre",
     category: "Retail",
     date: "Apr 12, 2024",
-    payment: "GoPay",
     totalData: "15",
     amount: "Rp 750.000",
     status: "Paid",
@@ -49,7 +45,6 @@ const ALL_TRANSACTIONS: Transaction[] = [
     location: "Sekupang",
     category: "Healthcare",
     date: "Apr 8, 2024",
-    payment: "GoPay",
     totalData: "20",
     amount: "Rp 1.100.000",
     status: "Failed",
@@ -63,7 +58,20 @@ function parseAmount(amount: string): number {
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<StatusFilter>("All");
-  const [sortBy, setSortBy] = useState<SortOption>("Newest First");
+  const [sortDate, setSortDate] = useState<SortDate>("Newest First");
+  const [sortAmount, setSortAmount] = useState<SortAmount>("Highest Amount");
+  const [sortCategory, setSortCategory] = useState<SortCategory>("All");
+  const [lastSort, setLastSort] = useState<"date" | "amount">("date");
+
+  const handleSortDateChange = (val: SortDate) => {
+    setSortDate(val);
+    setLastSort("date");
+  };
+
+  const handleSortAmountChange = (val: SortAmount) => {
+    setSortAmount(val);
+    setLastSort("amount");
+  };
 
   const stats = useMemo(
     () => ({
@@ -92,23 +100,26 @@ export default function Page() {
       result = result.filter((t) => t.status === activeFilter);
     }
 
-    switch (sortBy) {
-      case "Newest First":
-        result.sort((a, b) => b.id.localeCompare(a.id));
-        break;
-      case "Oldest First":
-        result.sort((a, b) => a.id.localeCompare(b.id));
-        break;
-      case "Highest Amount":
+    if (sortCategory !== "All") {
+      result = result.filter((t) => t.category === sortCategory);
+    }
+
+    if (lastSort === "date") {
+      if (sortDate === "Newest First") {
+        result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      } else {
+        result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      }
+    } else {
+      if (sortAmount === "Highest Amount") {
         result.sort((a, b) => parseAmount(b.amount) - parseAmount(a.amount));
-        break;
-      case "Lowest Amount":
+      } else {
         result.sort((a, b) => parseAmount(a.amount) - parseAmount(b.amount));
-        break;
+      }
     }
 
     return result;
-  }, [searchQuery, activeFilter, sortBy]);
+  }, [searchQuery, activeFilter, sortDate, sortAmount, sortCategory, lastSort]);
 
   return (
     <div
@@ -125,7 +136,7 @@ export default function Page() {
       `}</style>
 
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <TransactionHeader
+        <CollectionHeader
           total={stats.total}
           paid={stats.paid}
           pending={stats.pending}
@@ -141,16 +152,20 @@ export default function Page() {
             boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
           }}
         >
-          <TransactionFilter
+          <CollectionFilter
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
+            sortDate={sortDate}
+            onSortDateChange={handleSortDateChange}
+            sortAmount={sortAmount}
+            onSortAmountChange={handleSortAmountChange}
+            sortCategory={sortCategory}
+            onSortCategoryChange={setSortCategory}
           />
 
-          <TransactionList transactions={filtered} />
+          <CollectionList transactions={filtered} />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import TransactionCard, { Transaction } from "./TransactionCard";
+import TransactionCard, { Transaction } from "./CollectionCard";
 
 const ITEMS_PER_PAGE = 4;
 

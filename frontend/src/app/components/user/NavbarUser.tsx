@@ -16,7 +16,7 @@ const C = {
 const navLinks = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Projects", href: "/projects-list" },
-  { label: "My Transactions", href: "/transactions" },
+  { label: "My Collections", href: "/collections" },
 ];
 
 function CubeIcon({ size = 32 }: { size?: number }) {
@@ -231,8 +231,8 @@ const menuItems = [
     ),
   },
   {
-    label: "Transactions",
-    href: "/transactions",
+    label: "Collections",
+    href: "/collections",
     danger: false,
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
