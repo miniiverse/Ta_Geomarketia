@@ -285,25 +285,28 @@ export default function ProjectsPage() {
           <input type="text" placeholder="e.g. Retail Site Selection – Jakarta" style={inputStyle} />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-          <div>
-            <label style={labelStyle}>Category <span style={{ color: "#E24B4A" }}>*</span></label>
-            <div style={{ position: "relative" }}>
-              <select style={inputStyle}>
-                <option>Retail</option>
-                <option>Food & Beverage</option>
-                <option>Healthcare</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Price (Rp) <span style={{ color: "#E24B4A" }}>*</span></label>
-            <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "#94a3b8" }}>Rp</span>
-              <input type="number" placeholder="0" style={{ ...inputStyle, paddingLeft: "32px" }} />
-            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+        <div>
+          <label style={labelStyle}>Category <span style={{ color: "#E24B4A" }}>*</span></label>
+          <select style={inputStyle}>
+            <option>Retail</option>
+            <option>Food & Beverage</option>
+            <option>Healthcare</option>
+          </select>
+        </div>
+        <div>
+          <label style={labelStyle}>Price (Rp) <span style={{ color: "#E24B4A" }}>*</span></label>
+          <div style={{ position: "relative" }}>
+            <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "#94a3b8" }}>Rp</span>
+            <input type="number" placeholder="0" style={{ ...inputStyle, paddingLeft: "32px" }} />
           </div>
         </div>
+        <div>
+          <label style={labelStyle}>Total Data <span style={{ color: "#E24B4A" }}>*</span></label>
+          <input type="number" placeholder="0" style={inputStyle} />
+        </div>
+      </div>
+        
 
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div>
