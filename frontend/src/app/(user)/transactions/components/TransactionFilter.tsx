@@ -1,23 +1,133 @@
 "use client";
 
 import React, { useState } from "react";
-import { StatusFilter, SortOption } from "../page";
+import { StatusFilter } from "../page";
 
 const FILTER_TABS: StatusFilter[] = ["All", "Paid", "Pending", "Failed"];
-const SORT_OPTIONS: SortOption[] = [
-  "Newest First",
-  "Oldest First",
-  "Highest Amount",
-  "Lowest Amount",
-];
+
+export type SortDate = "Newest First" | "Oldest First";
+export type SortAmount = "Highest Amount" | "Lowest Amount";
 
 interface TransactionFilterProps {
   searchQuery: string;
   onSearchChange: (val: string) => void;
   activeFilter: StatusFilter;
   onFilterChange: (filter: StatusFilter) => void;
-  sortBy: SortOption;
-  onSortChange: (sort: SortOption) => void;
+  sortDate: SortDate;
+  onSortDateChange: (sort: SortDate) => void;
+  sortAmount: SortAmount;
+  onSortAmountChange: (sort: SortAmount) => void;
+}
+
+const dropdownMenuStyle: React.CSSProperties = {
+  position: "absolute",
+  top: "calc(100% + 8px)",
+  right: 0,
+  background: "#FFFFFF",
+  borderRadius: 12,
+  border: "1.5px solid #E2E8F0",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+  zIndex: 100,
+  minWidth: 160,
+  overflow: "hidden",
+};
+
+function SortDropdown<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: T[];
+  onChange: (val: T) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 16px",
+          borderRadius: 10,
+          border: "1.5px solid #E2E8F0",
+          background: "#FFFFFF",
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#0F172A",
+          cursor: "pointer",
+          fontFamily: "'Inter', sans-serif",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span style={{ fontSize: 12, color: "#0F172A", fontWeight: 500 }}>
+          {label}:
+        </span>
+        {value}
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          style={{
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "0.2s",
+          }}
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="#64748B"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {open && (
+        <div style={dropdownMenuStyle}>
+          {options.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => {
+                onChange(opt);
+                setOpen(false);
+              }}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "11px 16px",
+                textAlign: "left",
+                border: "none",
+                background: value === opt ? "#EFF6FF" : "#FFFFFF",
+                color: value === opt ? "#1A56DB" : "#334155",
+                fontSize: 14,
+                fontWeight: value === opt ? 700 : 500,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                if (value !== opt)
+                  (e.currentTarget as HTMLElement).style.background = "#F8FAFC";
+              }}
+              onMouseLeave={(e) => {
+                if (value !== opt)
+                  (e.currentTarget as HTMLElement).style.background = "#FFFFFF";
+              }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function TransactionFilter({
@@ -25,11 +135,11 @@ export default function TransactionFilter({
   onSearchChange,
   activeFilter,
   onFilterChange,
-  sortBy,
-  onSortChange,
+  sortDate,
+  onSortDateChange,
+  sortAmount,
+  onSortAmountChange,
 }: TransactionFilterProps) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
   return (
     <div
       style={{
@@ -41,7 +151,6 @@ export default function TransactionFilter({
         fontFamily: "'Inter', sans-serif",
       }}
     >
-
       <div style={{ flex: 1, minWidth: 240, position: "relative" }}>
         <svg
           style={{
@@ -56,7 +165,12 @@ export default function TransactionFilter({
           fill="none"
         >
           <circle cx="11" cy="11" r="7" stroke="#94A3B8" strokeWidth="2" />
-          <path d="M16.5 16.5L21 21" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d="M16.5 16.5L21 21"
+            stroke="#94A3B8"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </svg>
         <input
           type="text"
@@ -106,7 +220,9 @@ export default function TransactionFilter({
               background: activeFilter === tab ? "#1A56DB" : "transparent",
               color: activeFilter === tab ? "#FFFFFF" : "#64748B",
               boxShadow:
-                activeFilter === tab ? "0 2px 8px rgba(26,86,219,0.25)" : "none",
+                activeFilter === tab
+                  ? "0 2px 8px rgba(26,86,219,0.25)"
+                  : "none",
             }}
           >
             {tab}
@@ -114,98 +230,19 @@ export default function TransactionFilter({
         ))}
       </div>
 
+      <SortDropdown<SortDate>
+        label="Date"
+        value={sortDate}
+        options={["Newest First", "Oldest First"]}
+        onChange={onSortDateChange}
+      />
 
-      <div style={{ position: "relative" }}>
-        <button
-          onClick={() => setDropdownOpen((v) => !v)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "10px 16px",
-            borderRadius: 10,
-            border: "1.5px solid #E2E8F0",
-            background: "#FFFFFF",
-            fontSize: 14,
-            fontWeight: 600,
-            color: "#0F172A",
-            cursor: "pointer",
-            fontFamily: "'Inter', sans-serif",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {sortBy}
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{
-              transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "0.2s",
-            }}
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="#64748B"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        {dropdownOpen && (
-          <div
-            style={{
-              position: "absolute",
-              top: "calc(100% + 8px)",
-              right: 0,
-              background: "#FFFFFF",
-              borderRadius: 12,
-              border: "1.5px solid #E2E8F0",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
-              zIndex: 100,
-              minWidth: 180,
-              overflow: "hidden",
-            }}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => {
-                  onSortChange(opt);
-                  setDropdownOpen(false);
-                }}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "11px 16px",
-                  textAlign: "left",
-                  border: "none",
-                  background: sortBy === opt ? "#EFF6FF" : "#FFFFFF",
-                  color: sortBy === opt ? "#1A56DB" : "#334155",
-                  fontSize: 14,
-                  fontWeight: sortBy === opt ? 700 : 500,
-                  cursor: "pointer",
-                  fontFamily: "'Inter', sans-serif",
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  if (sortBy !== opt)
-                    (e.target as HTMLElement).style.background = "#F8FAFC";
-                }}
-                onMouseLeave={(e) => {
-                  if (sortBy !== opt)
-                    (e.target as HTMLElement).style.background = "#FFFFFF";
-                }}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <SortDropdown<SortAmount>
+        label="Amount"
+        value={sortAmount}
+        options={["Highest Amount", "Lowest Amount"]}
+        onChange={onSortAmountChange}
+      />
     </div>
   );
 }

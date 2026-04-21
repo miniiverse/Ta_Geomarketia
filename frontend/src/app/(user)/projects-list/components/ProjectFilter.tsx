@@ -5,9 +5,23 @@ import { useState } from "react";
 const categories = ["ALL", "Retail", "Food & Beverage", "Healthcare"];
 const years = ["All Years", "2025", "2024", "2023", "2022"];
 
+const selectStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 12px 10px 30px",
+  borderRadius: 10,
+  border: "1.5px solid #BFDBFE",
+  fontSize: 12,
+  fontWeight: 500,
+  background: "rgba(255,255,255,0.8)",
+  color: "#374151",
+  fontFamily: "'Inter', sans-serif",
+  outline: "none",
+  appearance: "none",
+  cursor: "pointer",
+};
+
 export default function ProjectsFilterSidebar() {
   const [category, setCategory] = useState("ALL");
-  const [rangeValue, setRangeValue] = useState(60);
   const [selectedYear, setSelectedYear] = useState("All Years");
 
   return (
@@ -89,7 +103,7 @@ export default function ProjectsFilterSidebar() {
                 color: "rgba(26,86,219,0.45)",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                fontFamily: "'Inter' sans-serif",
+                fontFamily: "'Inter', sans-serif",
               }}
             >
               SPATIAL SEARCH
@@ -114,36 +128,44 @@ export default function ProjectsFilterSidebar() {
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter, sans-serif'",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
             CATEGORIES
           </p>
-          <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-            {categories.map((item) => (
-              <button
-                key={item}
-                onClick={() => setCategory(item)}
-                style={{
-                  padding: "6px 11px",
-                  borderRadius: 8,
-                  border: `1.5px solid ${category === item ? "#1A56DB" : "rgba(26,86,219,0.2)"}`,
-                  background:
-                    category === item ? "#1A56DB" : "rgba(255,255,255,0.7)",
-                  color: category === item ? "#fff" : "#374151",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  transition: "all 0.18s ease",
-                  boxShadow:
-                    category === item
-                      ? "0 3px 10px rgba(26,86,219,0.28)"
-                      : "none",
-                }}
-              >
-                {item}
-              </button>
-            ))}
+          <div style={{ position: "relative" }}>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              style={{
+                position: "absolute",
+                left: 11,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#1A56DB",
+                pointerEvents: "none",
+              }}
+            >
+              <path
+                d="M4 6h16M4 10h16M4 14h8"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              style={selectStyle}
+            >
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -156,36 +178,53 @@ export default function ProjectsFilterSidebar() {
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter, sans-serif'",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
             YEAR
           </p>
-          <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-            {years.map((year) => (
-              <button
-                key={year}
-                onClick={() => setSelectedYear(year)}
-                style={{
-                  padding: "6px 11px",
-                  borderRadius: 8,
-                  border: `1.5px solid ${selectedYear === year ? "#1A56DB" : "rgba(26,86,219,0.2)"}`,
-                  background:
-                    selectedYear === year ? "#1A56DB" : "rgba(255,255,255,0.7)",
-                  color: selectedYear === year ? "#fff" : "#374151",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  transition: "all 0.18s ease",
-                  boxShadow:
-                    selectedYear === year
-                      ? "0 3px 10px rgba(26,86,219,0.28)"
-                      : "none",
-                }}
-              >
-                {year}
-              </button>
-            ))}
+          <div style={{ position: "relative" }}>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              style={{
+                position: "absolute",
+                left: 11,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#1A56DB",
+                pointerEvents: "none",
+              }}
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="18"
+                rx="2"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M16 2v4M8 2v4M3 10h18"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              style={selectStyle}
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -198,7 +237,7 @@ export default function ProjectsFilterSidebar() {
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter, sans-serif'",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
             LOCATION
@@ -227,22 +266,7 @@ export default function ProjectsFilterSidebar() {
                 strokeLinejoin="round"
               />
             </svg>
-            <select
-              style={{
-                width: "100%",
-                padding: "10px 12px 10px 30px",
-                borderRadius: 10,
-                border: "1.5px solid #BFDBFE",
-                fontSize: 12,
-                fontWeight: 500,
-                background: "rgba(255,255,255,0.8)",
-                color: "#374151",
-                fontFamily: "'Inter', sans-serif",
-                outline: "none",
-                appearance: "none",
-                cursor: "pointer",
-              }}
-            >
+            <select style={selectStyle}>
               <option>Select City</option>
               <option>Batam</option>
               <option>Tanjung Pinang</option>
@@ -271,22 +295,7 @@ export default function ProjectsFilterSidebar() {
               />
               <circle cx="12" cy="11" r="2" fill="currentColor" />
             </svg>
-            <select
-              style={{
-                width: "100%",
-                padding: "10px 12px 10px 30px",
-                borderRadius: 10,
-                border: "1.5px solid #BFDBFE",
-                fontSize: 12,
-                fontWeight: 500,
-                background: "rgba(255,255,255,0.8)",
-                color: "#374151",
-                fontFamily: "'Inter', sans-serif",
-                outline: "none",
-                appearance: "none",
-                cursor: "pointer",
-              }}
-            >
+            <select style={selectStyle}>
               <option>Select District</option>
               <option>Batam Kota</option>
               <option>Batu Aji</option>
@@ -300,6 +309,7 @@ export default function ProjectsFilterSidebar() {
           </div>
         </div>
 
+        {/* SORT BY */}
         <div style={{ marginBottom: 22 }}>
           <p
             style={{
@@ -309,7 +319,7 @@ export default function ProjectsFilterSidebar() {
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter, sans-serif'",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
             SORT BY
@@ -336,22 +346,7 @@ export default function ProjectsFilterSidebar() {
                 strokeLinecap="round"
               />
             </svg>
-            <select
-              style={{
-                width: "100%",
-                padding: "10px 12px 10px 30px",
-                borderRadius: 10,
-                border: "1.5px solid #BFDBFE",
-                fontSize: 12,
-                fontWeight: 500,
-                background: "rgba(255,255,255,0.8)",
-                color: "#374151",
-                fontFamily: "'Inter', sans-serif",
-                outline: "none",
-                appearance: "none",
-                cursor: "pointer",
-              }}
-            >
+            <select style={selectStyle}>
               <option>Most Relevant</option>
               <option>Newest</option>
               <option>Oldest</option>

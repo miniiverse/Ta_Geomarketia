@@ -162,7 +162,14 @@ export default function ProjectCard({
       </div>
 
       <div style={{ padding: "16px 18px 18px" }}>
-        <div style={{ marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div
+          style={{
+            marginBottom: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <span
             style={{
               fontSize: 10,
@@ -174,7 +181,13 @@ export default function ProjectCard({
           >
             {category}
           </span>
-          <span style={{ fontSize: 9, color: "#94A3B8", fontFamily: "'Inter', system-ui, sans-serif" }}>
+          <span
+            style={{
+              fontSize: 9,
+              color: "#94A3B8",
+              fontFamily: "'Inter', system-ui, sans-serif",
+            }}
+          >
             Last Update {lastUpdate}
           </span>
         </div>
@@ -203,10 +216,36 @@ export default function ProjectCard({
           {description}
         </p>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, marginBottom: 12 }}>
-          <span style={{ alignSelf: "flex-start", fontSize: 20, fontWeight: 800, color: "#1A56DB", fontFamily: "'Inter', system-ui, sans-serif", letterSpacing: "-0.03em" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 2,
+            marginBottom: 12,
+          }}
+        >
+          <span
+            style={{
+              alignSelf: "flex-start",
+              fontSize: 20,
+              fontWeight: 800,
+              color: "#1A56DB",
+              fontFamily: "'Inter', system-ui, sans-serif",
+              letterSpacing: "-0.03em",
+            }}
+          >
             {totalData.toLocaleString()}
-            <span style={{ fontSize: 11, fontWeight: 500, color: "#94A3B8", marginLeft: 4 }}>Total Data</span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: "#94A3B8",
+                marginLeft: 4,
+              }}
+            >
+              Total Data
+            </span>
           </span>
         </div>
 
