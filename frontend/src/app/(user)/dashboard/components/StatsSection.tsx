@@ -26,9 +26,9 @@ const stats = [
     bar: 80,
   },
   {
-    label: "Transactions",
-    value: "12",
-    sublabel: "Total purchases",
+    label: "Recent Activity",
+    value: "1",
+    sublabel: "Last seen recently",
     color: "#059669",
     lightBg: "#ECFDF5",
     border: "#A7F3D0",
