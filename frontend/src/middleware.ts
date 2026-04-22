@@ -14,12 +14,14 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/register");
 
-  // Kalau tidak ada token, langsung redirect tanpa hit Laravel
   if ((isAdminRoute || isProtectedUserRoute) && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Kalau ada token, validasi ke Laravel dan ambil role dari sana
+  if (isAuthRoute && !token) {
+    return NextResponse.next();
+  }
+
   let role: string | null = null;
   if (token) {
     try {
@@ -32,7 +34,13 @@ export async function middleware(request: NextRequest) {
       });
 
       if (!res.ok) {
-        // Token tidak valid / expired → hapus cookie dan redirect login
+        if (isAuthRoute) {
+          const response = NextResponse.next();
+          response.cookies.delete("token");
+          response.cookies.delete("role");
+          return response;
+        }
+
         const response = NextResponse.redirect(new URL("/login", request.url));
         response.cookies.delete("token");
         response.cookies.delete("role");
@@ -40,30 +48,30 @@ export async function middleware(request: NextRequest) {
       }
 
       const data = await res.json();
-      role = data.user.role; // "admin" atau "user" — dari database, bukan cookie
+      role = data.user.role;
     } catch {
-      // Laravel tidak bisa dihubungi
+      if (isAuthRoute) return NextResponse.next();
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  // Admin route: harus role admin
   if (isAdminRoute) {
     if (role !== "admin") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
-  // User route: admin tidak boleh masuk
   if (isProtectedUserRoute) {
     if (role === "admin") {
-      return NextResponse.redirect(new URL("/admin/dashboard-admin", request.url));
+      return NextResponse.redirect(
+        new URL("/admin/dashboard-admin", request.url),
+      );
     }
   }
 
-  // Sudah login tapi akses halaman auth → redirect sesuai role
   if (isAuthRoute && token) {
-    const destination = role === "admin" ? "/admin/dashboard-admin" : "/dashboard";
+    const destination =
+      role === "admin" ? "/admin/dashboard-admin" : "/dashboard";
     return NextResponse.redirect(new URL(destination, request.url));
   }
 

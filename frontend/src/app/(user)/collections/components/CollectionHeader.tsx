@@ -2,19 +2,19 @@
 
 import React from "react";
 
-interface TransactionHeaderProps {
+interface CollectionHeaderProps {
   total: number;
   paid: number;
   pending: number;
   failed: number;
 }
 
-export default function TransactionHeader({
+export default function CollectionHeader({
   total,
   paid,
   pending,
   failed,
-}: TransactionHeaderProps) {
+}: CollectionHeaderProps) {
   return (
     <div
       style={{

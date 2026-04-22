@@ -7,7 +7,7 @@ export type SortCategory = "All" | "Retail" | "Healthcare" | "Food & Beverage"
 export type SortDate = "Newest First" | "Oldest First";
 export type SortAmount = "Highest Amount" | "Lowest Amount";
 
-interface TransactionFilterProps {
+interface CollectionFilterProps {
   searchQuery: string;
   onSearchChange: (val: string) => void;
   activeFilter: StatusFilter;
@@ -129,7 +129,7 @@ function SortDropdown<T extends string>({
   );
 }
 
-export default function TransactionFilter({
+export default function CollectionFilter ({
   searchQuery,
   onSearchChange,
   sortDate,
@@ -138,7 +138,7 @@ export default function TransactionFilter({
   onSortAmountChange,
   sortCategory,
   onSortCategoryChange,
-}: TransactionFilterProps) {
+}: CollectionFilterProps) {
    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const handleToggle = useCallback((id: string | null) => {
     setOpenDropdown(id);
