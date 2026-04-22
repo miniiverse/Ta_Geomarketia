@@ -32,7 +32,7 @@ def list_projects():
     
     projects = []
     
-    # A simple lookup map for Regency -> Province based on current files
+    # A simple lookup map for City -> Province based on current files
     prov_map = {
         "Batam": "Kepulauan Riau",
         "Jakarta": "DKI Jakarta",
@@ -50,18 +50,18 @@ def list_projects():
         
         # Safe extraction with fallbacks
         country = parts[0] if len(parts) > 0 else "Unknown"
-        regency = parts[1] if len(parts) > 1 else "Unknown"
+        city = parts[1] if len(parts) > 1 else "Unknown"
         category = parts[2] if len(parts) > 2 else "Unknown"
         raw_date = parts[3] if len(parts) > 3 else "202401010000"
         
-        province = prov_map.get(regency, "Unknown Province")
+        province = prov_map.get(city, "Unknown Province")
         
         try:
             db_date = datetime.strptime(raw_date[:8], "%Y%m%d").strftime("%d %b %Y")
         except ValueError:
             db_date = raw_date
             
-        project_name = f"{category} Dataset - {regency}"
+        project_name = f"{category} Dataset - {city}"
         
         # Connect to DB to get total_data
         db_path = os.path.join(db_dir, file)
@@ -79,7 +79,7 @@ def list_projects():
             "db_id": name_no_ext,
             "date": db_date,
             "province": province,
-            "regency": regency,
+            "city": city,
             "category": category,
             "total_data": total_data
         })

@@ -6,6 +6,6 @@ class ProjectOut(BaseModel):
     db_id: str
     date: str
     province: str
-    regency: str
+    city: str
     category: str
     total_data: int
