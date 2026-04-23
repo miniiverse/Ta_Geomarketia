@@ -15,6 +15,7 @@ interface ProjectCardProps {
   image?: string;
   totalData?: number;
   lastUpdate?: string;
+  onPreview?: () => void;
 }
 
 const statusConfig = {
@@ -34,19 +35,26 @@ export default function ProjectCard({
   image = "https://source.unsplash.com/400x200/?map,city",
   totalData = 0,
   lastUpdate = "-",
+  onPreview, // ← BARU
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
   const router = useRouter();
   const cfg = statusConfig[status] ?? statusConfig["New"];
 
-  const handleBuyNow = () => {
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation(); // jangan trigger onPreview
     router.push(
       `/checkout?id=${id}&title=${encodeURIComponent(title ?? "")}&price=${encodeURIComponent(price ?? "")}&category=${encodeURIComponent(category ?? "")}&region=${encodeURIComponent(region ?? "")}&description=${encodeURIComponent(description ?? "")}`,
     );
   };
 
+  const handleCardClick = () => {
+    if (onPreview) onPreview();
+  };
+
   return (
     <div
+      onClick={handleCardClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -142,16 +150,16 @@ export default function ProjectCard({
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 21s-6-5-6-10a6 6 0 1112 0c0 5-6 10-6 10z"
-              stroke="black"
+              stroke="white"
               strokeWidth="2"
             />
-            <circle cx="12" cy="11" r="2" fill="black" />
+            <circle cx="12" cy="11" r="2" fill="white" />
           </svg>
           <span
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: "black",
+              color: "white",
               fontFamily: "'JetBrains Mono',monospace",
               letterSpacing: "0.04em",
             }}
@@ -159,6 +167,28 @@ export default function ProjectCard({
             {region}
           </span>
         </div>
+
+        {hovered && onPreview && (
+          <div style={{
+            position: "absolute", inset: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "rgba(15,23,42,0.25)",
+            animation: "fadeInHint 0.2s ease",
+          }}>
+            <div style={{
+              background: "rgba(255,255,255,0.95)", borderRadius: 10,
+              padding: "7px 14px", fontSize: 12, fontWeight: 700, color: "#1A56DB",
+              display: "flex", alignItems: "center", gap: 6,
+              boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Preview Project
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ padding: "16px 18px 18px" }}>
@@ -317,6 +347,13 @@ export default function ProjectCard({
           </button>
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeInHint {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
