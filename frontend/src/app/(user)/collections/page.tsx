@@ -165,7 +165,7 @@ export default function Page() {
             onSortCategoryChange={setSortCategory}
           />
 
-          <CollectionList transactions={filtered} />
+          <CollectionList collections={filtered} />
         </div>
       </div>
     </div>

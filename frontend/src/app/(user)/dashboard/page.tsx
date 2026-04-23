@@ -1,6 +1,6 @@
 import WelcomeCard from "./components/WelcomeCard";
 import StatsSection from "./components/StatsSection";
-import AnalysisSection from "./components/AnalysisSection";
+import CollectionSection from "./components/CollectionSection";
 
 
 export default function DashboardPage() {
@@ -13,7 +13,7 @@ export default function DashboardPage() {
       }}>
         <WelcomeCard />
         <StatsSection />
-        <AnalysisSection />
+        <CollectionSection />
   
       </div>
     </>

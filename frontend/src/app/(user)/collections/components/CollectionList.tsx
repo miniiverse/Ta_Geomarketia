@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import TransactionCard, { Transaction } from "./CollectionCard";
+import CollectionCard, { Collection } from "./CollectionCard";
 
 const ITEMS_PER_PAGE = 4;
 
-interface TransactionListProps {
-  transactions: Transaction[];
+interface CollectionListProps {
+  collections: Collection[];
 }
 
 function PaginationButton({
@@ -71,16 +71,16 @@ function PaginationButton({
   );
 }
 
-export default function TransactionList({ transactions }: TransactionListProps) {
+export default function CollectionList({ collections }: CollectionListProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [transactions]);
+  }, [collections]);
 
-  const totalPages = Math.max(1, Math.ceil(transactions.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(collections.length / ITEMS_PER_PAGE));
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginated = transactions.slice(start, start + ITEMS_PER_PAGE);
+  const paginated = collections.slice(start, start + ITEMS_PER_PAGE);
 
   return (
     <div>
@@ -93,10 +93,10 @@ export default function TransactionList({ transactions }: TransactionListProps) 
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        Showing {paginated.length} of {transactions.length} transaction{transactions.length !== 1 ? "s" : ""}
+        Showing {paginated.length} of {collections.length} collection{collections.length !== 1 ? "s" : ""}
       </p>
 
-      {transactions.length === 0 ? (
+      {collections.length === 0 ? (
         <div
           style={{
             textAlign: "center",
@@ -109,7 +109,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             <circle cx="11" cy="11" r="7" stroke="#94A3B8" strokeWidth="1.8" />
             <path d="M16.5 16.5L21 21" stroke="#94A3B8" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-          <p style={{ fontSize: 15, fontWeight: 600 }}>No transactions found</p>
+          <p style={{ fontSize: 15, fontWeight: 600 }}>No collections found</p>
           <p style={{ fontSize: 13, marginTop: 4 }}>Try adjusting your search or filter.</p>
         </div>
       ) : (
@@ -122,7 +122,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             }}
           >
             {paginated.map((item) => (
-              <TransactionCard key={item.id} data={item} />
+              <CollectionCard key={item.id} data={item} />
             ))}
           </div>
 

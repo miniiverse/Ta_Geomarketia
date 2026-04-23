@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 
-export type TransactionStatus = "Paid" | "Pending" | "Failed";
+export type CollectionStatus = "Paid" | "Pending" | "Failed";
 
-export interface Transaction {
+export interface Collection {
   id: string;
   title: string;
   location: string;
@@ -12,11 +12,11 @@ export interface Transaction {
   date: string;
   totalData: string;
   amount: string;
-  status: TransactionStatus;
+  status: CollectionStatus;
 }
 
-interface TransactionCardProps {
-  data: Transaction;
+interface CollectionCardProps {
+  data: Collection;
 }
 
 
@@ -94,7 +94,7 @@ function MapIcon() {
   );
 }
 
-export default function TransactionCard({ data }: TransactionCardProps) {
+export default function CollectionCard({ data }: CollectionCardProps) {
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
   const categoryImage = getCategoryImage(data.category);
