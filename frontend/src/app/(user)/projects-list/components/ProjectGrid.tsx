@@ -199,7 +199,7 @@ export default function ProjectGrid() {
           <ProjectCard
             key={`${page}-${i}`}
             {...project}
-            onPreview={() => router.push(`/project/${project.id}`)}
+            onPreview={() => router.push(`/project-detail/${project.id}`)}
           />
         ))}
       </div>
