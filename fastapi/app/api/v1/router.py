@@ -32,7 +32,7 @@ def list_projects():
     
     projects = []
     
-    # A simple lookup map for City -> Province based on current files
+    # A simple lookup map for Regency -> Province based on current files
     prov_map = {
         "Batam": "Kepulauan Riau",
         "Jakarta": "DKI Jakarta",
@@ -42,6 +42,17 @@ def list_projects():
         "Makassar": "Sulawesi Selatan"
     }
 
+    # Load custom metadata if it exists
+    custom_metadata = {}
+    metadata_path = os.path.join(db_dir, "custom_metadata.json")
+    if os.path.exists(metadata_path):
+        import json
+        try:
+            with open(metadata_path, 'r', encoding='utf-8') as f:
+                custom_metadata = json.load(f)
+        except Exception:
+            pass
+
     files = [f for f in os.listdir(db_dir) if f.endswith(".db")]
     for file in sorted(files):
         # file format: Indonesia.Batam.Cosmetics.202410290644.db
@@ -50,18 +61,25 @@ def list_projects():
         
         # Safe extraction with fallbacks
         country = parts[0] if len(parts) > 0 else "Unknown"
-        city = parts[1] if len(parts) > 1 else "Unknown"
+        regency = parts[1] if len(parts) > 1 else "Unknown"
         category = parts[2] if len(parts) > 2 else "Unknown"
         raw_date = parts[3] if len(parts) > 3 else "202401010000"
         
-        province = prov_map.get(city, "Unknown Province")
+        province = prov_map.get(regency, "Unknown Province")
         
         try:
             db_date = datetime.strptime(raw_date[:8], "%Y%m%d").strftime("%d %b %Y")
         except ValueError:
             db_date = raw_date
             
-        project_name = f"{category} Dataset - {city}"
+        project_name = f"{category} Dataset - {regency}"
+        
+        # Override with custom metadata
+        db_meta = custom_metadata.get(name_no_ext, {})
+        category = db_meta.get("category", category)
+        project_name = db_meta.get("project_name", f"{category} Dataset - {regency}")
+        province = db_meta.get("province", province)
+        regency = db_meta.get("regency", regency)
         
         # Connect to DB to get total_data
         db_path = os.path.join(db_dir, file)
@@ -79,7 +97,7 @@ def list_projects():
             "db_id": name_no_ext,
             "date": db_date,
             "province": province,
-            "city": city,
+            "regency": regency,
             "category": category,
             "total_data": total_data
         })
