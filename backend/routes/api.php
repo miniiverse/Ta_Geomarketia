@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProjectController;
 
 // Public
 Route::post('/login',    [AuthController::class, 'login']);
@@ -18,6 +19,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Protected - admin only
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    // Route::get('/admin/dashboard', [AdminController::class, 'index']);
-    // tambah route admin lainnya di sini
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::get('/projects',             [ProjectController::class, 'index']);
+        Route::post('/projects',            [ProjectController::class, 'store']);
+        Route::post('/projects/{id}',       [ProjectController::class, 'update']);
+        Route::delete('/projects/{id}',     [ProjectController::class, 'destroy']);
+        Route::get('/categories',           [ProjectController::class, 'categories']);
+        Route::get('/cities',               [ProjectController::class, 'cities']);
+    });
 });
