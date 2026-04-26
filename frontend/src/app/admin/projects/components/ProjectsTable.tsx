@@ -141,7 +141,7 @@ function ConfirmDialog({
                 fontFamily: "'Inter', sans-serif",
               }}
             >
-            This action cannot be undone.
+              This action cannot be undone.
             </p>
           </div>
         </div>
@@ -385,7 +385,17 @@ export default function ProjectsTable({
   const filtered = projects.filter((p) => {
     const matchCategory =
       filterCategory === "All" || p.category === filterCategory;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+
+    const q = search.toLowerCase().trim();
+    const matchSearch =
+      q === "" ||
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.totalData.toString().includes(q) ||
+      p.price.toLowerCase().includes(q) ||
+      p.date.toLowerCase().includes(q) ||
+      (p.city ?? "").toLowerCase().includes(q);
+
     return matchCategory && matchSearch;
   });
 
