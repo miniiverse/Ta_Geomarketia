@@ -122,10 +122,14 @@ export default function ProjectsPage() {
   useEffect(() => {
     if (!selectedDbId) {
       setAutoFilled(null);
+      setPrice(""); // ← reset price kalau dataset di-clear
       return;
     }
     const found = fastapiProjects.find((p) => p.db_id === selectedDbId);
     setAutoFilled(found || null);
+    if (found) {
+      setPrice(String(found.total_data * 1000)); // ← auto hitung: total_data × 1000
+    }
   }, [selectedDbId, fastapiProjects]);
 
   function resetForm() {

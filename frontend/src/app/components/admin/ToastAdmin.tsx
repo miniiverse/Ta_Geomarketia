@@ -63,29 +63,20 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
   const c = COLORS[type];
 
   useEffect(() => {
-    // Animasi masuk
     const t1 = setTimeout(() => setVisible(true), 10);
-    // Auto close setelah 4 detik
     const t2 = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 300); // tunggu animasi keluar
+      setTimeout(onClose, 300);
     }, 4000);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [onClose]);
+  }, []); 
 
   return (
     <div
       style={{
-        position: "fixed",
-        top: 24,
-        left: "50%",
-        transform: visible
-          ? "translateX(-50%)"
-          : "translateX(-50%) translateY(-120%)",
-        zIndex: 9999,
         display: "flex",
         alignItems: "flex-start",
         gap: 12,
@@ -97,6 +88,7 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
         maxWidth: 360,
         minWidth: 260,
         opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(-12px)",
         transition:
           "transform 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease",
         fontFamily: "'Inter', system-ui, sans-serif",
@@ -145,21 +137,19 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
   );
 }
 
-export function useToast() {
-  const [toasts, setToasts] = useState<
-    { id: number; message: string; type: ToastType }[]
-  >([]);
+interface ToastItem {
+  id: number;
+  message: string;
+  type: ToastType;
+}
 
-  const showToast = (message: string, type: ToastType = "error") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-  };
+interface ToastContainerProps {
+  toasts: ToastItem[];
+  removeToast: (id: number) => void;
+}
 
-  const removeToast = (id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const ToastContainer = () => (
+export function ToastContainer({ toasts, removeToast }: ToastContainerProps) {
+  return (
     <div
       style={{
         position: "fixed",
@@ -173,17 +163,29 @@ export function useToast() {
         alignItems: "center",
       }}
     >
-      {toasts.map((t, i) => (
-        <div key={t.id} style={{ transform: `translateY(${i * 4}px)` }}>
-          <Toast
-            message={t.message}
-            type={t.type}
-            onClose={() => removeToast(t.id)}
-          />
-        </div>
+      {toasts.map((t) => (
+        <Toast
+          key={t.id}
+          message={t.message}
+          type={t.type}
+          onClose={() => removeToast(t.id)}
+        />
       ))}
     </div>
   );
+}
 
-  return { showToast, ToastContainer };
+export function useToast() {
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  const showToast = (message: string, type: ToastType = "error") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id: number) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  return { showToast, toasts, removeToast };
 }

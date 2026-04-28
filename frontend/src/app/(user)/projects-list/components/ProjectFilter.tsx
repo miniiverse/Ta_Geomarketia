@@ -267,9 +267,9 @@ export default function ProjectsFilterSidebar() {
               />
             </svg>
             <select style={selectStyle}>
-              <option>Select City</option>
-              <option>Batam</option>
-              <option>Tanjung Pinang</option>
+              <option>Select Provinces</option>
+              <option>Kepulauan Riau</option>
+              <option>DKI Jakarta</option>
             </select>
           </div>
 
@@ -296,15 +296,11 @@ export default function ProjectsFilterSidebar() {
               <circle cx="12" cy="11" r="2" fill="currentColor" />
             </svg>
             <select style={selectStyle}>
-              <option>Select District</option>
-              <option>Batam Kota</option>
-              <option>Batu Aji</option>
-              <option>Batu Ampar</option>
-              <option>Bengkong</option>
-              <option>Nongsa</option>
-              <option>Sekupang</option>
-              <option>Tanjungpinang Timur</option>
-              <option>Bukit Bestari</option>
+              <option>Select City</option>
+              <option>Batam</option>
+              <option>Tanjung Pinang</option>
+              <option>Jakarta Selatan</option>
+              <option>Jakarta Pusat</option>
             </select>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import ProjectsDetail from "./ProjectsDetail";
-import { useToast } from "../../../components/admin/ToastAdmin";
+import { useToast, ToastContainer } from "../../../components/admin/ToastAdmin";
 
 type Project = {
   id: number;
@@ -256,7 +256,7 @@ export default function ProjectsTable({
   refreshKey?: number;
   onDelete?: () => void;
 }) {
-  const { showToast, ToastContainer } = useToast();
+  const { showToast, toasts, removeToast } = useToast();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -456,7 +456,7 @@ export default function ProjectsTable({
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
 
       {confirmDelete && (
         <ConfirmDialog
