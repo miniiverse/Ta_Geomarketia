@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectController;
 // Public
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/public/projects', [ProjectController::class, 'publicIndex']);
 
 // Protected - semua user yang login
 Route::middleware('auth:sanctum')->group(function () {
