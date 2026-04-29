@@ -9,6 +9,7 @@ export interface ProjectFilters {
   category?: string;
   city_id?: string;
   sort?: string;
+  year?: string;
   page?: number;
 }
 
@@ -37,6 +38,7 @@ interface ProjectGridProps {
   filters?: ProjectFilters;
   onPageChange?: (page: number) => void;
   onTotalChange?: (total: number) => void;
+  onYearsLoaded?: (years: number[]) => void;
 }
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER ?? "http://localhost:8001";
@@ -57,6 +59,7 @@ export default function ProjectGrid({
   filters = {},
   onPageChange,
   onTotalChange,
+  onYearsLoaded,
 }: ProjectGridProps) {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -71,11 +74,12 @@ export default function ProjectGrid({
     setError(null);
 
     const params = new URLSearchParams();
-    const { search, category, city_id, sort, page } = filters;
+    const { search, category, city_id, sort, year, page } = filters;
     if (search) params.set("search", search);
     if (category && category !== "ALL") params.set("category", category);
     if (city_id) params.set("city_id", city_id);
     if (sort) params.set("sort", sort);
+    if (year && year !== "All Years") params.set("year", year);
     if (page && page > 1) params.set("page", String(page));
 
     try {
@@ -89,8 +93,12 @@ export default function ProjectGrid({
       setProjects(json.data ?? []);
       setMeta(json.meta ?? null);
       onTotalChange?.(json.meta?.total ?? 0);
+
+      if (json.available_years && onYearsLoaded) {
+        onYearsLoaded(json.available_years);
+      }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Gagal memuat data.");
+      setError(e instanceof Error ? e.message : "Failed to load data.");
     } finally {
       setLoading(false);
     }
@@ -172,7 +180,35 @@ export default function ProjectGrid({
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "#FEE2E2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                stroke="#DC2626"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
         <div
           style={{
             fontSize: 14,
@@ -181,7 +217,7 @@ export default function ProjectGrid({
             marginBottom: 6,
           }}
         >
-          Gagal memuat data
+          Failed to load data
         </div>
         <div style={{ fontSize: 12, color: "#9F1239", marginBottom: 16 }}>
           {error}
@@ -199,7 +235,7 @@ export default function ProjectGrid({
             cursor: "pointer",
           }}
         >
-          Coba Lagi
+          Try Again
         </button>
       </div>
     );
@@ -217,12 +253,46 @@ export default function ProjectGrid({
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <div style={{ fontSize: 36, marginBottom: 8 }}>🗂️</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 16,
+              background: "#EBF3FF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 7a2 2 0 012-2h3l2 3h9a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+                stroke="#93C5FD"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 14h6M12 11v6"
+                stroke="#93C5FD"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+        </div>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#64748B" }}>
-          Tidak ada proyek ditemukan
+          No projects found
         </div>
         <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>
-          Coba ubah filter atau kata kunci pencarian.
+          Try adjusting your filters or search keyword.
         </div>
       </div>
     );

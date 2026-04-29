@@ -1,27 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const categories = ["ALL", "Retail", "Food & Beverage", "Healthcare"];
-const years = ["All Years", "2025", "2024", "2023", "2022"];
+interface Category {
+  category_id: number;
+  name: string;
+}
 
-const provinceCities: Record<string, { id: string; name: string }[]> = {
-  "": [],
-  "Kepulauan Riau": [
-    { id: "1", name: "Batam" },
-    { id: "2", name: "Tanjung Pinang" },
-  ],
-  "DKI Jakarta": [
-    { id: "3", name: "Jakarta Selatan" },
-    { id: "4", name: "Jakarta Pusat" },
-  ],
-};
+interface Province {
+  province_id: number;
+  name: string;
+}
+
+interface City {
+  city_id: number;
+  province_id: number;
+  name: string;
+}
 
 interface FilterSidebarProps {
   onFilterChange?: (filters: {
     category?: string;
     city_id?: string;
     sort?: string;
+    year?: string;
   }) => void;
 }
 
@@ -40,37 +42,70 @@ const selectStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
+const currentYear = new Date().getFullYear();
+const years = [
+  "All Years",
+  ...Array.from({ length: currentYear - 2019 }, (_, i) =>
+    String(currentYear - i),
+  ),
+];
+
 export default function ProjectsFilterSidebar({
   onFilterChange,
 }: FilterSidebarProps) {
   const [category, setCategory] = useState("ALL");
   const [selectedYear, setSelectedYear] = useState("All Years");
-  const [province, setProvince] = useState("");
+  const [provinceId, setProvinceId] = useState("");
   const [cityId, setCityId] = useState("");
-  const [sort, setSort] = useState("Most Relevant");
+  const [sort, setSort] = useState("newest");
 
-  const cities = provinceCities[province] ?? [];
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
 
-  const handleProvinceChange = (val: string) => {
-    setProvince(val);
-    setCityId("");
-  };
+  useEffect(() => {
+    fetch("/api/filters?type=categories")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setCategories(json.data);
+      });
+  }, []);
 
-  const handleApply = () => {
+  useEffect(() => {
+    fetch("/api/filters?type=provinces")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setProvinces(json.data);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!provinceId) {
+      setCities([]);
+      return;
+    }
+    setLoadingCities(true);
+    fetch(`/api/filters?type=cities&province_id=${provinceId}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setCities(json.data);
+      })
+      .finally(() => setLoadingCities(false));
+  }, [provinceId]);
+
+  useEffect(() => {
     onFilterChange?.({
       category: category === "ALL" ? undefined : category,
       city_id: cityId || undefined,
-      sort: sort === "Most Relevant" ? undefined : sort.toLowerCase(),
+      sort: sort,
+      year: selectedYear === "All Years" ? undefined : selectedYear,
     });
-  };
+  }, [category, selectedYear, cityId, sort]);
 
-  const handleReset = () => {
-    setCategory("ALL");
-    setSelectedYear("All Years");
-    setProvince("");
+  const handleProvinceChange = (val: string) => {
+    setProvinceId(val);
     setCityId("");
-    setSort("Most Relevant");
-    onFilterChange?.({});
   };
 
   return (
@@ -152,7 +187,6 @@ export default function ProjectsFilterSidebar({
                 color: "rgba(26,86,219,0.45)",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                fontFamily: "'Inter', sans-serif",
               }}
             >
               SPATIAL SEARCH
@@ -177,7 +211,6 @@ export default function ProjectsFilterSidebar({
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             CATEGORIES
@@ -209,9 +242,10 @@ export default function ProjectsFilterSidebar({
               onChange={(e) => setCategory(e.target.value)}
               style={selectStyle}
             >
-              {categories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              <option value="ALL">ALL</option>
+              {categories.map((c) => (
+                <option key={c.category_id} value={c.name}>
+                  {c.name}
                 </option>
               ))}
             </select>
@@ -227,7 +261,6 @@ export default function ProjectsFilterSidebar({
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             YEAR
@@ -268,9 +301,9 @@ export default function ProjectsFilterSidebar({
               onChange={(e) => setSelectedYear(e.target.value)}
               style={selectStyle}
             >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
                 </option>
               ))}
             </select>
@@ -286,7 +319,6 @@ export default function ProjectsFilterSidebar({
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             LOCATION
@@ -316,13 +348,16 @@ export default function ProjectsFilterSidebar({
               />
             </svg>
             <select
-              value={province}
+              value={provinceId}
               onChange={(e) => handleProvinceChange(e.target.value)}
               style={selectStyle}
             >
-              <option value="">Select Provinces</option>
-              <option value="Kepulauan Riau">Kepulauan Riau</option>
-              <option value="DKI Jakarta">DKI Jakarta</option>
+              <option value="">Select Province</option>
+              {provinces.map((p) => (
+                <option key={p.province_id} value={String(p.province_id)}>
+                  {p.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -351,12 +386,18 @@ export default function ProjectsFilterSidebar({
             <select
               value={cityId}
               onChange={(e) => setCityId(e.target.value)}
-              disabled={cities.length === 0}
-              style={{ ...selectStyle, opacity: cities.length === 0 ? 0.5 : 1 }}
+              disabled={!provinceId || loadingCities}
+              style={{ ...selectStyle, opacity: !provinceId ? 0.5 : 1 }}
             >
-              <option value="">Select City</option>
+              <option value="">
+                {loadingCities
+                  ? "Loading..."
+                  : !provinceId
+                    ? "Select Province first"
+                    : "Select City"}
+              </option>
               {cities.map((c) => (
-                <option key={c.id} value={c.id}>
+                <option key={c.city_id} value={String(c.city_id)}>
                   {c.name}
                 </option>
               ))}
@@ -364,7 +405,7 @@ export default function ProjectsFilterSidebar({
           </div>
         </div>
 
-        <div style={{ marginBottom: 22 }}>
+        <div style={{ marginBottom: 4 }}>
           <p
             style={{
               fontSize: 10,
@@ -373,7 +414,6 @@ export default function ProjectsFilterSidebar({
               color: "rgba(26,86,219,0.5)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             SORT BY
@@ -405,89 +445,10 @@ export default function ProjectsFilterSidebar({
               onChange={(e) => setSort(e.target.value)}
               style={selectStyle}
             >
-              <option>Most Relevant</option>
-              <option>Newest</option>
-              <option>Oldest</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
             </select>
           </div>
-        </div>
-
-        <div
-          style={{
-            height: 1,
-            background: "rgba(26,86,219,0.12)",
-            marginBottom: 16,
-          }}
-        />
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={handleReset}
-            style={{
-              flex: 1,
-              padding: "10px 0",
-              borderRadius: 10,
-              border: "1.5px solid #BFDBFE",
-              background: "rgba(255,255,255,0.8)",
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#64748B",
-              cursor: "pointer",
-              fontFamily: "'Inter', sans-serif",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.background = "#fff")
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.background =
-                "rgba(255,255,255,0.8)")
-            }
-          >
-            Reset
-          </button>
-          <button
-            onClick={handleApply}
-            style={{
-              flex: 2,
-              padding: "10px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "#1A56DB",
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#fff",
-              cursor: "pointer",
-              fontFamily: "'Inter', sans-serif",
-              transition: "all 0.2s",
-              boxShadow: "0 4px 14px rgba(26,86,219,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#1036A0";
-              (e.currentTarget as HTMLElement).style.transform =
-                "translateY(-1px)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#1A56DB";
-              (e.currentTarget as HTMLElement).style.transform =
-                "translateY(0)";
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2" />
-              <path
-                d="M20 20L17 17"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            Apply Filters
-          </button>
         </div>
       </div>
 

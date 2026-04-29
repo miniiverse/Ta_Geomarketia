@@ -4,11 +4,15 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\User\UserProjectController;
+use App\Http\Controllers\User\FilterController;
 
 // Public
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/user/projects', [UserProjectController::class, 'index']);
+Route::get('/user/projects',   [UserProjectController::class, 'index']);
+Route::get('/user/categories', [FilterController::class, 'categories']);  
+Route::get('/user/provinces',  [FilterController::class, 'provinces']);
+Route::get('/user/cities',     [FilterController::class, 'cities']);
 
 // Protected - semua user yang login
 Route::middleware('auth:sanctum')->group(function () {

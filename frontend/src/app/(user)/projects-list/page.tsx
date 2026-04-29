@@ -9,6 +9,7 @@ export interface ProjectFilters {
   category?: string;
   city_id?: string;
   sort?: string;
+  year?: string;
   page?: number;
 }
 
