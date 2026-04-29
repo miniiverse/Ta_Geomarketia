@@ -5,6 +5,26 @@ import { useState } from "react";
 const categories = ["ALL", "Retail", "Food & Beverage", "Healthcare"];
 const years = ["All Years", "2025", "2024", "2023", "2022"];
 
+const provinceCities: Record<string, { id: string; name: string }[]> = {
+  "": [],
+  "Kepulauan Riau": [
+    { id: "1", name: "Batam" },
+    { id: "2", name: "Tanjung Pinang" },
+  ],
+  "DKI Jakarta": [
+    { id: "3", name: "Jakarta Selatan" },
+    { id: "4", name: "Jakarta Pusat" },
+  ],
+};
+
+interface FilterSidebarProps {
+  onFilterChange?: (filters: {
+    category?: string;
+    city_id?: string;
+    sort?: string;
+  }) => void;
+}
+
 const selectStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px 10px 30px",
@@ -20,9 +40,38 @@ const selectStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-export default function ProjectsFilterSidebar() {
+export default function ProjectsFilterSidebar({
+  onFilterChange,
+}: FilterSidebarProps) {
   const [category, setCategory] = useState("ALL");
   const [selectedYear, setSelectedYear] = useState("All Years");
+  const [province, setProvince] = useState("");
+  const [cityId, setCityId] = useState("");
+  const [sort, setSort] = useState("Most Relevant");
+
+  const cities = provinceCities[province] ?? [];
+
+  const handleProvinceChange = (val: string) => {
+    setProvince(val);
+    setCityId("");
+  };
+
+  const handleApply = () => {
+    onFilterChange?.({
+      category: category === "ALL" ? undefined : category,
+      city_id: cityId || undefined,
+      sort: sort === "Most Relevant" ? undefined : sort.toLowerCase(),
+    });
+  };
+
+  const handleReset = () => {
+    setCategory("ALL");
+    setSelectedYear("All Years");
+    setProvince("");
+    setCityId("");
+    setSort("Most Relevant");
+    onFilterChange?.({});
+  };
 
   return (
     <div
@@ -266,10 +315,14 @@ export default function ProjectsFilterSidebar() {
                 strokeLinejoin="round"
               />
             </svg>
-            <select style={selectStyle}>
-              <option>Select Provinces</option>
-              <option>Kepulauan Riau</option>
-              <option>DKI Jakarta</option>
+            <select
+              value={province}
+              onChange={(e) => handleProvinceChange(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="">Select Provinces</option>
+              <option value="Kepulauan Riau">Kepulauan Riau</option>
+              <option value="DKI Jakarta">DKI Jakarta</option>
             </select>
           </div>
 
@@ -295,17 +348,22 @@ export default function ProjectsFilterSidebar() {
               />
               <circle cx="12" cy="11" r="2" fill="currentColor" />
             </svg>
-            <select style={selectStyle}>
-              <option>Select City</option>
-              <option>Batam</option>
-              <option>Tanjung Pinang</option>
-              <option>Jakarta Selatan</option>
-              <option>Jakarta Pusat</option>
+            <select
+              value={cityId}
+              onChange={(e) => setCityId(e.target.value)}
+              disabled={cities.length === 0}
+              style={{ ...selectStyle, opacity: cities.length === 0 ? 0.5 : 1 }}
+            >
+              <option value="">Select City</option>
+              {cities.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        {/* SORT BY */}
         <div style={{ marginBottom: 22 }}>
           <p
             style={{
@@ -342,7 +400,11 @@ export default function ProjectsFilterSidebar() {
                 strokeLinecap="round"
               />
             </svg>
-            <select style={selectStyle}>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              style={selectStyle}
+            >
               <option>Most Relevant</option>
               <option>Newest</option>
               <option>Oldest</option>
@@ -360,10 +422,7 @@ export default function ProjectsFilterSidebar() {
 
         <div style={{ display: "flex", gap: 8 }}>
           <button
-            onClick={() => {
-              setCategory("ALL");
-              setSelectedYear("All Years");
-            }}
+            onClick={handleReset}
             style={{
               flex: 1,
               padding: "10px 0",
@@ -388,6 +447,7 @@ export default function ProjectsFilterSidebar() {
             Reset
           </button>
           <button
+            onClick={handleApply}
             style={{
               flex: 2,
               padding: "10px 0",

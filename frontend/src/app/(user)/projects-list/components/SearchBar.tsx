@@ -1,10 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
-export default function ProjectsHeader() {
+interface ProjectsHeaderProps {
+  onSearch?: (search: string) => void;
+  totalProjects?: number;
+}
+
+export default function ProjectsHeader({
+  onSearch,
+  totalProjects,
+}: ProjectsHeaderProps) {
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      onSearch?.(search.trim());
+    }, 400);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]); 
+
+  const handleClear = () => {
+    setSearch("");
+    onSearch?.("");
+  };
 
   return (
     <div
@@ -77,7 +101,7 @@ export default function ProjectsHeader() {
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            56 Projects Found
+            {totalProjects ?? "..."} Projects Found
           </span>
         </div>
       </div>
@@ -151,7 +175,7 @@ export default function ProjectsHeader() {
             />
             {search && (
               <button
-                onClick={() => setSearch("")}
+                onClick={handleClear}
                 style={{
                   background: "none",
                   border: "none",

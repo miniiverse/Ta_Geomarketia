@@ -1,167 +1,112 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import ProjectCard from "./ProjectCard";
 
-const projects = [
-  {
-    id: "retail-site-selection",
-    title: "Retail Site Selection",
-    description: "Identify the best retail locations in Batam Kota using population density and accessibility data.",
-    region: "Batam Kota",
-    category: "Retail",
-    price: "Rp 850.000",
-    layerCount: 5,
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80&fit=crop",
-    totalData: 100,
-    lastUpdate: "Apr 2, 2025",
-  },
-  {
-    id: "fnb-hotspot-analysis",
-    title: "F&B Hotspot Analysis",
-    description: "Analyze high foot traffic areas in Nagoya for food & beverage business opportunities.",
-    region: "Nagoya",
-    category: "Food & Beverage",
-    price: "Rp 650.000",
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop",
-    totalData: 250,
-    lastUpdate: "Mar 28, 2025",
-  },
-  {
-    id: "healthcare-access-gap",
-    title: "Healthcare Access Gap",
-    description: "Map underserved healthcare zones in Batu Aji based on population distribution.",
-    region: "Batu Aji",
-    category: "Healthcare",
-    price: "Rp 1.200.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80&fit=crop",
-    totalData: 150,
-    lastUpdate: "Jan 15, 2025",
-  },
-  {
-    id: "retail-expansion-analysis",
-    title: "Retail Expansion Analysis",
-    description: "Evaluate retail expansion opportunities in Bengkong using economic activity data.",
-    region: "Bengkong",
-    category: "Retail",
-    price: "Rp 750.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80&fit=crop",
-    totalData: 320,
-    lastUpdate: "Feb 10, 2025",
-  },
-  {
-    id: "fnb-market-mapping",
-    title: "F&B Market Mapping",
-    description: "Discover potential F&B business zones in Nongsa based on tourism and traffic patterns.",
-    region: "Nongsa",
-    category: "Food & Beverage",
-    price: "Rp 700.000",
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop",
-    totalData: 80,
-    lastUpdate: "Apr 1, 2025",
-  },
-  {
-    id: "healthcare-facility-planning",
-    title: "Healthcare Facility Planning",
-    description: "Plan optimal healthcare facility locations in Sekupang using demographic insights.",
-    region: "Sekupang",
-    category: "Healthcare",
-    price: "Rp 1.150.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80&fit=crop",
-    totalData: 200,
-    lastUpdate: "Dec 20, 2024",
-  },
-  {
-    id: "retail-demand-heatmap",
-    title: "Retail Demand Heatmap",
-    description: "Visualize retail demand concentration in Lubuk Baja using consumer spending patterns.",
-    region: "Lubuk Baja",
-    category: "Retail",
-    price: "Rp 900.000",
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80&fit=crop",
-    totalData: 450,
-    lastUpdate: "Mar 31, 2025",
-  },
-  {
-    id: "fnb-competitor-density",
-    title: "F&B Competitor Density",
-    description: "Analyze restaurant competition density and identify saturation zones in Batam Center.",
-    region: "Batam Center",
-    category: "Food & Beverage",
-    price: "Rp 720.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop",
-    totalData: 600,
-    lastUpdate: "Jan 5, 2025",
-  },
-  {
-    id: "healthcare-coverage-optimization",
-    title: "Healthcare Coverage Optimization",
-    description: "Optimize clinic placement in Tiban based on accessibility and emergency response time.",
-    region: "Tiban",
-    category: "Healthcare",
-    price: "Rp 1.300.000",
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80&fit=crop",
-    totalData: 90,
-    lastUpdate: "Apr 3, 2025",
-  },
-  {
-    id: "retail-foot-traffic-analysis",
-    title: "Retail Foot Traffic Analysis",
-    description: "Measure pedestrian flow trends to identify high-performing retail zones in Nagoya.",
-    region: "Nagoya",
-    category: "Retail",
-    price: "Rp 880.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80&fit=crop",
-    totalData: 400,
-    lastUpdate: "Feb 22, 2025",
-  },
-  {
-    id: "fnb-revenue-potential-map",
-    title: "F&B Revenue Potential Map",
-    description: "Estimate revenue potential for new cafes based on income levels and visitor patterns.",
-    region: "Nongsa",
-    category: "Food & Beverage",
-    price: "Rp 780.000",
-    status: "New" as const,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop",
-    totalData: 120,
-    lastUpdate: "Mar 19, 2025",
-  },
-  {
-    id: "healthcare-service-demand",
-    title: "Healthcare Service Demand",
-    description: "Identify areas with high healthcare demand but limited facilities in Sei Beduk.",
-    region: "Sei Beduk",
-    category: "Healthcare",
-    price: "Rp 1.250.000",
-    status: "Oldest" as const,
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&q=80&fit=crop",
-    totalData: 180,
-    lastUpdate: "Nov 30, 2024",
-  },
-];
+export interface ProjectFilters {
+  search?: string;
+  category?: string;
+  city_id?: string;
+  sort?: string;
+  page?: number;
+}
 
-const ITEMS_PER_PAGE = 9;
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  price: string;
+  total_data: number;
+  last_update: string;
+  category: string;
+  region: string;
+  thumbnail: string | null;
+  api_url: string | null;
+  status: "New" | "Oldest";
+}
 
-export default function ProjectGrid() {
+interface Meta {
+  current_page: number;
+  last_page: number;
+  total: number;
+  per_page: number;
+}
+
+interface ProjectGridProps {
+  filters?: ProjectFilters;
+  onPageChange?: (page: number) => void;
+  onTotalChange?: (total: number) => void;
+}
+
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER ?? "http://localhost:8001";
+
+const FALLBACK_IMAGE: Record<string, string> = {
+  default: "/images/fallback.png",
+};
+
+function resolveImage(thumbnail: string | null, category: string): string {
+  if (thumbnail && thumbnail.trim() !== "") {
+    const fixedUrl = thumbnail.replace("http://localhost/", `${SERVER_URL}/`);
+    return fixedUrl;
+  }
+  return FALLBACK_IMAGE[category] ?? FALLBACK_IMAGE.default;
+}
+
+export default function ProjectGrid({
+  filters = {},
+  onPageChange,
+  onTotalChange,
+}: ProjectGridProps) {
   const router = useRouter();
-  const [page, setPage] = useState(1);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
-  const paginated = projects.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const currentPage = filters.page ?? 1;
 
-  const btnStyle = (active: boolean, disabled?: boolean): React.CSSProperties => ({
+  const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    const params = new URLSearchParams();
+    const { search, category, city_id, sort, page } = filters;
+    if (search) params.set("search", search);
+    if (category && category !== "ALL") params.set("category", category);
+    if (city_id) params.set("city_id", city_id);
+    if (sort) params.set("sort", sort);
+    if (page && page > 1) params.set("page", String(page));
+
+    try {
+      const res = await fetch(`/api/projects-user?${params.toString()}`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message ?? "Response error");
+
+      setProjects(json.data ?? []);
+      setMeta(json.meta ?? null);
+      onTotalChange?.(json.meta?.total ?? 0);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Gagal memuat data.");
+    } finally {
+      setLoading(false);
+    }
+  }, [JSON.stringify(filters)]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const totalPages = meta?.last_page ?? 1;
+  const goToPage = (p: number) => onPageChange?.(p);
+
+  const btnStyle = (
+    active: boolean,
+    disabled?: boolean,
+  ): React.CSSProperties => ({
     width: 36,
     height: 36,
     borderRadius: 10,
@@ -179,12 +124,122 @@ export default function ProjectGrid() {
     boxShadow: active ? "0 4px 14px rgba(26,86,219,0.28)" : "none",
   });
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: "60px 0",
+          textAlign: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              border: "3px solid #BFDBFE",
+              borderTopColor: "#1A56DB",
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+            }}
+          />
+          <span style={{ fontSize: 13, color: "#94A3B8", fontWeight: 500 }}>
+            Loading projects...
+          </span>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          padding: "40px 24px",
+          borderRadius: 16,
+          background: "#FFF1F2",
+          border: "1.5px solid #FECDD3",
+          textAlign: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#BE123C",
+            marginBottom: 6,
+          }}
+        >
+          Gagal memuat data
+        </div>
+        <div style={{ fontSize: 12, color: "#9F1239", marginBottom: 16 }}>
+          {error}
+        </div>
+        <button
+          onClick={fetchProjects}
+          style={{
+            padding: "8px 20px",
+            borderRadius: 8,
+            background: "#1A56DB",
+            color: "#fff",
+            border: "none",
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
+
+  if (projects.length === 0) {
+    return (
+      <div
+        style={{
+          padding: "60px 24px",
+          borderRadius: 16,
+          background: "#F8FAFC",
+          border: "1.5px dashed #CBD5E1",
+          textAlign: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ fontSize: 36, marginBottom: 8 }}>🗂️</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#64748B" }}>
+          Tidak ada proyek ditemukan
+        </div>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>
+          Coba ubah filter atau kata kunci pencarian.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div style={{ marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div
+        style={{
+          marginBottom: 16,
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}
+      >
         <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
-          Showing <strong style={{ color: "#0F172A" }}>{paginated.length}</strong> of{" "}
-          {projects.length} results
+          Showing{" "}
+          <strong style={{ color: "#0F172A" }}>{projects.length}</strong> of{" "}
+          {meta?.total ?? projects.length} results
         </span>
       </div>
 
@@ -195,87 +250,101 @@ export default function ProjectGrid() {
           gap: 18,
         }}
       >
-        {paginated.map((project, i) => (
+        {projects.map((project) => (
           <ProjectCard
-            key={`${page}-${i}`}
-            {...project}
+            key={project.id}
+            id={project.id}
+            title={project.title}
+            description={project.description}
+            region={project.region}
+            category={project.category}
+            price={project.price}
+            status={project.status}
+            image={resolveImage(project.thumbnail, project.category)}
+            totalData={project.total_data}
+            lastUpdate={project.last_update}
             onPreview={() => router.push(`/project-detail/${project.id}`)}
           />
         ))}
       </div>
 
-      {/* Pagination */}
-      <div
-        style={{
-          marginTop: 28,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 6,
-        }}
-      >
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          style={btnStyle(false, page === 1)}
-          onMouseEnter={(e) => {
-            if (page !== 1) (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
-          }}
-          onMouseLeave={(e) => {
-            if (page !== 1) (e.currentTarget as HTMLElement).style.background = "#ffffff";
+      {totalPages > 1 && (
+        <div
+          style={{
+            marginTop: 28,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M15 18l-6-6 6-6"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
           <button
-            key={p}
-            onClick={() => setPage(p)}
-            style={btnStyle(page === p)}
+            onClick={() => goToPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            style={btnStyle(false, currentPage === 1)}
             onMouseEnter={(e) => {
-              if (page !== p) (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
+              if (currentPage !== 1)
+                (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
             }}
             onMouseLeave={(e) => {
-              if (page !== p) (e.currentTarget as HTMLElement).style.background = "#ffffff";
+              if (currentPage !== 1)
+                (e.currentTarget as HTMLElement).style.background = "#ffffff";
             }}
           >
-            {p}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
-        ))}
 
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-          style={btnStyle(false, page === totalPages)}
-          onMouseEnter={(e) => {
-            if (page !== totalPages)
-              (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
-          }}
-          onMouseLeave={(e) => {
-            if (page !== totalPages)
-              (e.currentTarget as HTMLElement).style.background = "#ffffff";
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M9 18l6-6-6-6"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => goToPage(p)}
+              style={btnStyle(currentPage === p)}
+              onMouseEnter={(e) => {
+                if (currentPage !== p)
+                  (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== p)
+                  (e.currentTarget as HTMLElement).style.background = "#ffffff";
+              }}
+            >
+              {p}
+            </button>
+          ))}
+
+          <button
+            onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            style={btnStyle(false, currentPage === totalPages)}
+            onMouseEnter={(e) => {
+              if (currentPage !== totalPages)
+                (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage !== totalPages)
+                (e.currentTarget as HTMLElement).style.background = "#ffffff";
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 18l6-6-6-6"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

@@ -23,6 +23,9 @@ const statusConfig = {
   Oldest: { color: "#64748B", bg: "#F1F5F9", border: "#CBD5E1" },
 };
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80&fit=crop";
+
 export default function ProjectCard({
   id = 1,
   title = "Retail Site Selection Analysis",
@@ -32,17 +35,18 @@ export default function ProjectCard({
   price = "Rp 850.000",
   layerCount = 5,
   status = "New",
-  image = "https://source.unsplash.com/400x200/?map,city",
+  image = FALLBACK_IMAGE,
   totalData = 0,
   lastUpdate = "-",
-  onPreview, // ← BARU
+  onPreview,
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const router = useRouter();
   const cfg = statusConfig[status] ?? statusConfig["New"];
 
   const handleBuyNow = (e: React.MouseEvent) => {
-    e.stopPropagation(); // jangan trigger onPreview
+    e.stopPropagation();
     router.push(
       `/checkout?id=${id}&title=${encodeURIComponent(title ?? "")}&price=${encodeURIComponent(price ?? "")}&category=${encodeURIComponent(category ?? "")}&region=${encodeURIComponent(region ?? "")}&description=${encodeURIComponent(description ?? "")}`,
     );
@@ -51,6 +55,9 @@ export default function ProjectCard({
   const handleCardClick = () => {
     if (onPreview) onPreview();
   };
+
+  const imageSrc =
+    imgError || !image || image.trim() === "" ? FALLBACK_IMAGE : image;
 
   return (
     <div
@@ -71,37 +78,38 @@ export default function ProjectCard({
         fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >
-      <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: 140,
+          overflow: "hidden",
+          background: "#EBF3FF",
+        }}
+      >
         <img
-          src={image}
+          src={imageSrc}
           alt={title}
+          onError={() => setImgError(true)}
           style={{
+            position: "absolute",
+            inset: 0,
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            objectPosition: "center",
             display: "block",
-            filter: "brightness(0.82) saturate(1.15)",
             transition: "transform 0.4s ease",
             transform: hovered ? "scale(1.06)" : "scale(1)",
           }}
         />
+
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(26,86,219,0.05) 0%, rgba(26,86,219,0.35) 100%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)",
-            backgroundSize: "22px 22px",
-            opacity: hovered ? 1 : 0.5,
-            transition: "opacity 0.3s",
+              "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.25) 100%)",
           }}
         />
 
@@ -169,19 +177,41 @@ export default function ProjectCard({
         </div>
 
         {hovered && onPreview && (
-          <div style={{
-            position: "absolute", inset: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            background: "rgba(15,23,42,0.25)",
-            animation: "fadeInHint 0.2s ease",
-          }}>
-            <div style={{
-              background: "rgba(255,255,255,0.95)", borderRadius: 10,
-              padding: "7px 14px", fontSize: 12, fontWeight: 700, color: "#1A56DB",
-              display: "flex", alignItems: "center", gap: 6,
-              boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
-            }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(15,23,42,0.18)",
+              animation: "fadeInHint 0.2s ease",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255,255,255,0.95)",
+                borderRadius: 10,
+                padding: "7px 14px",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#1A56DB",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+              }}
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#1A56DB"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>

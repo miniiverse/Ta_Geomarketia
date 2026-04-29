@@ -1,9 +1,21 @@
 "use client";
 
 import ProjectFilter from "./ProjectFilter";
-import ProjectGrid from "./ProjectGrid";
+import ProjectGrid, { ProjectFilters } from "./ProjectGrid";
 
-export default function ProjectLayout() {
+interface ProjectLayoutProps {
+  filters?: ProjectFilters;
+  onFilterChange?: (filters: Partial<ProjectFilters>) => void;
+  onPageChange?: (page: number) => void;
+  onTotalChange?: (total: number) => void;
+}
+
+export default function ProjectLayout({
+  filters,
+  onFilterChange,
+  onPageChange,
+  onTotalChange,
+}: ProjectLayoutProps) {
   return (
     <div
       style={{
@@ -14,9 +26,13 @@ export default function ProjectLayout() {
         alignItems: "start",
       }}
     >
-      <ProjectFilter />
+      <ProjectFilter onFilterChange={onFilterChange} />
 
-      <ProjectGrid />
+      <ProjectGrid
+        filters={filters}
+        onPageChange={onPageChange}
+        onTotalChange={onTotalChange}
+      />
 
       <style jsx>{`
         .project-layout {

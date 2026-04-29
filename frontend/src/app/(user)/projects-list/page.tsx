@@ -1,7 +1,38 @@
+"use client";
+
+import { useState, useCallback } from "react";
 import SearchBar from "./components/SearchBar";
 import ProjectsLayout from "./components/ProjectLayout";
 
+export interface ProjectFilters {
+  search?: string;
+  category?: string;
+  city_id?: string;
+  sort?: string;
+  page?: number;
+}
+
 export default function ProjectsPage() {
+  const [filters, setFilters] = useState<ProjectFilters>({});
+  const [totalProjects, setTotalProjects] = useState<number | undefined>(
+    undefined
+  );
+
+  const handleSearch = useCallback((search: string) => {
+    setFilters((prev) => ({ ...prev, search: search || undefined, page: 1 }));
+  }, []);
+
+  const handleFilterChange = useCallback(
+    (incoming: Partial<ProjectFilters>) => {
+      setFilters((prev) => ({ ...prev, ...incoming, page: 1 }));
+    },
+    []
+  );
+
+  const handlePageChange = useCallback((page: number) => {
+    setFilters((prev) => ({ ...prev, page }));
+  }, []);
+
   return (
     <div
       style={{
@@ -10,9 +41,17 @@ export default function ProjectsPage() {
         padding: "0 40px 40px",
       }}
     >
-      <SearchBar />
+      <SearchBar
+        onSearch={handleSearch}
+        totalProjects={totalProjects}
+      />
 
-      <ProjectsLayout />
+      <ProjectsLayout
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onPageChange={handlePageChange}
+        onTotalChange={setTotalProjects}
+      />
     </div>
   );
 }

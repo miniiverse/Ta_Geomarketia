@@ -3,11 +3,12 @@
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\User\UserProjectController;
 
 // Public
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/public/projects', [ProjectController::class, 'publicIndex']);
+Route::get('/user/projects', [UserProjectController::class, 'index']);
 
 // Protected - semua user yang login
 Route::middleware('auth:sanctum')->group(function () {
