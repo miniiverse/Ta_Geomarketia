@@ -13,15 +13,24 @@ class UserProjectController extends Controller
     {
         $query = Project::with(['category', 'city'])
             ->select([
-                'project_id', 'category_id', 'city_id',
-                'title', 'description', 'price',
-                'total_data', 'project_date', 'thumbnail',
-                'api_url', 'created_at',
+                'project_id',
+                'category_id',
+                'city_id',
+                'title',
+                'description',
+                'price',
+                'total_data',
+                'project_date',
+                'thumbnail',
+                'api_url',
+                'created_at',
             ]);
 
         // Filter category
         if ($request->filled('category') && $request->category !== 'ALL') {
-            $query->whereHas('category', fn($q) =>
+            $query->whereHas(
+                'category',
+                fn($q) =>
                 $q->where('name', $request->category)
             );
         }
@@ -34,15 +43,29 @@ class UserProjectController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(fn($q) =>
+            $query->where(
+                fn($q) =>
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('total_data', 'like', "%{$search}%")
+                    ->orWhereHas(
+                        'category',
+                        fn($c) =>
+                        $c->where('name', 'like', "%{$search}%")
+                    )
             );
         }
 
         // Sort
         $sort = $request->get('sort', 'newest');
-        $query->orderBy('project_date', $sort === 'oldest' ? 'asc' : 'desc');
+
+        if ($sort === 'price_asc') {
+            $query->orderBy('price', 'asc');
+        } elseif ($sort === 'price_desc') {
+            $query->orderBy('price', 'desc');
+        } else {
+            $query->orderBy('project_date', $sort === 'oldest' ? 'asc' : 'desc');
+        }
 
         $projects = $query->paginate($request->get('per_page', 9));
 
