@@ -67,16 +67,17 @@ class UserProjectController extends Controller
 
         // Sort
         $sort = $request->get('sort', '');
- 
+
         match ($sort) {
-            'newest' => $query->where('updated_at', '>=', now()->subMonths(3))
-                              ->orderBy('updated_at', 'desc'),
-            'oldest' => $query->whereBetween('updated_at', [
-                              now()->subYear(),
-                              now()->subMonths(3),
-                          ])
-                          ->orderBy('updated_at', 'asc'),
-            default  => $query->orderBy('updated_at', 'desc'), 
+            'price_asc'  => $query->orderBy('price', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc'),
+            'newest'     => $query->where('updated_at', '>=', now()->subMonths(3))
+                ->orderBy('updated_at', 'desc'),
+            'oldest'     => $query->whereBetween('updated_at', [
+                now()->subYear(),
+                now()->subMonths(3),
+            ])->orderBy('updated_at', 'asc'),
+            default      => $query->orderBy('updated_at', 'desc'),
         };
 
         $projects = $query->paginate($request->get('per_page', 9));
