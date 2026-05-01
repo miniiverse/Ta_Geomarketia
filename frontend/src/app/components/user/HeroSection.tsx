@@ -487,7 +487,7 @@ export default function HeroSection() {
                   "0 0 24px rgba(37,99,235,0.45)";
               }}
             >
-              Browse Product
+              Browse Project
               <svg
                 width="14"
                 height="14"

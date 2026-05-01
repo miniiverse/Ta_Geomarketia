@@ -122,13 +122,13 @@ export default function ProjectsPage() {
   useEffect(() => {
     if (!selectedDbId) {
       setAutoFilled(null);
-      setPrice(""); // ← reset price kalau dataset di-clear
+      setPrice(""); 
       return;
     }
     const found = fastapiProjects.find((p) => p.db_id === selectedDbId);
     setAutoFilled(found || null);
     if (found) {
-      setPrice(String(found.total_data * 1000)); // ← auto hitung: total_data × 1000
+      setPrice(String(found.total_data * 1000)); 
     }
   }, [selectedDbId, fastapiProjects]);
 
@@ -379,10 +379,11 @@ export default function ProjectsPage() {
             background: "rgba(15,23,42,0.45)",
             zIndex: 50,
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
             padding: "24px",
             paddingTop: "80px",
+            overflowY: "auto",
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {

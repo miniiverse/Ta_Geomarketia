@@ -9,7 +9,8 @@ export interface ProjectFilters {
   category?: string;
   city_id?: string;
   sort?: string;
-  year?: string;
+  project_date_year?: string; 
+  last_update_year?: string; 
   page?: number;
 }
 
@@ -20,6 +21,7 @@ interface Project {
   price: string;
   total_data: number;
   last_update: string;
+  project_date: string | null;
   category: string;
   region: string;
   thumbnail: string | null;
@@ -69,22 +71,32 @@ export default function ProjectGrid({
 
   const currentPage = filters.page ?? 1;
 
+  const {
+    search,
+    category,
+    city_id,
+    sort,
+    project_date_year,
+    last_update_year,
+    page,
+  } = filters;
+
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     const params = new URLSearchParams();
-    const { search, category, city_id, sort, year, page } = filters;
     if (search) params.set("search", search);
     if (category && category !== "ALL") params.set("category", category);
     if (city_id) params.set("city_id", city_id);
     if (sort) params.set("sort", sort);
-    if (year && year !== "All Years") params.set("year", year);
+    if (project_date_year) params.set("project_date_year", project_date_year);
+    if (last_update_year) params.set("last_update_year", last_update_year);
     if (page && page > 1) params.set("page", String(page));
 
     try {
       const res = await fetch(`/api/projects-user?${params.toString()}`, {
-        cache: "no-store",
+        next: { revalidate: 60 },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
@@ -102,7 +114,17 @@ export default function ProjectGrid({
     } finally {
       setLoading(false);
     }
-  }, [JSON.stringify(filters)]);
+  }, [
+    search,
+    category,
+    city_id,
+    sort,
+    project_date_year,
+    last_update_year,
+    page,
+    onTotalChange,
+    onYearsLoaded,
+  ]);
 
   useEffect(() => {
     fetchProjects();
@@ -333,6 +355,7 @@ export default function ProjectGrid({
             image={resolveImage(project.thumbnail, project.category)}
             totalData={project.total_data}
             lastUpdate={project.last_update}
+            projectDate={project.project_date ?? undefined}
             onPreview={() => router.push(`/project-detail/${project.id}`)}
           />
         ))}

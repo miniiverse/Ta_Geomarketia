@@ -31,8 +31,7 @@ class UserProjectController extends Controller
         if ($request->filled('category') && $request->category !== 'ALL') {
             $query->whereHas(
                 'category',
-                fn($q) =>
-                $q->where('name', $request->category)
+                fn($q) => $q->where('name', $request->category)
             );
         }
 
@@ -41,9 +40,14 @@ class UserProjectController extends Controller
             $query->where('city_id', $request->city_id);
         }
 
-        // Filter year dari updated_at
-        if ($request->filled('year') && $request->year !== 'All Years') {
-            $query->whereYear('updated_at', $request->year);
+        // Filter project_date by year
+        if ($request->filled('project_date_year')) {
+            $query->whereYear('project_date', $request->project_date_year);
+        }
+
+        // Filter last update (updated_at) by year
+        if ($request->filled('last_update_year')) {
+            $query->whereYear('updated_at', $request->last_update_year);
         }
 
         // Search
@@ -56,29 +60,40 @@ class UserProjectController extends Controller
                     ->orWhere('total_data', 'like', "%{$search}%")
                     ->orWhereHas(
                         'category',
-                        fn($c) =>
-                        $c->where('name', 'like', "%{$search}%")
+                        fn($c) => $c->where('name', 'like', "%{$search}%")
                     )
             );
         }
 
         // Sort
-        $sort = $request->get('sort', 'newest');
-
-        if ($sort === 'price_asc') {
-            $query->orderBy('price', 'asc');
-        } elseif ($sort === 'price_desc') {
-            $query->orderBy('price', 'desc');
-        } else {
-            $query->orderBy('updated_at', $sort === 'oldest' ? 'asc' : 'desc');
-        }
+        $sort = $request->get('sort', '');
+ 
+        match ($sort) {
+            'newest' => $query->where('updated_at', '>=', now()->subMonths(3))
+                              ->orderBy('updated_at', 'desc'),
+            'oldest' => $query->whereBetween('updated_at', [
+                              now()->subYear(),
+                              now()->subMonths(3),
+                          ])
+                          ->orderBy('updated_at', 'asc'),
+            default  => $query->orderBy('updated_at', 'desc'), 
+        };
 
         $projects = $query->paginate($request->get('per_page', 9));
 
         $appUrl = rtrim(config('app.url'), '/');
 
+        // Ambil distinct years dari project_date
+        $projectDateYears = Project::selectRaw('YEAR(project_date) as year')
+            ->whereNotNull('project_date')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->filter()
+            ->values();
+
         // Ambil distinct years dari updated_at
-        $availableYears = Project::selectRaw('YEAR(updated_at) as year')
+        $lastUpdateYears = Project::selectRaw('YEAR(updated_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
@@ -95,19 +110,22 @@ class UserProjectController extends Controller
                 }
 
                 return [
-                    'id'          => $p->project_id,
-                    'title'       => $p->title,
-                    'description' => $p->description,
-                    'price'       => 'Rp ' . number_format($p->price, 0, ',', '.'),
-                    'total_data'  => $p->total_data ?? 0,
-                    'last_update' => $p->updated_at                          
+                    'id'           => $p->project_id,
+                    'title'        => $p->title,
+                    'description'  => $p->description,
+                    'price'        => 'Rp ' . number_format($p->price, 0, ',', '.'),
+                    'total_data'   => $p->total_data ?? 0,
+                    'last_update'  => $p->updated_at
                         ? Carbon::parse($p->updated_at)->format('M j, Y')
                         : '-',
-                    'category'    => $p->category?->name ?? '-',
-                    'region'      => $p->city?->name ?? '-',
-                    'thumbnail'   => $thumbnailUrl,
-                    'api_url'     => $p->api_url,
-                    'status'      => $p->updated_at && Carbon::parse($p->updated_at)->diffInDays(now()) <= 30  
+                    'project_date' => $p->project_date
+                        ? Carbon::parse($p->project_date)->format('Y-m-d')
+                        : null,
+                    'category'     => $p->category?->name ?? '-',
+                    'region'       => $p->city?->name ?? '-',
+                    'thumbnail'    => $thumbnailUrl,
+                    'api_url'      => $p->api_url,
+                    'status'       => $p->updated_at && Carbon::parse($p->updated_at)->diffInDays(now()) <= 30
                         ? 'New' : 'Oldest',
                 ];
             }),
@@ -117,7 +135,8 @@ class UserProjectController extends Controller
                 'total'        => $projects->total(),
                 'per_page'     => $projects->perPage(),
             ],
-            'available_years' => $availableYears,
+            'project_date_years' => $projectDateYears,
+            'last_update_years'  => $lastUpdateYears,
         ]);
     }
 }

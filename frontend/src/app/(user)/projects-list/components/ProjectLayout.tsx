@@ -8,6 +8,7 @@ interface ProjectLayoutProps {
   onFilterChange?: (filters: Partial<ProjectFilters>) => void;
   onPageChange?: (page: number) => void;
   onTotalChange?: (total: number) => void;
+  onYearsLoaded?: (years: number[]) => void;
 }
 
 export default function ProjectLayout({
@@ -15,6 +16,7 @@ export default function ProjectLayout({
   onFilterChange,
   onPageChange,
   onTotalChange,
+  onYearsLoaded,
 }: ProjectLayoutProps) {
   return (
     <div
@@ -26,28 +28,17 @@ export default function ProjectLayout({
         alignItems: "start",
       }}
     >
-      <ProjectFilter onFilterChange={onFilterChange} />
+      <ProjectFilter
+        onFilterChange={onFilterChange}
+        currentFilters={filters}
+      />
 
       <ProjectGrid
         filters={filters}
         onPageChange={onPageChange}
         onTotalChange={onTotalChange}
+        onYearsLoaded={onYearsLoaded}
       />
-
-      <style jsx>{`
-        .project-layout {
-          display: grid;
-          grid-template-columns: 280px 1fr;
-          gap: 24px;
-          margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-          .project-layout {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
     </div>
   );
 }

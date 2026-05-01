@@ -9,12 +9,15 @@ export interface ProjectFilters {
   category?: string;
   city_id?: string;
   sort?: string;
-  year?: string;
+  project_date_year?: string;
+  last_update_year?: string;
   page?: number;
 }
 
 export default function ProjectsPage() {
-  const [filters, setFilters] = useState<ProjectFilters>({});
+  const [filters, setFilters] = useState<ProjectFilters>({
+    sort: "",
+  });
   const [totalProjects, setTotalProjects] = useState<number | undefined>(undefined);
 
   const handleSearch = useCallback((search: string) => {

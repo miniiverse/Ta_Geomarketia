@@ -15,6 +15,7 @@ interface ProjectCardProps {
   image?: string;
   totalData?: number;
   lastUpdate?: string;
+  projectDate?: string;
   onPreview?: () => void;
 }
 
@@ -26,6 +27,17 @@ const statusConfig = {
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80&fit=crop";
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export default function ProjectCard({
   id = 1,
   title = "Retail Site Selection Analysis",
@@ -33,11 +45,11 @@ export default function ProjectCard({
   region = "Jakarta",
   category = "Retail",
   price = "Rp 850.000",
-  layerCount = 5,
   status = "New",
   image = FALLBACK_IMAGE,
   totalData = 0,
   lastUpdate = "-",
+  projectDate,
   onPreview,
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
@@ -224,7 +236,7 @@ export default function ProjectCard({
       <div style={{ padding: "16px 18px 18px" }}>
         <div
           style={{
-            marginBottom: 8,
+            marginBottom: 4,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -249,6 +261,41 @@ export default function ProjectCard({
             }}
           >
             Last Update {lastUpdate}
+          </span>
+        </div>
+
+        <div style={{ marginBottom: 8 }}>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 9,
+              color: "#64748B",
+              fontFamily: "'Inter', system-ui, sans-serif",
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="18"
+                rx="2"
+                stroke="#94A3B8"
+                strokeWidth="2"
+              />
+              <path
+                d="M16 2v4M8 2v4M3 10h18"
+                stroke="#94A3B8"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+            Project Date:{" "}
+            <strong style={{ color: "#475569" }}>
+              {formatDate(projectDate)}
+            </strong>
           </span>
         </div>
 
