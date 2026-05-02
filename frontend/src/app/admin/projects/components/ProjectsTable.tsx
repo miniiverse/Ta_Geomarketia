@@ -12,6 +12,7 @@ type Project = {
   price: string;
   rawPrice: number | null;
   date: string;
+  projectDate: string;
   description?: string;
   api_url?: string;
   city?: string;
@@ -287,7 +288,8 @@ export default function ProjectsTable({
         totalData: p.total_data ?? 0,
         price: formatPrice(p.price),
         rawPrice: p.price ? parseFloat(p.price) : null,
-        date: formatDate(p.project_date ?? p.created_at),
+        date: formatDate(p.updated_at),
+        projectDate: formatDate(p.project_date),
         description: p.description,
         api_url: p.api_url,
         city: p.city?.name,
@@ -896,6 +898,7 @@ export default function ProjectsTable({
                   "Category",
                   "Total Data",
                   "Price",
+                  "Project Date",
                   "Last Updated",
                   "Actions",
                 ].map((col) => (
@@ -1043,6 +1046,17 @@ export default function ProjectsTable({
                         {project.price}
                       </td>
 
+                      <td
+                        style={{
+                          padding: "14px 18px",
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: "13px",
+                          color: "#64748b",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {project.projectDate}
+                      </td>
                       <td
                         style={{
                           padding: "14px 18px",

@@ -9,7 +9,7 @@ type Project = {
   category: string;
   totalData: number;
   price: string;
-  date: string;
+  projectDate: string;
   description?: string;
   api_url?: string;
   city?: string;
@@ -97,21 +97,6 @@ const IconMap = () => (
     <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
     <line x1="8" y1="2" x2="8" y2="18" />
     <line x1="16" y1="6" x2="16" y2="22" />
-  </svg>
-);
-const IconClock = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#ef4444"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
   </svg>
 );
 const IconWarning = () => (
@@ -315,6 +300,7 @@ export default function ProjectsDetail({
           boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
         }}
       >
+        {/* Header */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -404,7 +390,7 @@ export default function ProjectsDetail({
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
-                Added {project.date} · {project.price}
+                Project Date: {project.projectDate} · {project.price}
               </p>
             </div>
             <button
@@ -479,11 +465,13 @@ export default function ProjectsDetail({
           </div>
         </div>
 
+        {/* Content */}
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
           {tab === "overview" && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "14px" }}
             >
+              {/* Thumbnail */}
               <div
                 style={{
                   width: "100%",
@@ -533,11 +521,13 @@ export default function ProjectsDetail({
                 )}
               </div>
 
+              {/* Project Name */}
               <div>
                 <label style={labelStyle}>Project Name</label>
                 <input readOnly value={project.name} style={readonlyStyle} />
               </div>
 
+              {/* Category, City, Total Data */}
               <div
                 style={{
                   display: "grid",
@@ -571,6 +561,7 @@ export default function ProjectsDetail({
                 </div>
               </div>
 
+              {/* Project Date & Price */}
               <div
                 style={{
                   display: "grid",
@@ -579,8 +570,12 @@ export default function ProjectsDetail({
                 }}
               >
                 <div>
-                  <label style={labelStyle}>Date</label>
-                  <input readOnly value={project.date} style={readonlyStyle} />
+                  <label style={labelStyle}>Project Date</label>
+                  <input
+                    readOnly
+                    value={project.projectDate || "-"}
+                    style={readonlyStyle}
+                  />
                 </div>
                 <div>
                   <label style={labelStyle}>Price</label>
@@ -588,6 +583,7 @@ export default function ProjectsDetail({
                 </div>
               </div>
 
+              {/* Description */}
               <div>
                 <label style={labelStyle}>Description</label>
                 <textarea
@@ -598,6 +594,7 @@ export default function ProjectsDetail({
                 />
               </div>
 
+              {/* API URL */}
               {project.api_url && (
                 <div>
                   <label style={labelStyle}>API URL</label>
@@ -609,6 +606,7 @@ export default function ProjectsDetail({
                 </div>
               )}
 
+              {/* DB ID */}
               <div>
                 <label style={labelStyle}>DB ID</label>
                 <input readOnly value={dbId} style={readonlyStyle} />
@@ -723,7 +721,8 @@ export default function ProjectsDetail({
                         fontFamily: "'Inter', sans-serif",
                       }}
                     >
-                      Loading {project.totalData.toLocaleString()} data points...
+                      Loading {project.totalData.toLocaleString()} data
+                      points...
                     </div>
                     <div
                       style={{
@@ -872,7 +871,8 @@ export default function ProjectsDetail({
                   }}
                 >
                   This feature is coming soon! We are working hard to bring you
-                  insights on data clusters and patterns. Stay tuned for updates.
+                  insights on data clusters and patterns. Stay tuned for
+                  updates.
                 </div>
                 <div
                   style={{
@@ -902,6 +902,7 @@ export default function ProjectsDetail({
           )}
         </div>
 
+        {/* Footer */}
         <div
           style={{
             padding: "16px 28px",

@@ -586,7 +586,7 @@ export default function ProjectsPage() {
                       />
                     </div>
                     <div>
-                      <label style={labelStyle}>Date</label>
+                      <label style={labelStyle}>Project Date</label>
                       <input
                         readOnly
                         value={autoFilled.date}
