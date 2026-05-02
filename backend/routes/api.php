@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\User\UserProjectController;
 use App\Http\Controllers\User\FilterController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -31,4 +32,5 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/categories',       [ProjectController::class, 'categories']);
     Route::get('/cities',           [ProjectController::class, 'cities']);
+    Route::get('/users',            [UserController::class, 'index']); 
 });

@@ -1,85 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-
-const regularStats = [
-  {
-    label: "Total Project",
-    value: "4",
-    href: "/admin/projects",
-    positive: true,
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M2 7h20M2 12h20M2 17h20" />
-        <circle cx="5" cy="7" r="1.5" fill="currentColor" stroke="none" />
-        <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
-        <circle cx="5" cy="17" r="1.5" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-    color: "#1A56DB",
-    bg: "#EBF3FF",
-    border: "#BFDBFE",
-  },
-  {
-    label: "Total Earnings",
-    value: "Rp800.000",
-    href: null,
-    positive: true,
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <line x1="12" y1="1" x2="12" y2="23" />
-        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-      </svg>
-    ),
-    color: "#059669",
-    bg: "#ECFDF5",
-    border: "#A7F3D0",
-  },
-  {
-    label: "Registered Users",
-    value: "12",
-    href: null,
-    positive: true,
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-      </svg>
-    ),
-    color: "#7c3aed",
-    bg: "#F5F3FF",
-    border: "#DDD6FE",
-  },
-];
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -477,6 +399,109 @@ function ExportExcelCard() {
 }
 
 export default function StatCards() {
+  const [totalProjects, setTotalProjects] = useState<string>("...");
+  const [totalUsers, setTotalUsers] = useState<string>("...");
+
+  useEffect(() => {
+    fetch("/api/project", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((json) => {
+        const total =
+          json.meta?.total ??
+          (Array.isArray(json.data) ? json.data.length : 0);
+        setTotalProjects(String(total));
+      })
+      .catch(() => setTotalProjects("0"));
+
+    fetch("/api/users", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((json) => {
+        const total =
+          json.total ?? (Array.isArray(json.data) ? json.data.length : 0);
+        setTotalUsers(String(total));
+      })
+      .catch(() => setTotalUsers("0"));
+  }, []);
+
+  const isLoading = (label: string) =>
+    (label === "Total Project" && totalProjects === "...") ||
+    (label === "Registered Users" && totalUsers === "...");
+
+  const regularStats = [
+    {
+      label: "Total Project",
+      value: totalProjects,
+      href: "/admin/projects",
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2 7h20M2 12h20M2 17h20" />
+          <circle cx="5" cy="7" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+          <circle cx="5" cy="17" r="1.5" fill="currentColor" stroke="none" />
+        </svg>
+      ),
+      color: "#1A56DB",
+      bg: "#EBF3FF",
+      border: "#BFDBFE",
+    },
+    {
+      label: "Total Earnings",
+      value: "Rp800.000",
+      href: null,
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+        </svg>
+      ),
+      color: "#059669",
+      bg: "#ECFDF5",
+      border: "#A7F3D0",
+    },
+    {
+      label: "Registered Users",
+      value: totalUsers,
+      href: null,
+      icon: (
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+        </svg>
+      ),
+      color: "#7c3aed",
+      bg: "#F5F3FF",
+      border: "#DDD6FE",
+    },
+  ];
+
   const handleEnter = (e: React.MouseEvent<HTMLElement>) => {
     (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)";
     (e.currentTarget as HTMLElement).style.boxShadow =
@@ -557,7 +582,7 @@ export default function StatCards() {
                     fontSize: "28px",
                     fontWeight: 700,
                     fontFamily: "'Inter', sans-serif",
-                    color: "#0f172a",
+                    color: isLoading(stat.label) ? "#94a3b8" : "#0f172a",
                     letterSpacing: "-0.04em",
                     lineHeight: 1,
                   }}

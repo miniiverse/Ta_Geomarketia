@@ -9,6 +9,7 @@ interface Project {
   category: string;
   total_data: number;
   price: string;
+  project_date: string;
   last_update: string;
 }
 
@@ -44,6 +45,13 @@ export default function ProjectList() {
             total_data: p.total_data ?? 0,
             price: p.price
               ? "Rp " + Number(p.price).toLocaleString("id-ID")
+              : "-",
+            project_date: p.project_date
+              ? new Date(p.project_date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
               : "-",
             last_update: p.updated_at
               ? new Date(p.updated_at).toLocaleDateString("en-US", {
@@ -157,6 +165,7 @@ export default function ProjectList() {
                   "Category",
                   "Total Data",
                   "Price",
+                  "Project Date",
                   "Last Updated",
                 ].map((col) => (
                   <th
@@ -255,6 +264,18 @@ export default function ProjectList() {
                       }}
                     >
                       {project.price}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: "13px 18px",
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "13px",
+                        color: "#64748b",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {project.project_date}
                     </td>
 
                     <td

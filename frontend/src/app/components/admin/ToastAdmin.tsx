@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type ToastType = "error" | "success" | "info";
 
@@ -72,7 +72,7 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, []); 
+  }, []);
 
   return (
     <div
@@ -187,5 +187,9 @@ export function useToast() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  return { showToast, toasts, removeToast };
+  const ToastContainerWrapper = (): React.JSX.Element => (
+    <ToastContainer toasts={toasts} removeToast={removeToast} />
+  );
+
+  return { showToast, ToastContainer: ToastContainerWrapper };
 }

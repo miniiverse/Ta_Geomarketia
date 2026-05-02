@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import ProfileCard, { type ProfileForm } from "./components/ProfileCard";
 import { useToast } from "../../components/admin/ToastAdmin";
-import { Toast } from "../../components/user/Toast";
 
 function MiniCalendar() {
   const now = new Date();
@@ -11,13 +10,13 @@ function MiniCalendar() {
   const month = now.getMonth();
   const today = now.getDate();
 
-  const monthName = now.toLocaleDateString("id-ID", {
+  const monthName = now.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -181,14 +180,14 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      showToast("Failed to save profile.");
+      showToast("Failed to save profile.", "error");
     }
   };
 
   const handleSavePhoto = async (file: File) => {
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      showToast("Maximum photo size is 10MB.");
+      showToast("Maximum photo size is 10MB.", "error");
       return;
     }
 
@@ -206,6 +205,7 @@ export default function AdminProfilePage() {
         return;
       }
       setPhotoUrl(data.photo_url);
+      showToast("Profile photo updated successfully.", "success");
 
       window.dispatchEvent(
         new CustomEvent("profile-photo-updated", {
@@ -213,7 +213,7 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      showToast("Failed to upload photo.");
+      showToast("Failed to upload photo.", "error");
     }
   };
 
@@ -231,13 +231,14 @@ export default function AdminProfilePage() {
           background: "#fff",
         }}
       >
-        Memuat data profil...
+        Loading profile data...
       </div>
     );
   }
 
   return (
     <>
+      <ToastContainer />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         * { box-sizing: border-box; }
@@ -298,7 +299,7 @@ export default function AdminProfilePage() {
               My Profile
             </h1>
             <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>
-              Kelola informasi akun dan keamanan Anda.
+              Manage your account information and security.
             </p>
           </div>
         </div>
@@ -331,7 +332,6 @@ export default function AdminProfilePage() {
                 }}
               />
               <MiniCalendar />
-              <ToastContainer />
             </div>
           </div>
         </div>
