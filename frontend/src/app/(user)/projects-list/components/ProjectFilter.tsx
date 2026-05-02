@@ -107,13 +107,14 @@ export default function ProjectsFilterSidebar({
   }, []);
 
   useEffect(() => {
-    fetch("/api/projects-user")
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.project_date_years)
-          setProjectDateYears(json.project_date_years);
-        if (json.last_update_years) setLastUpdateYears(json.last_update_years);
-      });
+    const currentYear = new Date().getFullYear(); 
+    const years = Array.from(
+      { length: currentYear - 2024 + 1 },
+      (_, i) => 2024 + i,
+    ).reverse(); 
+
+    setProjectDateYears(years);
+    setLastUpdateYears(years);
   }, []);
 
   useEffect(() => {
