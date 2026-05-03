@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 interface AdminSidebarProps {
   open: boolean;
   onClose: () => void;
-  enableTransition?: boolean; // baru: matikan transisi saat refresh
+  enableTransition?: boolean; 
 }
 
 const navItems = [
@@ -114,14 +114,12 @@ export default function AdminSidebar({
 
   useEffect(() => {
     if (isMobile && open) onClose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const sidebarWidth = isMobile ? "240px" : "248px";
 
   return (
     <>
-      {/* Overlay */}
       <div
         onClick={onClose}
         style={{
@@ -132,12 +130,10 @@ export default function AdminSidebar({
           backdropFilter: "blur(2px)",
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
-          // Overlay boleh selalu pakai transisi — hanya muncul saat user klik toggle
           transition: "opacity 0.25s ease",
         }}
       />
 
-      {/* Sidebar */}
       <aside
         style={{
           position: "fixed",
@@ -150,7 +146,6 @@ export default function AdminSidebar({
           display: "flex",
           flexDirection: "column",
           transform: open ? "translateX(0)" : "translateX(-100%)",
-          // Transisi hanya aktif setelah mount selesai
           transition: enableTransition
             ? "transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)"
             : "none",
@@ -161,7 +156,6 @@ export default function AdminSidebar({
           scrollbarColor: "rgba(255,255,255,0.2) transparent",
         }}
       >
-        {/* Decorative blobs */}
         <div
           style={{
             position: "absolute",
@@ -187,7 +181,6 @@ export default function AdminSidebar({
           }}
         />
 
-        {/* Nav items */}
         <div style={{ padding: "20px 12px 12px", flex: 1 }}>
           <p
             style={{
@@ -273,7 +266,6 @@ export default function AdminSidebar({
           </nav>
         </div>
 
-        {/* Logout */}
         <div
           style={{
             padding: "12px",

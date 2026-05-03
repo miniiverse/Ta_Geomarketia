@@ -84,7 +84,6 @@ export default function MonthlySalesSummary() {
           overflow: "hidden",
         }}
       >
-        {/* Header */}
         <div
           className="mss-header"
           style={{
@@ -112,7 +111,6 @@ export default function MonthlySalesSummary() {
           </div>
         </div>
 
-        {/* ── DESKTOP: Table ── */}
         <div className="mss-table-wrapper">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -188,7 +186,6 @@ export default function MonthlySalesSummary() {
           </table>
         </div>
 
-        {/* ── MOBILE: Cards ── */}
         <div className="mss-mobile-list">
           {data.map((row) => {
             const isPositive = row.growth.startsWith("+");

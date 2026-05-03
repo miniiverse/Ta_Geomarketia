@@ -129,7 +129,6 @@ export default function RecentTransactions() {
           overflow: "hidden",
         }}
       >
-        {/* Header */}
         <div
           className="rt-header"
           style={{
@@ -157,7 +156,6 @@ export default function RecentTransactions() {
           </div>
         </div>
 
-        {/* ── DESKTOP: Table ── */}
         <div className="rt-table-wrapper">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -232,14 +230,12 @@ export default function RecentTransactions() {
           </table>
         </div>
 
-        {/* ── MOBILE: Cards ── */}
         <div className="rt-mobile-list">
           {transactions.map((tx) => {
             const s   = statusConfig[tx.status]    || statusConfig.Paid;
             const cat = categoryConfig[tx.category] || { color: "#1A56DB", bg: "#EBF3FF" };
             return (
               <div key={tx.id} className="rt-card">
-                {/* Top row: invoice ID + status */}
                 <div className="rt-card-top">
                   <span className="rt-card-id">{tx.id}</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: s.bg, color: s.color, fontSize: "12px", fontWeight: 600, fontFamily: "'Inter', sans-serif", padding: "4px 10px", borderRadius: "20px" }}>
@@ -248,10 +244,8 @@ export default function RecentTransactions() {
                   </span>
                 </div>
 
-                {/* Project name */}
                 <div className="rt-card-project">{tx.project}</div>
 
-                {/* Category */}
                 <div className="rt-card-row">
                   <span className="rt-card-label">Category</span>
                   <span style={{ background: cat.bg, color: cat.color, fontSize: "11.5px", fontWeight: 600, fontFamily: "'Inter', sans-serif", padding: "3px 10px", borderRadius: "6px" }}>
@@ -259,7 +253,6 @@ export default function RecentTransactions() {
                   </span>
                 </div>
 
-                {/* Payment method */}
                 <div className="rt-card-row">
                   <span className="rt-card-label">Payment</span>
                   <span style={{ background: "#F1F5F9", padding: "3px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 500, fontFamily: "'Inter', sans-serif", color: "#64748b" }}>
@@ -267,13 +260,11 @@ export default function RecentTransactions() {
                   </span>
                 </div>
 
-                {/* Amount */}
                 <div className="rt-card-row">
                   <span className="rt-card-label">Amount</span>
                   <span className="rt-card-value">{tx.amount}</span>
                 </div>
 
-                {/* Date */}
                 <div className="rt-card-row" style={{ marginBottom: 0 }}>
                   <span className="rt-card-label">Date</span>
                   <span className="rt-card-value muted">{tx.date}</span>
@@ -283,7 +274,6 @@ export default function RecentTransactions() {
           })}
         </div>
 
-        {/* Footer */}
         <div
           className="rt-footer"
           style={{

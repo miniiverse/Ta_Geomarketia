@@ -89,7 +89,6 @@ export default function TopSellingServices() {
           overflow: "hidden",
         }}
       >
-        {/* Header */}
         <div
           className="tss-header"
           style={{
@@ -117,7 +116,6 @@ export default function TopSellingServices() {
           </div>
         </div>
 
-        {/* ── DESKTOP: Table ── */}
         <div className="tss-table-wrapper">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -177,7 +175,6 @@ export default function TopSellingServices() {
           </table>
         </div>
 
-        {/* ── MOBILE: Cards ── */}
         <div className="tss-mobile-list">
           {data.map((row) => {
             const cat = categoryConfig[row.category] ?? { color: "#1A56DB", bg: "#EBF3FF" };
