@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 interface AdminSidebarProps {
   open: boolean;
   onClose: () => void;
+  enableTransition?: boolean; // baru: matikan transisi saat refresh
 }
 
 const navItems = [
@@ -96,10 +97,12 @@ const navItems = [
   },
 ];
 
-export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
+export default function AdminSidebar({
+  open,
+  onClose,
+  enableTransition = true,
+}: AdminSidebarProps) {
   const pathname = usePathname();
-
-  // Detect screen size
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -109,12 +112,6 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // On desktop: auto-close overlay behavior is not needed
-  // On mobile/tablet: sidebar is always overlay (drawer style)
-  // On desktop: sidebar can be persistent (always open) or drawer
-  // We keep drawer style for all, but on desktop it pushes content via CSS class
-
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     if (isMobile && open) onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,7 +121,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Overlay — shown on mobile/tablet when open */}
+      {/* Overlay */}
       <div
         onClick={onClose}
         style={{
@@ -135,6 +132,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           backdropFilter: "blur(2px)",
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
+          // Overlay boleh selalu pakai transisi — hanya muncul saat user klik toggle
           transition: "opacity 0.25s ease",
         }}
       />
@@ -152,16 +150,18 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           display: "flex",
           flexDirection: "column",
           transform: open ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
+          // Transisi hanya aktif setelah mount selesai
+          transition: enableTransition
+            ? "transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)"
+            : "none",
           boxShadow: open ? "4px 0 32px rgba(26,86,219,0.25)" : "none",
           overflowY: "auto",
           overflowX: "hidden",
-          // Custom scrollbar
           scrollbarWidth: "thin",
           scrollbarColor: "rgba(255,255,255,0.2) transparent",
         }}
       >
-        {/* Decorative bg blobs */}
+        {/* Decorative blobs */}
         <div
           style={{
             position: "absolute",
@@ -212,7 +212,6 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                   key={item.label}
                   href={item.href}
                   onClick={() => {
-                    // Always close on mobile; on desktop keep open
                     if (isMobile) onClose();
                   }}
                   style={{
@@ -232,7 +231,6 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                     transition: "background 0.18s, color 0.18s",
                     position: "relative",
                     letterSpacing: "-0.01em",
-                    // Larger tap target on mobile
                     minHeight: isMobile ? "48px" : "auto",
                   }}
                   onMouseEnter={(e) => {
@@ -251,7 +249,6 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                     }
                   }}
                 >
-                  {/* Active indicator bar */}
                   {active && (
                     <span
                       style={{
@@ -276,7 +273,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           </nav>
         </div>
 
-        {/* Bottom logout */}
+        {/* Logout */}
         <div
           style={{
             padding: "12px",
