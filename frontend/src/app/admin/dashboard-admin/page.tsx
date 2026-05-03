@@ -18,20 +18,14 @@ export default function DashboardAdminPage() {
       try {
         const res = await fetch("/api/me", {
           method: "GET",
-          credentials: "include", 
-          headers: {
-            Accept: "application/json",
-          },
+          credentials: "include",
+          headers: { Accept: "application/json" },
         });
-
         if (!res.ok) return;
-
         const data = await res.json();
         setFullname(data.user?.fullname ?? "Admin");
-      } catch {
-      }
+      } catch {}
     };
-
     fetchUser();
   }, []);
 
@@ -162,14 +156,21 @@ export default function DashboardAdminPage() {
 
       <StatsCard />
 
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          flexWrap: "wrap",
-          marginBottom: "24px",
-        }}
-      >
+      <style>{`
+        .charts-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          margin-bottom: 24px;
+        }
+        @media (max-width: 768px) {
+          .charts-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="charts-grid">
         <MonthlyIncomeCard />
         <ProductSalesCard />
       </div>

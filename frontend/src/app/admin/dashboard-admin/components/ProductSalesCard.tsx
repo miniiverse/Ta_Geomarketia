@@ -13,13 +13,13 @@ const totalSold = productData.reduce((s, c) => s + c.sold, 0);
 function DonutChart() {
   const [hovered, setHovered] = useState<number | null>(null);
 
-  const size = 380;
-  const r = 148;
-  const stroke = 62;
+  const size = 220;
+  const r = 78;
+  const stroke = 36;
   const cx = size / 2;
   const cy = size / 2;
   const circumference = 2 * Math.PI * r;
-  const GAP = (2.5 / 360) * circumference;
+  const GAP = (3 / 360) * circumference;
 
   let cumulative = 0;
   const slices = productData.map((cat, i) => {
@@ -36,19 +36,28 @@ function DonutChart() {
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
       <svg
-        width="100%"                          
+        width="100%"
         viewBox={`0 0 ${size} ${size}`}
-        style={{ overflow: "visible", maxWidth: size }}  
+        style={{ overflow: "visible", maxWidth: size, display: "block" }}
       >
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F1F5F9" strokeWidth={stroke} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke="#F1F5F9"
+          strokeWidth={stroke}
+        />
 
         {slices.map((s) => (
           <circle
             key={s.i}
-            cx={cx} cy={cy} r={r}
+            cx={cx}
+            cy={cy}
+            r={r}
             fill="none"
             stroke={s.color}
-            strokeWidth={hovered === s.i ? stroke + 10 : stroke}
+            strokeWidth={hovered === s.i ? stroke + 8 : stroke}
             strokeDasharray={`${s.dash} ${s.gap}`}
             strokeDashoffset={s.offset}
             transform={`rotate(-90 ${cx} ${cy})`}
@@ -56,7 +65,10 @@ function DonutChart() {
               transition: "stroke-width 0.18s ease, opacity 0.18s ease",
               opacity: hovered !== null && hovered !== s.i ? 0.38 : 1,
               cursor: "pointer",
-              filter: hovered === s.i ? `drop-shadow(0 0 12px ${s.color}99)` : "none",
+              filter:
+                hovered === s.i
+                  ? `drop-shadow(0 0 8px ${s.color}99)`
+                  : "none",
             }}
             onMouseEnter={() => setHovered(s.i)}
             onMouseLeave={() => setHovered(null)}
@@ -65,35 +77,76 @@ function DonutChart() {
 
         {hov === null && (
           <>
-            <text x={cx} y={cy - 10} textAnchor="middle" fontSize="14" fill="#94a3b8" fontFamily="'DM Sans', sans-serif" fontWeight={500}>Total Sold</text>
-            <text x={cx} y={cy + 16} textAnchor="middle" fontSize="32" fill="#0f172a" fontFamily="'DM Sans', sans-serif" fontWeight={800}>{totalSold}</text>
-            <text x={cx} y={cy + 36} textAnchor="middle" fontSize="12" fill="#94a3b8" fontFamily="'DM Sans', sans-serif">products</text>
+            <text
+              x={cx}
+              y={cy - 8}
+              textAnchor="middle"
+              fontSize="9"
+              fill="#94a3b8"
+              fontFamily="'DM Sans', sans-serif"
+              fontWeight={500}
+            >
+              Total Sold
+            </text>
+            <text
+              x={cx}
+              y={cy + 14}
+              textAnchor="middle"
+              fontSize="22"
+              fill="#0f172a"
+              fontFamily="'DM Sans', sans-serif"
+              fontWeight={800}
+            >
+              {totalSold}
+            </text>
+            <text
+              x={cx}
+              y={cy + 28}
+              textAnchor="middle"
+              fontSize="8.5"
+              fill="#94a3b8"
+              fontFamily="'DM Sans', sans-serif"
+            >
+              products
+            </text>
           </>
         )}
 
-        {hov !== null && (() => {
-          const startAngle = slices.slice(0, hov.i).reduce((s, sl) => s + sl.pct, 0);
-          const midAngle = (startAngle + hov.pct / 2) * 2 * Math.PI - Math.PI / 2;
-          const dist = r + stroke / 2 + 14;
-          const rawX = cx + dist * Math.cos(midAngle);
-          const rawY = cy + dist * Math.sin(midAngle);
-          const pw = 152;
-          const ph = 58;
-          const px = Math.min(Math.max(rawX - pw / 2, 4), size - pw - 4);
-          const py = Math.min(Math.max(rawY - ph / 2, 4), size - ph - 4);
-
-          return (
-            <g pointerEvents="none">
-              <rect x={px + 2} y={py + 3} width={pw} height={ph} rx={12} fill="rgba(0,0,0,0.08)" />
-              <rect x={px} y={py} width={pw} height={ph} rx={12} fill="#fff" stroke={hov.color} strokeWidth="1.5" />
-              <circle cx={px + 16} cy={py + 18} r={5} fill={hov.color} />
-              <text x={px + 27} y={py + 22} fontSize="11" fill="#374151" fontFamily="'DM Sans', sans-serif" fontWeight={600}>{hov.label}</text>
-              <rect x={px + pw - 46} y={py + 10} width={38} height={16} rx={8} fill={hov.color + "22"} />
-              <text x={px + pw - 27} y={py + 21} textAnchor="middle" fontSize="9.5" fill={hov.color} fontFamily="'DM Sans', sans-serif" fontWeight={700}>{(hov.pct * 100).toFixed(1)}%</text>
-              <text x={px + 12} y={py + 44} fontSize="12" fill="#0f172a" fontFamily="'DM Sans', sans-serif" fontWeight={800}>{hov.sold} products sold</text>
-            </g>
-          );
-        })()}
+        {hov !== null && (
+          <>
+            <text
+              x={cx}
+              y={cy - 10}
+              textAnchor="middle"
+              fontSize="8.5"
+              fill="#94a3b8"
+              fontFamily="'DM Sans', sans-serif"
+            >
+              {hov.label}
+            </text>
+            <text
+              x={cx}
+              y={cy + 10}
+              textAnchor="middle"
+              fontSize="20"
+              fill={hov.color}
+              fontFamily="'DM Sans', sans-serif"
+              fontWeight={800}
+            >
+              {hov.sold}
+            </text>
+            <text
+              x={cx}
+              y={cy + 25}
+              textAnchor="middle"
+              fontSize="8.5"
+              fill="#94a3b8"
+              fontFamily="'DM Sans', sans-serif"
+            >
+              {(hov.pct * 100).toFixed(1)}%
+            </text>
+          </>
+        )}
       </svg>
     </div>
   );
@@ -102,44 +155,153 @@ function DonutChart() {
 export default function ProductSalesCard() {
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+      `}</style>
+
       <div
         style={{
           background: "#ffffff",
           borderRadius: "20px",
           border: "1px solid #e8edf5",
           boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-          padding: "24px 24px 20px",
-
+          padding: "22px 22px 20px",
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
+          gap: "12px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <h2 style={{
-            margin: 0,
-            fontSize: "clamp(15px, 3vw, 18px)",  
-            fontWeight: 800,
-            fontFamily: "'DM Sans', sans-serif",
-            color: "#0f172a",
-            letterSpacing: "-0.02em",
-          }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "16px",
+              fontWeight: 800,
+              fontFamily: "'DM Sans', sans-serif",
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
+            }}
+          >
             Product Sales Overview
           </h2>
         </div>
 
-        <DonutChart />
+        <div style={{ maxWidth: 220, width: "100%", margin: "0 auto" }}>
+          <DonutChart />
+        </div>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "28px", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+          }}
+        >
           {productData.map((cat) => (
-            <div key={cat.label} style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-              <span style={{ width: "12px", height: "12px", borderRadius: "50%", background: cat.color, flexShrink: 0 }} />
-              <span style={{ fontSize: "13px", fontFamily: "'DM Sans', sans-serif", color: "#374151", fontWeight: 500 }}>
+            <div
+              key={cat.label}
+              style={{ display: "flex", alignItems: "center", gap: "6px" }}
+            >
+              <span
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background: cat.color,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: "#374151",
+                  fontWeight: 500,
+                }}
+              >
                 {cat.label}
+              </span>
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: "#94a3b8",
+                  fontWeight: 400,
+                }}
+              >
+                ({cat.sold})
               </span>
             </div>
           ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            marginTop: "4px",
+          }}
+        >
+          {productData.map((cat) => {
+            const pct = (cat.sold / totalSold) * 100;
+            return (
+              <div key={cat.label}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: "#374151",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {cat.label}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: "#64748b",
+                    }}
+                  >
+                    {pct.toFixed(1)}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    background: "#F1F5F9",
+                    borderRadius: "999px",
+                    height: "6px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${pct}%`,
+                      height: "100%",
+                      background: cat.color,
+                      borderRadius: "999px",
+                      transition: "width 0.5s ease",
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>

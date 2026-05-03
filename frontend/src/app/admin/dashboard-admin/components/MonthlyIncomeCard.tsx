@@ -4,48 +4,52 @@ import { useState } from "react";
 
 const incomeData: Record<number, { month: string; amount: number }[]> = {
   2024: [
-    { month: "Jan 2024", amount: 620000000 },
-    { month: "Feb 2024", amount: 850000000 },
-    { month: "Mar 2024", amount: 720000000 },
-    { month: "Apr 2024", amount: 1100000000 },
-    { month: "May 2024", amount: 980000000 },
-    { month: "Jun 2024", amount: 1350000000 },
-    { month: "Jul 2024", amount: 1600000000 },
-    { month: "Aug 2024", amount: 1200000000 },
-    { month: "Sep 2024", amount: 900000000 },
-    { month: "Oct 2024", amount: 1050000000 },
-    { month: "Nov 2024", amount: 1400000000 },
-    { month: "Dec 2024", amount: 1750000000 },
+    { month: "Jan", amount: 620000000 },
+    { month: "Feb", amount: 850000000 },
+    { month: "Mar", amount: 720000000 },
+    { month: "Apr", amount: 1100000000 },
+    { month: "May", amount: 980000000 },
+    { month: "Jun", amount: 1350000000 },
+    { month: "Jul", amount: 1600000000 },
+    { month: "Aug", amount: 1200000000 },
+    { month: "Sep", amount: 900000000 },
+    { month: "Oct", amount: 1050000000 },
+    { month: "Nov", amount: 1400000000 },
+    { month: "Dec", amount: 1750000000 },
   ],
   2025: [
-    { month: "Jan 2025", amount: 820000000 },
-    { month: "Feb 2025", amount: 1450000000 },
-    { month: "Mar 2025", amount: 1100000000 },
-    { month: "Apr 2025", amount: 1780000000 },
-    { month: "May 2025", amount: 2500000000 },
-    { month: "Jun 2025", amount: 16200000000 },
-    { month: "Jul 2025", amount: 15800000000 },
-    { month: "Aug 2025", amount: 4500000000 },
-    { month: "Sep 2025", amount: 500000000 },
-    { month: "Oct 2025", amount: 600000000 },
-    { month: "Nov 2025", amount: 750000000 },
-    { month: "Dec 2025", amount: 500000000 },
+    { month: "Jan", amount: 820000000 },
+    { month: "Feb", amount: 1450000000 },
+    { month: "Mar", amount: 1100000000 },
+    { month: "Apr", amount: 1780000000 },
+    { month: "May", amount: 2500000000 },
+    { month: "Jun", amount: 16200000000 },
+    { month: "Jul", amount: 15800000000 },
+    { month: "Aug", amount: 4500000000 },
+    { month: "Sep", amount: 500000000 },
+    { month: "Oct", amount: 600000000 },
+    { month: "Nov", amount: 750000000 },
+    { month: "Dec", amount: 500000000 },
   ],
   2026: [
-    { month: "Jan 2026", amount: 2100000000 },
-    { month: "Feb 2026", amount: 3200000000 },
-    { month: "Mar 2026", amount: 5000000000 },
+    { month: "Jan", amount: 2100000000 },
+    { month: "Feb", amount: 3200000000 },
+    { month: "Mar", amount: 5000000000 },
   ],
 };
 
-function formatRpAxis(n: number) {
+function formatRpAxis(n: number): string {
   if (n === 0) return "0";
-  if (n >= 1_000_000_000)
-    return `${(n / 1_000_000_000).toFixed(0)},000,000,000`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)},000,000`;
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
   return n.toLocaleString("id-ID");
 }
-function formatRpFull(n: number) {
+
+function formatRpFull(n: number): string {
+  if (n >= 1_000_000_000)
+    return `Rp ${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000)
+    return `Rp ${(n / 1_000_000).toFixed(1)}M`;
   return "Rp " + n.toLocaleString("id-ID");
 }
 
@@ -53,17 +57,25 @@ function LineChart({ year }: { year: number }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const data = incomeData[year] ?? [];
 
-  const W = 560;
-  const H = 220;
-  const padL = 130;
-  const padR = 16;
-  const padT = 16;
-  const padB = 48;
+  const W = 620;
+  const H = 240;
+  const padL = 52;   
+  const padR = 20;
+  const padT = 20;
+  const padB = 36;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
 
   const max = Math.max(...data.map((m) => m.amount), 1);
-  const niceMax = Math.ceil(max / 2_000_000_000) * 2_000_000_000;
+
+  function getNiceMax(val: number): number {
+    const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
+    const normalized = val / magnitude;
+    let nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+    return nice * magnitude;
+  }
+  const niceMax = getNiceMax(max * 1.1);
+
   const xStep = data.length > 1 ? chartW / (data.length - 1) : chartW;
 
   const points = data.map((m, i) => ({
@@ -76,13 +88,14 @@ function LineChart({ year }: { year: number }) {
   const pathD = points
     .map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
     .join(" ");
+
   const areaD =
     points.length > 0
       ? pathD +
         ` L${points[points.length - 1].x},${padT + chartH} L${points[0].x},${padT + chartH} Z`
       : "";
 
-  const yTickCount = 9;
+  const yTickCount = 5;
   const yLabels = Array.from({ length: yTickCount + 1 }, (_, i) => ({
     val: (niceMax / yTickCount) * i,
     y: padT + chartH - (i / yTickCount) * chartH,
@@ -95,8 +108,8 @@ function LineChart({ year }: { year: number }) {
       style={{ overflow: "visible", display: "block" }}
     >
       <defs>
-        <linearGradient id="areaGradIncome" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2DD4BF" stopOpacity="0.28" />
+        <linearGradient id={`areaGrad_${year}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2DD4BF" stopOpacity="0.25" />
           <stop offset="100%" stopColor="#2DD4BF" stopOpacity="0.01" />
         </linearGradient>
       </defs>
@@ -112,10 +125,10 @@ function LineChart({ year }: { year: number }) {
             strokeWidth="1"
           />
           <text
-            x={padL - 8}
+            x={padL - 6}
             y={yl.y + 4}
             textAnchor="end"
-            fontSize="8.5"
+            fontSize="9.5"
             fill="#94a3b8"
             fontFamily="'DM Sans', sans-serif"
           >
@@ -136,13 +149,14 @@ function LineChart({ year }: { year: number }) {
         />
       ))}
 
-      {areaD && <path d={areaD} fill="url(#areaGradIncome)" />}
+      {areaD && <path d={areaD} fill={`url(#areaGrad_${year})`} />}
+
       {pathD && (
         <path
           d={pathD}
           fill="none"
           stroke="#2DD4BF"
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeLinejoin="round"
           strokeLinecap="round"
         />
@@ -153,86 +167,107 @@ function LineChart({ year }: { year: number }) {
           key={p.i}
           x={p.x}
           y={H - 4}
-          textAnchor="end"
+          textAnchor="middle"
           fontSize="9"
           fill="#94a3b8"
           fontFamily="'DM Sans', sans-serif"
-          transform={`rotate(-40, ${p.x}, ${H - 4})`}
         >
           {p.month}
         </text>
       ))}
 
-      {points.map((p) => (
-        <g key={p.i}>
-          <rect
-            x={p.x - xStep / 2}
-            y={padT}
-            width={xStep}
-            height={chartH}
-            fill="transparent"
-            onMouseEnter={() => setHovered(p.i)}
-            onMouseLeave={() => setHovered(null)}
-            style={{ cursor: "pointer" }}
-          />
-          {hovered === p.i && (
-            <line
-              x1={p.x}
-              y1={padT}
-              x2={p.x}
-              y2={padT + chartH}
-              stroke="#2DD4BF"
-              strokeWidth="1.5"
-              strokeDasharray="4 3"
-              opacity="0.5"
+      {points.map((p) => {
+        const tooltipW = 130;
+        const tooltipH = 44;
+        let tx = p.x - tooltipW / 2;
+        if (tx < padL) tx = padL;
+        if (tx + tooltipW > W - padR) tx = W - padR - tooltipW;
+        let ty = p.y - tooltipH - 10;
+        if (ty < 4) ty = p.y + 14;
+
+        return (
+          <g key={p.i}>
+            <rect
+              x={p.x - xStep / 2}
+              y={padT}
+              width={xStep}
+              height={chartH}
+              fill="transparent"
+              onMouseEnter={() => setHovered(p.i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{ cursor: "pointer" }}
             />
-          )}
-          <circle
-            cx={p.x}
-            cy={p.y}
-            r={hovered === p.i ? 6 : 4}
-            fill={hovered === p.i ? "#2DD4BF" : "#fff"}
-            stroke="#2DD4BF"
-            strokeWidth="2.5"
-            style={{ transition: "r 0.12s" }}
-            pointerEvents="none"
-          />
-          {hovered === p.i && (
-            <g>
-              <rect
-                x={p.x - 58}
-                y={p.y - 42}
-                width={116}
-                height={30}
-                rx={8}
-                fill="#0f172a"
-                opacity="0.88"
+
+            {hovered === p.i && (
+              <line
+                x1={p.x}
+                y1={padT}
+                x2={p.x}
+                y2={padT + chartH}
+                stroke="#2DD4BF"
+                strokeWidth="1.5"
+                strokeDasharray="4 3"
+                opacity="0.55"
+                pointerEvents="none"
               />
-              <text
-                x={p.x}
-                y={p.y - 30}
-                textAnchor="middle"
-                fontSize="9"
-                fill="#94a3b8"
-                fontFamily="'DM Sans', sans-serif"
-              >
-                {p.month}
-              </text>
-              <text
-                x={p.x}
-                y={p.y - 17}
-                textAnchor="middle"
-                fontSize="10.5"
-                fill="white"
-                fontFamily="'DM Sans', sans-serif"
-                fontWeight="700"
-              >
-                {formatRpFull(p.amount)}
-              </text>
-            </g>
-          )}
-        </g>
-      ))}
+            )}
+
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={hovered === p.i ? 6 : 4}
+              fill={hovered === p.i ? "#2DD4BF" : "#fff"}
+              stroke="#2DD4BF"
+              strokeWidth="2.5"
+              style={{ transition: "r 0.12s" }}
+              pointerEvents="none"
+            />
+
+            {hovered === p.i && (
+              <g pointerEvents="none">
+                <rect
+                  x={tx + 2}
+                  y={ty + 3}
+                  width={tooltipW}
+                  height={tooltipH}
+                  rx={9}
+                  fill="rgba(0,0,0,0.07)"
+                />
+                <rect
+                  x={tx}
+                  y={ty}
+                  width={tooltipW}
+                  height={tooltipH}
+                  rx={9}
+                  fill="#0f172a"
+                  opacity="0.92"
+                />
+                <text
+                  x={tx + tooltipW / 2}
+                  y={ty + 16}
+                  textAnchor="middle"
+                  fontSize="9.5"
+                  fill="#94a3b8"
+                  fontFamily="'DM Sans', sans-serif"
+                >
+                  {p.month} {year}
+                </text>
+                <text
+                  x={tx + tooltipW / 2}
+                  y={ty + 33}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fill="white"
+                  fontFamily="'DM Sans', sans-serif"
+                  fontWeight="700"
+                >
+                  {formatRpFull(p.amount)}
+                </text>
+              </g>
+            )}
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -241,45 +276,49 @@ export default function MonthlyIncomeCard() {
   const availableYears = Object.keys(incomeData).map(Number).sort();
   const [selectedYear, setSelectedYear] = useState(2025);
 
-  const data = incomeData[selectedYear] ?? [];
-  const lastMonth = data[data.length - 1];
-  const prevMonth = data[data.length - 2];
-  const current = lastMonth?.amount ?? 0;
-  const prev = prevMonth?.amount ?? 0;
-  const growth =
-    prev > 0 ? (((current - prev) / prev) * 100).toFixed(1) : "0.0";
-  const isUp = current >= prev;
-
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+        .mic-year-btn {
+          border: none;
+          border-radius: 8px;
+          padding: 5px 12px;
+          font-size: 12px;
+          font-weight: 700;
+          font-family: 'DM Sans', sans-serif;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+      `}</style>
+
       <div
         style={{
           background: "#ffffff",
           borderRadius: "20px",
           border: "1px solid #e8edf5",
           boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-          padding: "24px 24px 20px",
-
+          padding: "22px 22px 18px",
           minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          gap: "14px",
+          gap: "16px",
         }}
       >
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             justifyContent: "space-between",
-            flexWrap: "wrap", 
+            flexWrap: "wrap",
             gap: "10px",
           }}
         >
           <h2
             style={{
               margin: 0,
-              fontSize: "clamp(15px, 3vw, 18px)",
+              fontSize: "16px",
               fontWeight: 800,
               fontFamily: "'DM Sans', sans-serif",
               color: "#0f172a",
@@ -288,6 +327,7 @@ export default function MonthlyIncomeCard() {
           >
             Monthly Payment Income
           </h2>
+
           <div
             style={{
               display: "flex",
@@ -301,16 +341,9 @@ export default function MonthlyIncomeCard() {
             {availableYears.map((y) => (
               <button
                 key={y}
+                className="mic-year-btn"
                 onClick={() => setSelectedYear(y)}
                 style={{
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "5px 11px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  fontFamily: "'DM Sans', sans-serif",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
                   background: selectedYear === y ? "#fff" : "transparent",
                   color: selectedYear === y ? "#1A56DB" : "#94a3b8",
                   boxShadow:
@@ -323,7 +356,7 @@ export default function MonthlyIncomeCard() {
           </div>
         </div>
 
-        <div style={{ width: "100%" }}>
+        <div style={{ width: "100%", minHeight: 0 }}>
           <LineChart year={selectedYear} />
         </div>
       </div>
