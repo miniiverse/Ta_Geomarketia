@@ -13,10 +13,10 @@ const C = {
   border: "rgba(0,0,0,0.08)",
 } as const;
 
-const navLinks = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Projects", href: "/projects-list" },
-  { label: "My Collections", href: "/collections" },
+const allNavLinks = [
+  { label: "Dashboard", href: "/dashboard", authOnly: true },
+  { label: "Projects", href: "/projects-list", authOnly: true },
+  { label: "My Collections", href: "/collections", authOnly: true },
 ];
 
 function CubeIcon({ size = 32 }: { size?: number }) {
@@ -231,7 +231,7 @@ const menuItems = [
     ),
   },
   {
-    label: "Collections",
+    label: "My Collections",
     href: "/collections",
     danger: false,
     icon: (
@@ -308,7 +308,6 @@ function ProfileDropdown() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Ambil data user saat komponen mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -331,8 +330,7 @@ function ProfileDropdown() {
         setInitials(ini);
         setEmail(user.email ?? "");
         if (user.profile_photo) setPhotoUrl(user.profile_photo);
-      } catch {
-      }
+      } catch {}
     };
     fetchUser();
   }, []);
@@ -585,10 +583,68 @@ function ProfileDropdown() {
   );
 }
 
+function LoginButton() {
+  return (
+    <Link
+      href="/login"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 7,
+        padding: "7px 20px",
+        borderRadius: 100,
+        background: C.blue,
+        color: "#fff",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: 13.5,
+        fontWeight: 600,
+        letterSpacing: "-0.015em",
+        textDecoration: "none",
+        transition: "background 0.15s, transform 0.15s, box-shadow 0.15s",
+        boxShadow: "0 2px 8px rgba(26,86,219,0.25)",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.background = C.blueHover;
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+        (e.currentTarget as HTMLElement).style.boxShadow =
+          "0 4px 14px rgba(26,86,219,0.35)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.background = C.blue;
+        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+        (e.currentTarget as HTMLElement).style.boxShadow =
+          "0 2px 8px rgba(26,86,219,0.25)";
+      }}
+    >
+      Login
+    </Link>
+  );
+}
+
 export default function UserNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/me", {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        setIsLoggedIn(res.ok);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const navLinks = allNavLinks.filter(
+    (link) => !link.authOnly || isLoggedIn === true,
+  );
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 12);
@@ -721,7 +777,12 @@ export default function UserNavbar() {
               flexShrink: 0,
             }}
           >
-            <ProfileDropdown />
+            {isLoggedIn === true ? (
+              <ProfileDropdown />
+            ) : isLoggedIn === false ? (
+              <LoginButton />
+            ) : null}
+
             <button
               className="gm-burger"
               onClick={() => setMenuOpen((v) => !v)}
@@ -865,26 +926,49 @@ export default function UserNavbar() {
               >
                 Account
               </p>
-              <Link
-                href="/profile"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 7,
-                  padding: "10px",
-                  borderRadius: 100,
-                  background: C.blue,
-                  color: "#fff",
-                  fontFamily: "'Inter', system-ui, sans-serif",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                <ProfileIcon /> Profile
-              </Link>
+              {isLoggedIn === true ? (
+                <Link
+                  href="/profile"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 7,
+                    padding: "10px",
+                    borderRadius: 100,
+                    background: C.blue,
+                    color: "#fff",
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  <ProfileIcon /> Profile
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 7,
+                    padding: "10px",
+                    borderRadius: 100,
+                    background: C.blue,
+                    color: "#fff",
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  <ProfileIcon /> Login
+                </Link>
+              )}
             </div>
           </div>
         </div>

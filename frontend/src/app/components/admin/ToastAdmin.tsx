@@ -191,5 +191,5 @@ export function useToast() {
     <ToastContainer toasts={toasts} removeToast={removeToast} />
   );
 
-  return { showToast, ToastContainer: ToastContainerWrapper };
+  return { showToast, toasts, removeToast, ToastContainer: ToastContainerWrapper };
 }

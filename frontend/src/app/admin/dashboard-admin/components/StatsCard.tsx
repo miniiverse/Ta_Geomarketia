@@ -456,7 +456,7 @@ export default function StatCards() {
     {
       label: "Total Earnings",
       value: "Rp800.000",
-      href: null,
+      href: "/admin/transactions",
       icon: (
         <svg
           width="22"
