@@ -407,8 +407,7 @@ export default function StatCards() {
       .then((r) => r.json())
       .then((json) => {
         const total =
-          json.meta?.total ??
-          (Array.isArray(json.data) ? json.data.length : 0);
+          json.meta?.total ?? (Array.isArray(json.data) ? json.data.length : 0);
         setTotalProjects(String(total));
       })
       .catch(() => setTotalProjects("0"));
@@ -518,7 +517,8 @@ export default function StatCards() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
           gap: "16px",
           marginBottom: "28px",
         }}

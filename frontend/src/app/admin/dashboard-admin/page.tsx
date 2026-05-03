@@ -18,7 +18,7 @@ export default function DashboardAdminPage() {
       try {
         const res = await fetch("/api/me", {
           method: "GET",
-          credentials: "include", // supaya cookie token ikut dikirim
+          credentials: "include", 
           headers: {
             Accept: "application/json",
           },
@@ -29,7 +29,6 @@ export default function DashboardAdminPage() {
         const data = await res.json();
         setFullname(data.user?.fullname ?? "Admin");
       } catch {
-        // Gagal fetch, biarkan default "Admin"
       }
     };
 
@@ -57,7 +56,7 @@ export default function DashboardAdminPage() {
       style={{
         minHeight: "100vh",
         background: "#F5F7FB",
-        padding: "28px 28px 40px",
+        padding: "clamp(16px, 4vw, 28px) clamp(14px, 3vw, 28px) 40px",
       }}
     >
       <div
@@ -87,7 +86,7 @@ export default function DashboardAdminPage() {
           <h1
             style={{
               margin: 0,
-              fontSize: "26px",
+              fontSize: "clamp(20px, 4vw, 26px)",
               fontWeight: 800,
               fontFamily: "'Inter', sans-serif",
               color: "#1A56DB",
@@ -130,6 +129,7 @@ export default function DashboardAdminPage() {
             alignItems: "center",
             gap: "8px",
             boxShadow: "0 1px 4px rgba(26,86,219,0.06)",
+            flexShrink: 0,
           }}
         >
           <svg
