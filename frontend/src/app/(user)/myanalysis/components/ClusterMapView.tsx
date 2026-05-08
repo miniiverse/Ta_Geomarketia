@@ -96,17 +96,33 @@ function isOpenNow(hours: { day: string; hours: string }[]): boolean {
   }
 }
 
-// ─── Statistics Side Panel ────────────────────────────────────────────────────
+function useWindowSize() {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    function update() {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return size;
+}
+
 function StatsPanel({
   area,
   businesses,
   areaColors,
   onClose,
+  isMobile,
 }: {
   area: string;
   businesses: Business[];
   areaColors: Record<string, string>;
   onClose: () => void;
+  isMobile: boolean;
 }) {
   const bizList = businesses.filter((b) => b.area === area);
   const color = areaColors[area] ?? "#6B7280";
@@ -196,9 +212,25 @@ function StatsPanel({
   const ratio = bizList.length / Math.max(businesses.length * 0.35, 1);
   const dm = densityMeta(Math.min(ratio, 1));
 
-  return (
-    <div
-      style={{
+  const panelStyle: React.CSSProperties = isMobile
+    ? {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: "100%",
+        maxHeight: "72vh",
+        background: "white",
+        borderTop: "1px solid #E2E8F0",
+        borderRadius: "20px 20px 0 0",
+        overflowY: "auto",
+        zIndex: 800,
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "0 -8px 32px rgba(0,0,0,0.14)",
+        animation: "slideInBottom 0.25s ease",
+      }
+    : {
         position: "absolute",
         top: 0,
         right: 0,
@@ -212,19 +244,42 @@ function StatsPanel({
         flexDirection: "column",
         boxShadow: "-8px 0 32px rgba(0,0,0,0.10)",
         animation: "slideInRight 0.22s ease",
-      }}
-    >
+      };
+
+  return (
+    <div style={panelStyle}>
       <style>{`
         @keyframes slideInRight { from { transform:translateX(20px);opacity:0; } to { transform:translateX(0);opacity:1; } }
+        @keyframes slideInBottom { from { transform:translateY(30px);opacity:0; } to { transform:translateY(0);opacity:1; } }
         .scard:hover { background:#F8FAFC !important; }
         .bizrow:hover { background:#F0F9FF !important; }
         .spanel::-webkit-scrollbar { width:4px; }
         .spanel::-webkit-scrollbar-thumb { background:#CBD5E1;border-radius:99px; }
       `}</style>
 
+      {isMobile && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "10px 0 4px",
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              width: 40,
+              height: 4,
+              borderRadius: 99,
+              background: "#CBD5E1",
+            }}
+          />
+        </div>
+      )}
+
       <div
         style={{
-          padding: "16px 16px 12px",
+          padding: isMobile ? "10px 16px 10px" : "16px 16px 12px",
           borderBottom: "1px solid #F1F5F9",
           flexShrink: 0,
           background: `linear-gradient(135deg,${color}14,${color}06)`,
@@ -278,7 +333,7 @@ function StatsPanel({
               <div>
                 <div
                   style={{
-                    fontSize: 15,
+                    fontSize: isMobile ? 14 : 15,
                     fontWeight: 800,
                     color: "#0F172A",
                     letterSpacing: "-0.02em",
@@ -319,8 +374,8 @@ function StatsPanel({
           <button
             onClick={onClose}
             style={{
-              width: 28,
-              height: 28,
+              width: 32,
+              height: 32,
               borderRadius: 7,
               border: "1px solid #E2E8F0",
               background: "white",
@@ -353,16 +408,17 @@ function StatsPanel({
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "14px 14px 24px",
+          padding: isMobile ? "12px 14px 32px" : "14px 14px 24px",
           display: "flex",
           flexDirection: "column",
           gap: 16,
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "1fr 1fr 1fr",
             gap: 7,
           }}
         >
@@ -385,7 +441,7 @@ function StatsPanel({
               key={k.label}
               className="scard"
               style={{
-                padding: "10px 6px",
+                padding: isMobile ? "10px 4px" : "10px 6px",
                 background: "#FAFAFA",
                 border: "1px solid #E2E8F0",
                 borderRadius: 10,
@@ -396,7 +452,7 @@ function StatsPanel({
               <div style={{ fontSize: 12, marginBottom: 3 }}>{k.icon}</div>
               <div
                 style={{
-                  fontSize: 19,
+                  fontSize: isMobile ? 20 : 19,
                   fontWeight: 800,
                   color: k.clr,
                   lineHeight: 1,
@@ -507,7 +563,11 @@ function StatsPanel({
             Operasional
           </div>
           <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 6,
+            }}
           >
             {[
               {
@@ -542,7 +602,7 @@ function StatsPanel({
               <div
                 key={item.label}
                 style={{
-                  padding: "8px 10px",
+                  padding: isMobile ? "10px 10px" : "8px 10px",
                   background: item.bg,
                   borderRadius: 9,
                   border: `1px solid ${item.clr}22`,
@@ -776,7 +836,7 @@ function StatsPanel({
                   className="bizrow"
                   onClick={() => b.url && window.open(b.url, "_blank")}
                   style={{
-                    padding: "9px 10px",
+                    padding: isMobile ? "11px 12px" : "9px 10px",
                     borderRadius: 10,
                     border: "1px solid #E2E8F0",
                     cursor: b.url ? "pointer" : "default",
@@ -814,7 +874,7 @@ function StatsPanel({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: 12,
+                          fontSize: isMobile ? 13 : 12,
                           fontWeight: 700,
                           color: "#0F172A",
                           overflow: "hidden",
@@ -950,7 +1010,6 @@ function StatsPanel({
   );
 }
 
-// ─── ClusterMap Main ──────────────────────────────────────────────────────────
 export default function ClusterMap({
   businesses,
   areaColors,
@@ -967,6 +1026,10 @@ export default function ClusterMap({
   const [mapReady, setMapReady] = useState(false);
   const [loadingMap, setLoadingMap] = useState(true);
   const [panelCluster, setPanelCluster] = useState<string | null>(null);
+
+  const { width } = useWindowSize();
+  const isMobile = width > 0 && width < 640;
+  const isTablet = width >= 640 && width < 1024;
 
   const computeStats = useCallback((): AreaStats[] => {
     const countByArea: Record<string, number> = {};
@@ -1019,7 +1082,6 @@ export default function ClusterMap({
     setPanelCluster(selectedCluster);
   }, [selectedCluster]);
 
-  // Init map (FIXED)
   useEffect(() => {
     let isMounted = true;
 
@@ -1033,8 +1095,6 @@ export default function ClusterMap({
         instanceRef.current = null;
       }
 
-      // Reset leaflet marker on the DOM container to avoid:
-      // "Map container is already initialized"
       if ((container as any)._leaflet_id) {
         (container as any)._leaflet_id = null;
       }
@@ -1050,6 +1110,8 @@ export default function ClusterMap({
         zoom: 12,
         zoomControl: true,
         attributionControl: false,
+        touchZoom: true,
+        bounceAtZoomLimits: false,
       });
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1090,9 +1152,7 @@ export default function ClusterMap({
       layersRef.current.forEach((layer) => {
         try {
           layer.remove();
-        } catch {
-          // ignore
-        }
+        } catch {}
       });
       layersRef.current = [];
 
@@ -1107,11 +1167,9 @@ export default function ClusterMap({
     };
   }, []);
 
-  // Render layers safely
   useEffect(() => {
     if (!mapReady || !instanceRef.current) return;
     renderLayers(selectedCluster);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, selectedCluster, businesses, clusterAreas, areaColors]);
 
   function renderLayers(selected: string | null) {
@@ -1122,9 +1180,7 @@ export default function ClusterMap({
     layersRef.current.forEach((l) => {
       try {
         l.remove();
-      } catch {
-        // ignore
-      }
+      } catch {}
     });
     layersRef.current = [];
 
@@ -1134,6 +1190,9 @@ export default function ClusterMap({
     });
 
     const maxCount = Math.max(...Object.values(countByArea), 1);
+
+    const currentWidth = window.innerWidth;
+    const bubbleSizeMultiplier = currentWidth < 640 ? 1.2 : 1;
 
     clusterAreas.forEach((area) => {
       const count = countByArea[area.name] ?? 0;
@@ -1170,7 +1229,8 @@ export default function ClusterMap({
           .on("click", () => handleClick(area.name, selected)),
       );
 
-      const bw = Math.max(52, Math.min(92, 36 + ratio * 56));
+      const bw =
+        Math.max(52, Math.min(92, 36 + ratio * 56)) * bubbleSizeMultiplier;
       const areaBizs = businesses.filter((b) => b.area === area.name);
       const rateds = areaBizs.filter((b) => b.rating > 0);
       const avgR = rateds.length
@@ -1209,7 +1269,16 @@ export default function ClusterMap({
       const inSel = !selected || biz.area === selected;
       const clr = areaColors[biz.area] ?? "#6B7280";
       const big = biz.reviews >= 100;
-      const ds = inSel ? (big ? 10 : 7) : 5;
+      const currentWidth = window.innerWidth;
+      const ds = inSel
+        ? big
+          ? currentWidth < 640
+            ? 12
+            : 10
+          : currentWidth < 640
+            ? 9
+            : 7
+        : 5;
       const op = inSel ? (big ? 0.9 : 0.65) : 0.1;
       const isOpen =
         biz.open_hours.length > 0 ? isOpenNow(biz.open_hours) : null;
@@ -1268,6 +1337,42 @@ export default function ClusterMap({
     setPanelCluster(next);
   }
 
+  const legendStyle: React.CSSProperties = isMobile
+    ? {
+        position: "absolute",
+        top: 10,
+        left: 10,
+        zIndex: 700,
+        background: "rgba(255,255,255,0.94)",
+        backdropFilter: "blur(4px)",
+        borderRadius: 10,
+        padding: "6px 10px",
+        border: "1px solid #E2E8F0",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+      }
+    : {
+        position: "absolute",
+        bottom: 40,
+        left: 12,
+        zIndex: 700,
+        background: "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(4px)",
+        borderRadius: 10,
+        padding: "8px 12px",
+        border: "1px solid #E2E8F0",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+      };
+
+  const densityItems = [
+    { label: "Sangat Padat", color: "#DC2626" },
+    { label: "Padat", color: "#EA580C" },
+    { label: "Sedang", color: "#D97706" },
+    { label: "Jarang", color: "#16A34A" },
+  ];
+
   return (
     <>
       <link
@@ -1281,6 +1386,18 @@ export default function ClusterMap({
         .custom-popup .leaflet-popup-content{margin:10px 12px!important;}
         .leaflet-control-attribution{font-size:10px!important;background:rgba(255,255,255,0.85)!important;border-radius:6px 0 0 0!important;padding:3px 6px!important;}
         @keyframes spin{to{transform:rotate(360deg);}}
+        /* Larger tap targets on mobile */
+        @media (max-width: 640px) {
+          .leaflet-control-zoom a {
+            width: 36px !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            font-size: 18px !important;
+          }
+          .leaflet-popup-content-wrapper {
+            max-width: 240px !important;
+          }
+        }
       `}</style>
 
       {loadingMap && (
@@ -1320,61 +1437,87 @@ export default function ClusterMap({
         />
 
         {!loadingMap && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 40,
-              left: 12,
-              zIndex: 700,
-              background: "rgba(255,255,255,0.92)",
-              backdropFilter: "blur(4px)",
-              borderRadius: 10,
-              padding: "8px 12px",
-              border: "1px solid #E2E8F0",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: "#94A3B8",
-                textTransform: "uppercase",
-                letterSpacing: "0.07em",
-                marginBottom: 6,
-              }}
-            >
-              Kepadatan
-            </div>
-            {[
-              { label: "Sangat Padat", color: "#DC2626" },
-              { label: "Padat", color: "#EA580C" },
-              { label: "Sedang", color: "#D97706" },
-              { label: "Jarang", color: "#16A34A" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  marginBottom: 4,
-                }}
-              >
-                <div
+          <div style={legendStyle}>
+            {isMobile ? (
+              <>
+                <span
                   style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background: item.color,
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    color: "#94A3B8",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
                     flexShrink: 0,
                   }}
-                />
-                <span style={{ fontSize: 10.5, color: "#374151" }}>
-                  {item.label}
+                >
+                  Kepadatan:
                 </span>
-              </div>
-            ))}
+                {densityItems.map((item) => (
+                  <div
+                    key={item.label}
+                    style={{ display: "flex", alignItems: "center", gap: 3 }}
+                  >
+                    <div
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        background: item.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: "#374151",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    color: "#94A3B8",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.07em",
+                    marginBottom: 6,
+                  }}
+                >
+                  Kepadatan
+                </div>
+                {densityItems.map((item) => (
+                  <div
+                    key={item.label}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      marginBottom: 4,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        background: item.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontSize: 10.5, color: "#374151" }}>
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
 
@@ -1382,25 +1525,31 @@ export default function ClusterMap({
           <div
             style={{
               position: "absolute",
-              bottom: 14,
+              bottom: isMobile ? 16 : 14,
               left: "50%",
               transform: "translateX(-50%)",
-              padding: "7px 16px",
+              padding: isMobile ? "8px 18px" : "7px 16px",
               background: "rgba(15,23,42,0.72)",
               borderRadius: 99,
               pointerEvents: "none",
               zIndex: 700,
               backdropFilter: "blur(4px)",
+              maxWidth: "90vw",
             }}
           >
             <span
               style={{
-                fontSize: 12,
+                fontSize: isMobile ? 11 : 12,
                 color: "rgba(255,255,255,0.92)",
                 fontWeight: 500,
+                whiteSpace: isMobile ? "normal" : "nowrap",
+                textAlign: "center",
+                display: "block",
               }}
             >
-              Klik bubble area untuk melihat statistik detail
+              {isMobile
+                ? "Tap bubble area untuk statistik detail"
+                : "Klik bubble area untuk melihat statistik detail"}
             </span>
           </div>
         )}
@@ -1410,6 +1559,7 @@ export default function ClusterMap({
             area={panelCluster}
             businesses={businesses}
             areaColors={areaColors}
+            isMobile={isMobile}
             onClose={() => {
               setPanelCluster(null);
               onSelectCluster(null);

@@ -2,7 +2,11 @@
 
 import React, { useState, useMemo } from "react";
 import CollectionHeader from "./components/CollectionHeader";
-import CollectionFilter, { SortDate, SortAmount, SortCategory } from "./components/CollectionFilter";
+import CollectionFilter, {
+  SortDate,
+  SortAmount,
+  SortCategory,
+} from "./components/CollectionFilter";
 import CollectionList from "./components/CollectionList";
 import { Collection } from "./components/CollectionCard";
 
@@ -80,7 +84,7 @@ export default function Page() {
       pending: ALL_TRANSACTIONS.filter((t) => t.status === "Pending").length,
       failed: ALL_TRANSACTIONS.filter((t) => t.status === "Failed").length,
     }),
-    []
+    [],
   );
 
   const filtered = useMemo(() => {
@@ -92,7 +96,7 @@ export default function Page() {
         (t) =>
           t.title.toLowerCase().includes(q) ||
           t.location.toLowerCase().includes(q) ||
-          t.id.toLowerCase().includes(q)
+          t.id.toLowerCase().includes(q),
       );
     }
 
@@ -106,9 +110,13 @@ export default function Page() {
 
     if (lastSort === "date") {
       if (sortDate === "Newest First") {
-        result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        result.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
       } else {
-        result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        result.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
       }
     } else {
       if (sortAmount === "Highest Amount") {
@@ -126,7 +134,7 @@ export default function Page() {
       style={{
         minHeight: "100vh",
         background: "#FFFFFF",
-        padding: "20px 40px 40px",
+        padding: "20px clamp(16px, 4vw, 40px) 40px",
         boxSizing: "border-box",
       }}
     >
@@ -147,7 +155,7 @@ export default function Page() {
           style={{
             background: "#FFFFFF",
             borderRadius: 20,
-            padding: "28px 28px 32px",
+            padding: "clamp(16px, 3vw, 28px) clamp(16px, 3vw, 28px) 32px",
             border: "1.5px solid #E2E8F0",
             boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
           }}

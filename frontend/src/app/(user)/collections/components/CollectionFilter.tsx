@@ -62,7 +62,7 @@ function SortDropdown<T extends string>({
   };
   document.addEventListener("mousedown", handler);
   return () => document.removeEventListener("mousedown", handler);
-}, [open]); // hapus onToggle dari deps
+}, [open]); 
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -72,7 +72,7 @@ function SortDropdown<T extends string>({
           display: "flex",
           alignItems: "center",
           gap: 8,
-          padding: "10px 16px",
+          padding: "10px clamp(10px, 2vw, 16px)",
           borderRadius: 10,
           border: `1.5px solid ${open ? "#1A56DB" : "#E2E8F0"}`,
           background: open ? "#EFF6FF" : "#FFFFFF",
