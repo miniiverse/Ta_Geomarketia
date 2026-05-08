@@ -516,6 +516,8 @@ export default function AnalysisSection() {
           justifyContent: "space-between",
           alignItems: "flex-end",
           marginBottom: 16,
+          flexWrap: "wrap" as const,
+          gap: 10,
         }}
       >
         <div>
@@ -586,7 +588,7 @@ export default function AnalysisSection() {
           position: "relative",
           zIndex: 1,
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
           gap: 12,
           alignItems: "stretch",
         }}
