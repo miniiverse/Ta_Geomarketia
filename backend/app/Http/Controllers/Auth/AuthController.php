@@ -13,7 +13,9 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    // REGISTER
+    /**
+     * Register a new user.
+     */
     public function register(Request $request)
     {
         $request->validate([
@@ -37,7 +39,9 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // LOGIN 
+    /**
+     * Log in an existing user.
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -87,7 +91,9 @@ class AuthController extends Controller
         ]);
     }
 
-    // GET PROFILE 
+    /**
+     * Get the authenticated user's profile.
+     */
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
@@ -108,7 +114,9 @@ class AuthController extends Controller
         ])->header('Cache-Control', 'no-store'); 
     }
 
-    // UPDATE PROFILE 
+    /**
+     * Update the authenticated user's profile.
+     */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -136,7 +144,9 @@ class AuthController extends Controller
         ]);
     }
 
-    // UPDATE PHOTO 
+    /**
+     * Update the authenticated user's profile photo.
+     */
     public function updatePhoto(Request $request)
     {
         $request->validate([
@@ -160,7 +170,9 @@ class AuthController extends Controller
         ]);
     }
 
-    // LOGOUT 
+    /**
+     * Log out the authenticated user.
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

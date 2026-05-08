@@ -9,6 +9,9 @@ use Carbon\Carbon;
 
 class UserProjectController extends Controller
 {
+    /**
+     * Display a listing of the projects.
+     */
     public function index(Request $request)
     {
         $query = Project::with(['category', 'city'])
@@ -84,7 +87,7 @@ class UserProjectController extends Controller
 
         $appUrl = rtrim(config('app.url'), '/');
 
-        // Ambil distinct years dari project_date
+        // Add distinct years for project_date filter
         $projectDateYears = Project::selectRaw('YEAR(project_date) as year')
             ->whereNotNull('project_date')
             ->distinct()
@@ -93,7 +96,7 @@ class UserProjectController extends Controller
             ->filter()
             ->values();
 
-        // Ambil distinct years dari updated_at
+        // Add distinct years for last_update filter
         $lastUpdateYears = Project::selectRaw('YEAR(updated_at) as year')
             ->distinct()
             ->orderBy('year', 'desc')

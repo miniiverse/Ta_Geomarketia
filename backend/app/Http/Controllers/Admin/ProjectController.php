@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
-    // Admin CRUD for Projects
+    /**
+     * Display a listing of the projects for the authenticated user.
+     */
     public function index()
     {
         $projects = Project::with(['category', 'city'])
@@ -23,19 +25,25 @@ class ProjectController extends Controller
         return response()->json(['success' => true, 'data' => $projects]);
     }
 
-    // Get categories and cities for project creation form
+    /**
+     * Get categories for project creation form
+     */
     public function categories()
     {
         return response()->json(Category::select('category_id', 'name')->get());
     }
 
-    // Get cities for project creation form
+    /**
+     * Get cities for project creation form
+     */
     public function cities()
     {
         return response()->json(City::select('city_id', 'province_id', 'name')->get());
     }
 
-    // Create new project
+    /**
+     * Create a new project
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -75,7 +83,9 @@ class ProjectController extends Controller
         ], 201);
     }
 
-    // Delete project
+    /**
+     * Delete a project
+     */
     public function destroy($id)
     {
         $project = Project::where('project_id', $id)
@@ -91,7 +101,9 @@ class ProjectController extends Controller
         return response()->json(['success' => true, 'message' => 'Project deleted.']);
     }
 
-    // Update project
+    /**
+     * Update a project
+     */
     public function update(Request $request, $id)
     {
         $project = Project::where('project_id', $id)
