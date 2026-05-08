@@ -58,7 +58,7 @@ const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
 export function PaymentTabs({ activeTab, onTabChange }: PaymentTabsProps) {
   return (
     <div style={{
-      display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+      display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
       borderBottom: "1px solid #E5E7EB",
       background: "#FAFBFF",
     }}>
@@ -70,7 +70,7 @@ export function PaymentTabs({ activeTab, onTabChange }: PaymentTabsProps) {
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 7, flexWrap: "wrap",
               padding: "15px 8px",
               background: isActive
                 ? "#fff"
@@ -100,7 +100,16 @@ export function PaymentTabs({ activeTab, onTabChange }: PaymentTabsProps) {
             }}
           >
             <span style={{ flexShrink: 0 }}>{tab.icon}</span>
-            <span className="tab-label">{tab.label}</span>
+           <span
+            className="tab-label"
+            style={{
+              minWidth: 0,
+              wordBreak: "break-word",
+              textAlign: "center",
+            }}
+          >
+            {tab.label}
+          </span>
           </button>
         );
       })}

@@ -18,7 +18,7 @@ function InputField({
         style={{
           width: "100%", padding: "10px 14px", borderRadius: 9,
           border: "1.5px solid #E5E7EB", background: "#F8FAFF",
-          fontSize: "0.88rem", color: "#111827", outline: "none",
+          fontSize: "0.92rem", color: "#111827", outline: "none",
           fontFamily: "'Inter', system-ui, sans-serif",
           boxSizing: "border-box" as const,
           transition: "border 0.15s, box-shadow 0.15s",
@@ -42,7 +42,7 @@ function PayButton({ label, icon }: { label: string; icon: React.ReactNode }) {
   return (
     <button
       style={{
-        width: "100%", padding: "12px 0", marginTop: 8, borderRadius: 10,
+        width: "100%", padding: "13px 14px", marginTop: 8, borderRadius: 10,
         background: "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)",
         border: "none", color: "#fff", fontSize: "0.92rem", fontWeight: 700,
         cursor: "pointer",
@@ -80,7 +80,7 @@ export function CreditCardTab() {
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
 
       <div style={{
-        borderRadius: 16, padding: "1.5rem",
+        borderRadius: 16, padding: "1.1rem",
         background: "linear-gradient(135deg, #1A56DB 0%, #2563EB 50%, #3B82F6 100%)",
         color: "#fff", marginBottom: 4,
         position: "relative", overflow: "hidden",
@@ -90,7 +90,12 @@ export function CreditCardTab() {
         <div style={{ position: "absolute", bottom: -40, right: 50, width: 110, height: 110, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", top: 20, left: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div style={{ display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20,
+          gap: 12,
+          flexWrap: "wrap", }}>
           <div style={{
             width: 36, height: 28, borderRadius: 5,
             background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
@@ -105,11 +110,15 @@ export function CreditCardTab() {
           <span style={{ fontSize: "0.65rem", opacity: 0.65, letterSpacing: "0.12em", fontWeight: 600 }}>CREDIT CARD</span>
         </div>
 
-        <div style={{ fontSize: "1.15rem", fontWeight: 700, letterSpacing: "0.22em", marginBottom: 22, opacity: 0.9, fontFamily: "monospace" }}>
+        <div style={{ fontSize: "clamp(0.9rem, 3vw, 1.15rem)", fontWeight: 700, letterSpacing: "0.14em", marginBottom: 22, opacity: 0.9, fontFamily: "monospace" }}>
           •••• •••• •••• ••••
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div style={{display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          gap: 12,
+          flexWrap: "wrap",}}>
           <div>
             <div style={{ fontSize: "0.6rem", opacity: 0.55, letterSpacing: "0.1em", marginBottom: 2 }}>CARDHOLDER NAME</div>
             <div style={{ fontSize: "0.8rem", fontWeight: 600, opacity: 0.9 }}>Full Name</div>
@@ -145,5 +154,13 @@ export function CreditCardTab() {
 
       <PayButton label="Pay with Credit Card" icon={<CreditCardIcon />} />
     </div>
+    
   );
+  <style>{`
+  @media (max-width: 640px) {
+    .credit-card-preview {
+      padding: 1rem !important;
+    }
+  }
+`}</style>
 }

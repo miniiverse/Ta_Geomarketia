@@ -9,12 +9,15 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ subtotal, tax, total, formatRp, title, category }: OrderSummaryProps) {
   return (
-    <div style={{
+    <div 
+    className="order-summary"
+    style={{
       background: "#fff", borderRadius: 16,
       border: "1px solid #E5E7EB",
       boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
       overflow: "hidden",
-      position: "sticky", top: "1.5rem",
+      position: "sticky", 
+      top: "1.5rem",
     }}>
 
       <div style={{
@@ -46,7 +49,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
 
         <div style={{ paddingBottom: "0.75rem", borderBottom: "1px dashed #E5E7EB" }}>
           <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8,
+           display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap",
             padding: "8px 10px", borderRadius: 8,
             background: "#F8FAFF", border: "1px solid #EEF2FF",
           }}>
@@ -55,7 +58,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
                 width: 6, height: 6, borderRadius: "50%",
                 background: "#1A56DB", flexShrink: 0, marginTop: 5,
               }} />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ fontSize: "0.76rem", color: "#374151", fontWeight: 600, lineHeight: 1.5, display: "block" }}>
                   {title ?? "Geospatial Analysis Package"}
                 </span>
@@ -72,7 +75,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
                 )}
               </div>
             </div>
-            <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0 }}>
+            <span style={{fontSize: "0.78rem",color: "#111827",fontWeight: 700, flexShrink: 0, wordBreak: "break-word",}}>
               {formatRp(subtotal)}
             </span>
           </div>
@@ -88,7 +91,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
         </div>
 
         <div style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center",
+          display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap",
           padding: "10px 12px", borderRadius: 10,
           background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
           border: "1px solid #BFDBFE",
@@ -111,6 +114,14 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
           Protected by SSL encryption
         </div>
       </div>
+      <style>{`
+  @media (max-width: 768px) {
+    .order-summary {
+      position: static !important;
+      top: unset !important;
+    }
+  }
+`}</style>
     </div>
   );
 }

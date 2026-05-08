@@ -32,7 +32,14 @@ export function EWalletTab() {
         Select your e-wallet to continue payment.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.65rem" }}>
+      <div
+        className="wallet-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0.65rem",
+        }}
+      >
         {wallets.map((w) => {
           const isSelected = selected === w.name;
           return (
@@ -43,7 +50,10 @@ export function EWalletTab() {
                 padding: "11px 13px", borderRadius: 11, cursor: "pointer",
                 border: isSelected ? "2px solid #1A56DB" : "1.5px solid #E5E7EB",
                 background: isSelected ? "#EFF6FF" : "#F8FAFF",
-                display: "flex", alignItems: "center", gap: 10,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
                 transition: "all 0.15s",
                 fontFamily: "'Inter', system-ui, sans-serif",
                 boxShadow: isSelected ? "0 0 0 3px rgba(26,86,219,0.1)" : "none",
@@ -65,7 +75,7 @@ export function EWalletTab() {
                 width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                 background: w.bg,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 900, fontSize: "0.6rem", color: w.color,
+                fontWeight: 900, fontSize: "0.68rem", color: w.color,
                 border: `1.5px solid ${w.color}30`,
                 letterSpacing: "0.02em",
               }}>
@@ -73,10 +83,14 @@ export function EWalletTab() {
               </div>
 
               <span style={{
-                fontSize: "0.82rem", fontWeight: 600,
-                color: isSelected ? "#1A56DB" : "#111827",
-                flex: 1, textAlign: "left",
-              }}>
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              color: isSelected ? "#1A56DB" : "#111827",
+              flex: 1,
+              textAlign: "left",
+              minWidth: 0,
+              wordBreak: "break-word",
+            }}>
                 {w.name}
               </span>
 
@@ -93,7 +107,7 @@ export function EWalletTab() {
 
       {selected && (
         <div style={{
-          display: "flex", alignItems: "center", gap: 10,
+          display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
           padding: "10px 14px", borderRadius: 9,
           background: "#EFF6FF", border: "1px solid #BFDBFE",
         }}>
@@ -109,7 +123,7 @@ export function EWalletTab() {
 
       <button
         style={{
-          width: "100%", padding: "12px 0", marginTop: 4, borderRadius: 10,
+          width: "100%", padding: "11px 0", marginTop: 4, borderRadius: 10,
           background: selected
             ? "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)"
             : "#E5E7EB",
@@ -139,4 +153,11 @@ export function EWalletTab() {
       </button>
     </div>
   );
+  <style>{`
+  @media (max-width: 640px) {
+    .wallet-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+`}</style>
 }

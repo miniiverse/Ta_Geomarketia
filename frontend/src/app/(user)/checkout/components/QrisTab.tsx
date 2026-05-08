@@ -42,14 +42,14 @@ function PayButton({ label, icon }: { label: string; icon: React.ReactNode }) {
 function QRCode() {
   return (
     <div style={{
-      width: 196, height: 196,
+      width: 196, height: 196, aspectRatio: "1 / 1",
       border: "2px solid #BFDBFE",
       borderRadius: 16, padding: 14,
       background: "#fff",
       display: "flex", alignItems: "center", justifyContent: "center",
       boxShadow: "0 4px 16px rgba(26,86,219,0.1)",
     }}>
-      <svg width="168" height="168" viewBox="0 0 156 156" fill="none">
+      <svg width="100%" height="100%" viewBox="0 0 156 156" fill="none" style={{ maxWidth: 168, maxHeight: 168 }}>
         <rect x="0" y="0" width="52" height="52" fill="#1A56DB" rx="4" /><rect x="6" y="6" width="40" height="40" fill="white" rx="2" /><rect x="13" y="13" width="26" height="26" fill="#1A56DB" rx="1" />
         <rect x="104" y="0" width="52" height="52" fill="#1A56DB" rx="4" /><rect x="110" y="6" width="40" height="40" fill="white" rx="2" /><rect x="117" y="13" width="26" height="26" fill="#1A56DB" rx="1" />
         <rect x="0" y="104" width="52" height="52" fill="#1A56DB" rx="4" /><rect x="6" y="110" width="40" height="40" fill="white" rx="2" /><rect x="13" y="117" width="26" height="26" fill="#1A56DB" rx="1" />
@@ -88,7 +88,7 @@ export function QrisTab() {
       </div>
 
       <div style={{
-        display: "flex", alignItems: "flex-start", gap: 8,
+        display: "flex", alignItems: "flex-start", gap: 8, flexWrap: "wrap",
         padding: "10px 14px", borderRadius: 9,
         background: "#EFF6FF", border: "1px solid #BFDBFE",
         width: "100%", boxSizing: "border-box" as const,

@@ -20,7 +20,7 @@ function PayButton({ label, icon }: { label: string; icon: React.ReactNode }) {
   return (
     <button
       style={{
-        width: "100%", padding: "12px 0", marginTop: 8, borderRadius: 10,
+        width: "100%", padding: "13px 14px", marginTop: 8, borderRadius: 10,
         background: "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)",
         border: "none", color: "#fff", fontSize: "0.92rem", fontWeight: 700,
         cursor: "pointer",
@@ -69,11 +69,14 @@ export function BankTransferTab() {
       </div>
 
       {banks.map((bank) => (
-        <div key={bank.name} style={{
-          padding: "1rem 1.1rem", borderRadius: 12,
+        <div
+        key={bank.name}
+        className="bank-card"
+        style={{
+          padding: "0.9rem 1rem", borderRadius: 12,
           border: "1.5px solid #EEF2FF",
           background: "#FAFBFF",
-          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
           transition: "border-color 0.15s, box-shadow 0.15s",
         }}
           onMouseEnter={(e) => {
@@ -97,7 +100,7 @@ export function BankTransferTab() {
               {bank.name}
             </div>
             <div>
-              <p style={{ margin: 0, fontWeight: 800, fontSize: "0.95rem", color: "#111827", letterSpacing: "0.06em", fontFamily: "monospace" }}>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: "clamp(0.8rem, 2vw, 0.95rem)", color: "#111827", letterSpacing: "0.06em", fontFamily: "monospace" }}>
                 {bank.account}
               </p>
               <p style={{ margin: "3px 0 0", fontSize: "0.72rem", color: "#9CA3AF", fontWeight: 500 }}>
@@ -107,6 +110,7 @@ export function BankTransferTab() {
           </div>
 
           <button
+          className="copy-btn"
             onClick={() => navigator.clipboard.writeText(bank.account)}
             style={{
               display: "inline-flex", alignItems: "center", gap: 5,
@@ -152,12 +156,27 @@ export function BankTransferTab() {
             }}>
               {i + 1}
             </div>
-            <span style={{ fontSize: "0.78rem", color: "#374151", fontWeight: 500, lineHeight: "20px" }}>{step}</span>
+            <span style={{ fontSize: "0.78rem", color: "#374151", fontWeight: 500, lineHeight: "1.5" }}>{step}</span>
           </div>
         ))}
       </div>
-
+    
       <PayButton label="Confirm Transfer" icon={<BankIcon />} />
+      
+          <style>{`
+      @media (max-width: 640px) {
+        .bank-card {
+          flex-direction: column;
+          align-items: flex-start !important;
+        }
+
+        .copy-btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    `}</style>
     </div>
   );
+  
 }
