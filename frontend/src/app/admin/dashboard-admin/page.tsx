@@ -13,6 +13,7 @@ export default function DashboardAdminPage() {
   const [fullname, setFullname] = useState<string>("Admin");
   const [currentDate, setCurrentDate] = useState<string>("");
 
+  // Fetch user info untuk dapatkan fullname
   useEffect(() => {
     const fetchUser = async () => {
       try {

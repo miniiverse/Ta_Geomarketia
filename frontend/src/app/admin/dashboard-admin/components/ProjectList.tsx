@@ -25,6 +25,7 @@ export default function ProjectList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch project data
   useEffect(() => {
     const fetchProjects = async () => {
       try {
