@@ -29,6 +29,18 @@ type PlaceData = {
 
 type Tab = "overview" | "sp-map" | "cluster";
 
+function useWindowWidth() {
+  const [width, setWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1200,
+  );
+  useEffect(() => {
+    const handle = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, []);
+  return width;
+}
+
 const categoryColors: Record<string, { color: string; bg: string }> = {
   Retail: { color: "#1A56DB", bg: "#EBF3FF" },
   "Food and Beverage": { color: "#d97706", bg: "#FFFBEB" },
@@ -219,6 +231,10 @@ export default function ProjectsDetail({
   const [mapError, setMapError] = useState<string | null>(null);
   const hasFetchedMap = useRef(false);
 
+  const windowWidth = useWindowWidth();
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+
   const dbId = project.api_url
     ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "-")
     : "-";
@@ -228,11 +244,13 @@ export default function ProjectsDetail({
     : null;
 
   const SERVER = process.env.NEXT_PUBLIC_SERVER;
+
   const thumbnailUrl = project.thumbnail
     ? `${SERVER}/storage/${project.thumbnail}`
     : null;
 
   useEffect(() => {
+    // Fetch data lokasi dari /api/places
     if (tab !== "sp-map" || !apiBase || hasFetchedMap.current) return;
     hasFetchedMap.current = true;
     setMapLoading(true);
@@ -282,29 +300,39 @@ export default function ProjectsDetail({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px",
-        paddingTop: "68px",
+        padding: isMobile ? "0" : isTablet ? "20px" : "40px",
+        paddingTop: isMobile ? "0" : "68px",
       }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         style={{
           background: "#fff",
-          borderRadius: "20px",
-          width: "calc(100vw - 80px)",
+          borderRadius: isMobile ? "20px 20px 0 0" : "20px",
+          width: isMobile
+            ? "100%"
+            : isTablet
+              ? "calc(100vw - 40px)"
+              : "calc(100vw - 80px)",
           maxWidth: "1200px",
-          height: "calc(100vh - 68px)",
+          height: isMobile
+            ? "calc(100vh - 48px)"
+            : isTablet
+              ? "calc(100vh - 40px)"
+              : "calc(100vh - 68px)",
+          ...(isMobile
+            ? { position: "fixed" as const, bottom: 0, left: 0, right: 0 }
+            : {}),
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
         }}
       >
-        {/* Header */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
-            padding: "24px 28px 20px",
+            padding: isMobile ? "16px 16px 12px" : "24px 28px 20px",
             flexShrink: 0,
           }}
         >
@@ -316,20 +344,21 @@ export default function ProjectsDetail({
               marginBottom: "16px",
             }}
           >
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "10px",
+                  gap: "8px",
                   marginBottom: "6px",
+                  flexWrap: "wrap",
                 }}
               >
                 <span
                   style={{
                     background: "rgba(255,255,255,0.2)",
                     color: "#fff",
-                    fontSize: "11px",
+                    fontSize: isMobile ? "10px" : "11px",
                     fontWeight: 600,
                     fontFamily: "'Inter', sans-serif",
                     padding: "3px 10px",
@@ -344,7 +373,7 @@ export default function ProjectsDetail({
                     style={{
                       background: "rgba(255,255,255,0.15)",
                       color: "#e2e8f0",
-                      fontSize: "11px",
+                      fontSize: isMobile ? "10px" : "11px",
                       fontWeight: 600,
                       fontFamily: "'Inter', sans-serif",
                       padding: "3px 10px",
@@ -373,11 +402,14 @@ export default function ProjectsDetail({
               <h2
                 style={{
                   margin: 0,
-                  fontSize: "22px",
+                  fontSize: isMobile ? "16px" : isTablet ? "18px" : "22px",
                   fontWeight: 700,
                   fontFamily: "'Inter', sans-serif",
                   color: "#fff",
                   letterSpacing: "-0.03em",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: isMobile ? "nowrap" : "normal",
                 }}
               >
                 {project.name}
@@ -385,7 +417,7 @@ export default function ProjectsDetail({
               <p
                 style={{
                   margin: "4px 0 0",
-                  fontSize: "13px",
+                  fontSize: isMobile ? "11px" : "13px",
                   color: "rgba(255,255,255,0.6)",
                   fontFamily: "'Inter', sans-serif",
                 }}
@@ -407,6 +439,7 @@ export default function ProjectsDetail({
                 cursor: "pointer",
                 color: "#fff",
                 flexShrink: 0,
+                marginLeft: "12px",
               }}
             >
               <svg
@@ -424,7 +457,15 @@ export default function ProjectsDetail({
             </button>
           </div>
 
-          <div style={{ display: "flex", gap: "4px" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "4px",
+              overflowX: isMobile ? "auto" : "visible",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -433,18 +474,19 @@ export default function ProjectsDetail({
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
-                  padding: "8px 14px",
+                  padding: isMobile ? "7px 10px" : "8px 14px",
                   borderRadius: "10px",
                   border: "none",
                   background:
                     tab === t.key ? "rgba(255,255,255,0.2)" : "transparent",
                   color: tab === t.key ? "#fff" : "rgba(255,255,255,0.55)",
-                  fontSize: "12.5px",
+                  fontSize: isMobile ? "11.5px" : "12.5px",
                   fontWeight: 600,
                   fontFamily: "'Inter', sans-serif",
                   cursor: "pointer",
                   transition: "all 0.15s",
                   whiteSpace: "nowrap",
+                  flexShrink: 0,
                 }}
               >
                 <svg
@@ -465,13 +507,17 @@ export default function ProjectsDetail({
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: isMobile ? "16px" : "24px 28px",
+          }}
+        >
           {tab === "overview" && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "14px" }}
             >
-              {/* Thumbnail */}
               <div
                 style={{
                   width: "100%",
@@ -521,17 +567,19 @@ export default function ProjectsDetail({
                 )}
               </div>
 
-              {/* Project Name */}
               <div>
                 <label style={labelStyle}>Project Name</label>
                 <input readOnly value={project.name} style={readonlyStyle} />
               </div>
 
-              {/* Category, City, Total Data */}
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gridTemplateColumns: isMobile
+                    ? "1fr"
+                    : isTablet
+                      ? "1fr 1fr"
+                      : "1fr 1fr 1fr",
                   gap: "12px",
                 }}
               >
@@ -561,11 +609,10 @@ export default function ProjectsDetail({
                 </div>
               </div>
 
-              {/* Project Date & Price */}
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
                   gap: "12px",
                 }}
               >
@@ -583,7 +630,6 @@ export default function ProjectsDetail({
                 </div>
               </div>
 
-              {/* Description */}
               <div>
                 <label style={labelStyle}>Description</label>
                 <textarea
@@ -594,7 +640,6 @@ export default function ProjectsDetail({
                 />
               </div>
 
-              {/* API URL */}
               {project.api_url && (
                 <div>
                   <label style={labelStyle}>API URL</label>
@@ -606,7 +651,6 @@ export default function ProjectsDetail({
                 </div>
               )}
 
-              {/* DB ID */}
               <div>
                 <label style={labelStyle}>DB ID</label>
                 <input readOnly value={dbId} style={readonlyStyle} />
@@ -619,7 +663,7 @@ export default function ProjectsDetail({
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
                   gap: "12px",
                   marginBottom: "16px",
                 }}
@@ -695,7 +739,7 @@ export default function ProjectsDetail({
               {mapLoading && (
                 <div
                   style={{
-                    height: "400px",
+                    height: isMobile ? "280px" : "400px",
                     background: "#f0f7ff",
                     borderRadius: "14px",
                     display: "flex",
@@ -741,7 +785,7 @@ export default function ProjectsDetail({
               {mapError && (
                 <div
                   style={{
-                    height: "400px",
+                    height: isMobile ? "280px" : "400px",
                     background: "#fff5f5",
                     borderRadius: "14px",
                     display: "flex",
@@ -799,7 +843,7 @@ export default function ProjectsDetail({
               {!mapLoading && !mapError && places.length === 0 && (
                 <div
                   style={{
-                    height: "400px",
+                    height: isMobile ? "280px" : "400px",
                     background: "#f8fafc",
                     borderRadius: "14px",
                     display: "flex",
@@ -868,6 +912,8 @@ export default function ProjectsDetail({
                     color: "#94a3b8",
                     fontFamily: "'Inter', sans-serif",
                     lineHeight: 1.6,
+                    maxWidth: "280px",
+                    margin: "0 auto",
                   }}
                 >
                   This feature is coming soon! We are working hard to bring you
@@ -902,10 +948,9 @@ export default function ProjectsDetail({
           )}
         </div>
 
-        {/* Footer */}
         <div
           style={{
-            padding: "16px 28px",
+            padding: isMobile ? "12px 16px" : "16px 28px",
             borderTop: "1px solid #f1f5f9",
             display: "flex",
             justifyContent: "space-between",
@@ -925,6 +970,10 @@ export default function ProjectsDetail({
                 display: "flex",
                 alignItems: "center",
                 gap: "4px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: isMobile ? "160px" : "unset",
               }}
             >
               <svg
@@ -949,7 +998,7 @@ export default function ProjectsDetail({
           <button
             onClick={onClose}
             style={{
-              padding: "9px 20px",
+              padding: isMobile ? "8px 16px" : "9px 20px",
               borderRadius: "10px",
               border: "1px solid #e2e8f0",
               background: "#fff",

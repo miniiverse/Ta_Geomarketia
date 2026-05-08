@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import ProjectsDetail from "./ProjectsDetail";
 import { useToast, ToastContainer } from "../../../components/admin/ToastAdmin";
 
+// Tipe data project yang ditampilkan di tabel
 type Project = {
   id: number;
   name: string;
@@ -222,6 +223,7 @@ function FieldRow({
 }) {
   return (
     <div
+      className="pt-field-row"
       style={{
         display: "grid",
         gridTemplateColumns: "140px 1fr",
@@ -266,7 +268,6 @@ export default function ProjectsTable({
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
   const [confirmDelete, setConfirmDelete] = useState<Project | null>(null);
 
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -275,6 +276,10 @@ export default function ProjectsTable({
   const [editThumbnail, setEditThumbnail] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  /**
+   * Mengambil seluruh data project dari API internal (/api/project),
+   * kemudian memetakan respons ke format tipe Project untuk ditampilkan di tabel.
+   */
   const fetchProjects = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -312,6 +317,10 @@ export default function ProjectsTable({
     setConfirmDelete(project);
   }
 
+  /**
+   * Mengirim permintaan DELETE ke API (/api/project/:id)
+   * setelah pengguna mengonfirmasi penghapusan melalui dialog.
+   */
   async function handleConfirmDelete() {
     if (!confirmDelete) return;
     const id = confirmDelete.id;
@@ -348,6 +357,10 @@ export default function ProjectsTable({
     setEditThumbnail(null);
   }
 
+  /**
+   * Mengirim permintaan PUT ke API (/api/project/:id) dengan data yang telah diubah,
+   * kemudian memuat ulang daftar project setelah pembaruan berhasil.
+   */
   async function handleSaveEdit() {
     if (!editingProject) return;
     setIsSaving(true);
@@ -384,6 +397,7 @@ export default function ProjectsTable({
     ...Array.from(new Set(projects.map((p) => p.category))),
   ];
 
+  // Filter project berdasarkan kategori dan kata kunci pencarian
   const filtered = projects.filter((p) => {
     const matchCategory =
       filterCategory === "All" || p.category === filterCategory;
@@ -401,6 +415,7 @@ export default function ProjectsTable({
     return matchCategory && matchSearch;
   });
 
+  // Kalkulasi total halaman dan data yang ditampilkan per halaman
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -456,6 +471,284 @@ export default function ProjectsTable({
     cursor: "default",
   };
 
+  function MobileProjectCard({
+    project,
+    index,
+  }: {
+    project: Project;
+    index: number;
+  }) {
+    const cat = getCategoryColor(project.category);
+    const isDeleting = deletingId === project.id;
+    const invoiceNum = `INV-${String((page - 1) * ITEMS_PER_PAGE + index + 1).padStart(3, "0")}`;
+
+    return (
+      <div
+        style={{
+          background: "#fff",
+          borderBottom: "1px solid #f1f5f9",
+          padding: "16px 18px",
+          opacity: isDeleting ? 0 : 1,
+          transition: "opacity 0.35s",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "13px",
+              fontWeight: 700,
+              color: "#1A56DB",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {invoiceNum}
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              fontSize: "12px",
+              fontWeight: 600,
+              color: "#059669",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            <span
+              style={{
+                width: "7px",
+                height: "7px",
+                borderRadius: "50%",
+                background: "#059669",
+                display: "inline-block",
+              }}
+            />
+            Active
+          </span>
+        </div>
+
+        <p
+          style={{
+            margin: "0 0 10px",
+            fontSize: "14.5px",
+            fontWeight: 600,
+            color: "#0f172a",
+            fontFamily: "'Inter', sans-serif",
+            lineHeight: 1.3,
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedProject(project)}
+        >
+          {project.name}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "12px",
+          }}
+        >
+          <span
+            style={{
+              background: cat.bg,
+              color: cat.color,
+              fontSize: "11.5px",
+              fontWeight: 600,
+              fontFamily: "'Inter', sans-serif",
+              padding: "3px 10px",
+              borderRadius: "6px",
+            }}
+          >
+            {project.category}
+          </span>
+          <span
+            style={{
+              fontSize: "14px",
+              fontWeight: 700,
+              color: "#0f172a",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {project.price}
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingTop: "10px",
+            borderTop: "1px solid #f8fafc",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "12px",
+                color: "#64748b",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 500,
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#94a3b8"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+              </svg>
+              {project.totalData.toLocaleString()}
+            </span>
+            <span
+              style={{
+                fontSize: "12px",
+                color: "#94a3b8",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {project.projectDate}
+            </span>
+            <span
+              style={{
+                fontSize: "10px",
+                color: "#cbd5e1",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              •
+            </span>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "3px",
+                fontSize: "11px",
+                color: "#94a3b8",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#cbd5e1"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              {project.date}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: "6px" }}>
+            <button
+              onClick={() => setSelectedProject(project)}
+              style={{
+                background: "#EBF3FF",
+                color: "#1A56DB",
+                border: "none",
+                borderRadius: "8px",
+                padding: "6px 14px",
+                fontSize: "12px",
+                fontWeight: 600,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+              }}
+            >
+              Detail
+            </button>
+            <button
+              onClick={() => openEdit(project)}
+              style={{
+                background: "#F8FAFF",
+                color: "#64748b",
+                border: "1px solid #e2e8f0",
+                borderRadius: "8px",
+                padding: "6px 10px",
+                fontSize: "12px",
+                fontWeight: 600,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => requestDelete(project)}
+              style={{
+                background: "#FFF5F5",
+                color: "#ef4444",
+                border: "none",
+                borderRadius: "8px",
+                padding: "6px 10px",
+                fontSize: "12px",
+                fontWeight: 600,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
@@ -485,13 +778,14 @@ export default function ProjectsTable({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "24px",
           }}
+          className="pt-edit-overlay"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeEdit();
           }}
         >
           <div
+            className="pt-edit-box"
             style={{
               background: "#fff",
               borderRadius: "20px",
@@ -537,6 +831,7 @@ export default function ProjectsTable({
                     {editingProject.name}
                   </p>
                 </div>
+
                 <button
                   onClick={closeEdit}
                   style={{
@@ -568,7 +863,7 @@ export default function ProjectsTable({
               </div>
             </div>
 
-            <div style={{ padding: "8px 28px 24px" }}>
+            <div className="pt-edit-body" style={{ padding: "8px 28px 24px" }}>
               <FieldRow label="Project Name">
                 <input
                   readOnly
@@ -781,6 +1076,7 @@ export default function ProjectsTable({
         }}
       >
         <div
+          className="pt-filter-bar"
           style={{
             padding: "18px 22px",
             borderBottom: "1px solid #f1f5f9",
@@ -844,6 +1140,7 @@ export default function ProjectsTable({
                   setSearch(e.target.value);
                   setPage(1);
                 }}
+                className="pt-search-input"
                 style={{
                   background: "#F8FAFF",
                   border: "1px solid #BFDBFE",
@@ -889,7 +1186,7 @@ export default function ProjectsTable({
           </span>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
+        <div className="pt-desktop-table" style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#F8FAFF" }}>
@@ -926,7 +1223,7 @@ export default function ProjectsTable({
               {isLoading && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     style={{
                       padding: "48px",
                       textAlign: "center",
@@ -1057,6 +1354,7 @@ export default function ProjectsTable({
                       >
                         {project.projectDate}
                       </td>
+
                       <td
                         style={{
                           padding: "14px 18px",
@@ -1070,11 +1368,16 @@ export default function ProjectsTable({
                       </td>
 
                       <td
+                        className="pt-action-cell"
                         style={{ padding: "14px 18px", whiteSpace: "nowrap" }}
                       >
-                        <div style={{ display: "flex", gap: "8px" }}>
+                        <div
+                          className="pt-action-group"
+                          style={{ display: "flex", gap: "8px" }}
+                        >
                           <button
                             onClick={() => setSelectedProject(project)}
+                            className="pt-btn-detail"
                             style={{
                               background: "#EBF3FF",
                               color: "#1A56DB",
@@ -1117,11 +1420,12 @@ export default function ProjectsTable({
                               <circle cx="11" cy="11" r="8" />
                               <line x1="21" y1="21" x2="16.65" y2="16.65" />
                             </svg>
-                            Detail
+                            <span className="pt-btn-label">Detail</span>
                           </button>
 
                           <button
                             onClick={() => openEdit(project)}
+                            className="pt-btn-edit"
                             style={{
                               background: "#F8FAFF",
                               color: "#64748b",
@@ -1160,11 +1464,12 @@ export default function ProjectsTable({
                               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
-                            Edit
+                            <span className="pt-btn-label">Edit</span>
                           </button>
 
                           <button
                             onClick={() => requestDelete(project)}
+                            className="pt-btn-delete"
                             style={{
                               background: "#FFF5F5",
                               color: "#ef4444",
@@ -1209,7 +1514,7 @@ export default function ProjectsTable({
                               <path d="M10 11v6M14 11v6" />
                               <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                             </svg>
-                            Hapus
+                            <span className="pt-btn-label">Hapus</span>
                           </button>
                         </div>
                       </td>
@@ -1257,8 +1562,88 @@ export default function ProjectsTable({
           )}
         </div>
 
+        <div className="pt-mobile-cards">
+          {isLoading && (
+            <div
+              style={{
+                padding: "48px",
+                textAlign: "center",
+                color: "#94a3b8",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "14px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#BFDBFE"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ animation: "spin 1s linear infinite" }}
+                >
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                <span>Memuat data...</span>
+              </div>
+            </div>
+          )}
+
+          {!isLoading && filtered.length === 0 && (
+            <div
+              style={{
+                padding: "48px",
+                textAlign: "center",
+                color: "#94a3b8",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "14px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#BFDBFE"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  <line x1="8" y1="11" x2="14" y2="11" />
+                </svg>
+                <span>Tidak ada project ditemukan.</span>
+              </div>
+            </div>
+          )}
+
+          {!isLoading &&
+            paginated.map((project, i) => (
+              <MobileProjectCard key={project.id} project={project} index={i} />
+            ))}
+        </div>
+
         {totalPages > 1 && (
           <div
+            className="pt-pagination"
             style={{
               padding: "16px 22px",
               borderTop: "1px solid #f1f5f9",
@@ -1306,10 +1691,84 @@ export default function ProjectsTable({
         )}
       </div>
 
+      {/* ── Responsive CSS & Animasi ── */}
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          to   { transform: rotate(360deg); }
+        }
+
+        .pt-desktop-table { display: block; }
+        .pt-mobile-cards  { display: none; }
+
+        @media (max-width: 768px) {
+          .pt-desktop-table { display: none !important; }
+          .pt-mobile-cards  { display: block !important; }
+
+          .pt-edit-overlay {
+            padding: 16px !important;
+          }
+
+          .pt-edit-box {
+            max-height: 92vh !important;
+            overflow-y: auto !important;
+            border-radius: 16px !important;
+          }
+
+          .pt-edit-body {
+            padding: 8px 18px 20px !important;
+          }
+
+          .pt-field-row {
+            grid-template-columns: 1fr !important;
+            gap: 6px !important;
+          }
+
+          .pt-search-input {
+            width: 180px !important;
+          }
+
+          .pt-pagination {
+            flex-wrap: wrap !important;
+            padding: 12px 16px !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .pt-filter-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 14px 16px !important;
+          }
+
+          .pt-search-input {
+            width: 100% !important;
+          }
+
+          .pt-btn-label {
+            display: none;
+          }
+
+          .pt-btn-detail,
+          .pt-btn-edit,
+          .pt-btn-delete {
+            padding: 6px 8px !important;
+          }
+
+          .pt-action-group {
+            gap: 5px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .pt-edit-body {
+            padding: 8px 14px 16px !important;
+          }
+
+          .pt-edit-box {
+            max-height: 96vh !important;
+            border-radius: 12px !important;
+          }
         }
       `}</style>
     </>

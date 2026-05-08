@@ -41,7 +41,6 @@ export default function ProjectsPage() {
 
   const [fastapiProjects, setFastapiProjects] = useState<FastApiProject[]>([]);
   const [metaLoading, setMetaLoading] = useState(false);
-
   const [selectedDbId, setSelectedDbId] = useState("");
   const [autoFilled, setAutoFilled] = useState<FastApiProject | null>(null);
   const [price, setPrice] = useState("");
@@ -94,6 +93,7 @@ export default function ProjectsPage() {
     },
   ];
 
+  // Fetch jumlah project & kategori untuk kartu statistik
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
@@ -109,6 +109,7 @@ export default function ProjectsPage() {
       .catch(() => {});
   }, [refreshKey]);
 
+  // Fetch daftar dataset dari FastAPI saat modal Add dibuka
   useEffect(() => {
     if (!showAdd) return;
     setMetaLoading(true);
@@ -119,19 +120,21 @@ export default function ProjectsPage() {
       .finally(() => setMetaLoading(false));
   }, [showAdd]);
 
+  // Auto-fill form saat user memilih dataset dari dropdown
   useEffect(() => {
     if (!selectedDbId) {
       setAutoFilled(null);
-      setPrice(""); 
+      setPrice("");
       return;
     }
     const found = fastapiProjects.find((p) => p.db_id === selectedDbId);
     setAutoFilled(found || null);
     if (found) {
-      setPrice(String(found.total_data * 1000)); 
+      setPrice(String(found.total_data * 1000));
     }
   }, [selectedDbId, fastapiProjects]);
 
+  // Reset semua field form ke kondisi awal
   function resetForm() {
     setSelectedDbId("");
     setAutoFilled(null);
@@ -140,6 +143,7 @@ export default function ProjectsPage() {
     setThumbnailFile(null);
   }
 
+  // Kirim data project baru ke API
   async function handleSave() {
     if (!autoFilled) {
       alert("Pilih dataset terlebih dahulu.");
@@ -193,6 +197,7 @@ export default function ProjectsPage() {
       }}
     >
       <div
+        className="prj-topbar"
         style={{
           background: "#fff",
           borderBottom: "1px solid #f1f5f9",
@@ -223,8 +228,10 @@ export default function ProjectsPage() {
             Projects
           </span>
         </div>
+
         <button
           onClick={() => setShowAdd(true)}
+          className="prj-add-btn"
           style={{
             display: "flex",
             alignItems: "center",
@@ -260,12 +267,12 @@ export default function ProjectsPage() {
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Add New Project
+          <span className="prj-add-btn-text">Add New Project</span>
         </button>
       </div>
 
-      <div style={{ padding: "32px" }}>
-        <div style={{ marginBottom: "28px" }}>
+      <div className="prj-content" style={{ padding: "32px" }}>
+        <div className="prj-page-header" style={{ marginBottom: "28px" }}>
           <h1
             style={{
               margin: "0 0 4px",
@@ -283,6 +290,7 @@ export default function ProjectsPage() {
         </div>
 
         <div
+          className="prj-stats-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
@@ -372,42 +380,45 @@ export default function ProjectsPage() {
       </div>
 
       {showAdd && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(15,23,42,0.45)",
-            zIndex: 50,
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            padding: "24px",
-            paddingTop: "80px",
-            overflowY: "auto",
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
+        <>
+          <div
+            className="prj-modal-overlay"
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(15,23,42,0.5)",
+              zIndex: 50,
+            }}
+            onClick={() => {
               setShowAdd(false);
               resetForm();
-            }
-          }}
-        >
+            }}
+          />
+
           <div
+            className="prj-modal-box"
             style={{
+              position: "fixed",
+              zIndex: 51,
               background: "#fff",
-              borderRadius: "20px",
-              width: "100%",
-              maxWidth: "540px",
-              maxHeight: "90vh",
-              overflowY: "auto",
               boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
-              marginBottom: "24px",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "90%",
+              maxWidth: "540px",
+              maxHeight: "88vh",
+              overflowY: "auto",
+              borderRadius: "20px",
             }}
           >
             <div
               style={{
                 background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
                 padding: "22px 28px",
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
               }}
             >
               <div
@@ -454,6 +465,7 @@ export default function ProjectsPage() {
                     justifyContent: "center",
                     cursor: "pointer",
                     color: "#fff",
+                    flexShrink: 0,
                   }}
                 >
                   <svg
@@ -473,6 +485,7 @@ export default function ProjectsPage() {
             </div>
 
             <div
+              className="prj-modal-body"
               style={{
                 padding: "24px 28px",
                 display: "flex",
@@ -538,6 +551,7 @@ export default function ProjectsPage() {
                   </div>
 
                   <div
+                    className="prj-autofill-3col"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1fr 1fr 1fr",
@@ -546,27 +560,15 @@ export default function ProjectsPage() {
                   >
                     <div>
                       <label style={labelStyle}>Category</label>
-                      <input
-                        readOnly
-                        value={autoFilled.category}
-                        style={readonlyStyle}
-                      />
+                      <input readOnly value={autoFilled.category} style={readonlyStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>City</label>
-                      <input
-                        readOnly
-                        value={autoFilled.regency}
-                        style={readonlyStyle}
-                      />
+                      <input readOnly value={autoFilled.regency} style={readonlyStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Total Data</label>
-                      <input
-                        readOnly
-                        value={autoFilled.total_data.toLocaleString()}
-                        style={readonlyStyle}
-                      />
+                      <input readOnly value={autoFilled.total_data.toLocaleString()} style={readonlyStyle} />
                     </div>
                   </div>
 
@@ -579,19 +581,11 @@ export default function ProjectsPage() {
                   >
                     <div>
                       <label style={labelStyle}>Province</label>
-                      <input
-                        readOnly
-                        value={autoFilled.province}
-                        style={readonlyStyle}
-                      />
+                      <input readOnly value={autoFilled.province} style={readonlyStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Project Date</label>
-                      <input
-                        readOnly
-                        value={autoFilled.date}
-                        style={readonlyStyle}
-                      />
+                      <input readOnly value={autoFilled.date} style={readonlyStyle} />
                     </div>
                   </div>
 
@@ -633,6 +627,7 @@ export default function ProjectsPage() {
                 </div>
               )}
 
+              {/* Input harga manual */}
               <div>
                 <label style={labelStyle}>Price (Rp)</label>
                 <div style={{ position: "relative" }}>
@@ -658,6 +653,7 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
+              {/* Input deskripsi project */}
               <div>
                 <label style={labelStyle}>Description</label>
                 <textarea
@@ -669,6 +665,7 @@ export default function ProjectsPage() {
                 />
               </div>
 
+              {/* Upload thumbnail project */}
               <div>
                 <label style={labelStyle}>Thumbnail</label>
                 <label
@@ -757,8 +754,81 @@ export default function ProjectsPage() {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
+
+      {/* ── Responsive CSS ── */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .prj-stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .prj-topbar {
+            padding: 0 16px !important;
+            height: 56px !important;
+          }
+          .prj-content {
+            padding: 20px 16px !important;
+          }
+          .prj-page-header {
+            margin-bottom: 20px !important;
+          }
+          .prj-stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+            margin-bottom: 20px !important;
+          }
+
+          .prj-modal-box {
+            top: auto !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            transform: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            max-height: 92vh !important;
+            border-radius: 20px 20px 0 0 !important;
+          }
+
+          .prj-modal-body {
+            padding: 18px 18px !important;
+          }
+          .prj-autofill-3col {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .prj-topbar {
+            padding: 0 12px !important;
+          }
+          .prj-add-btn-text {
+            display: none;
+          }
+          .prj-add-btn {
+            padding: 9px 12px !important;
+          }
+          .prj-content {
+            padding: 16px 12px !important;
+          }
+          .prj-stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .prj-modal-body {
+            padding: 14px 14px !important;
+          }
+
+          /* [DIUBAH] Kolom autofill jadi 1 di layar sangat kecil */
+          .prj-autofill-3col {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
