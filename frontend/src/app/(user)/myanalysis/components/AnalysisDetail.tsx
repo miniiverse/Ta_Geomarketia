@@ -101,7 +101,16 @@ function StatCard({
           {value}
         </div>
         {sub && (
-          <div style={{ fontSize: 11, color: "#64748B", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#64748B",
+              marginTop: 3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {sub}
           </div>
         )}
@@ -282,7 +291,7 @@ function ClusterStatsCard({
                 <span
                   style={{ fontSize: 10.5, color: "#15803D", fontWeight: 600 }}
                 >
-                  {s.openNow} buka skrg
+                  {s.openNow} open now
                 </span>
               </div>
             )}
@@ -336,7 +345,7 @@ function NearbyList({
       >
         <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
         <div style={{ fontSize: 13, color: "#64748B" }}>
-          Tidak ada bisnis dalam radius ini
+          No businesses found in this area. Try expanding the radius or selecting a different cluster?
         </div>
       </div>
     );
@@ -632,7 +641,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span style={{ display: "var(--back-label-display, inline)" }}>Back</span>
+            <span className="back-label">Back</span>
           </button>
 
           <div
@@ -693,7 +702,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 alignItems: "center",
                 gap: 6,
                 marginTop: 1,
-                flexWrap: "wrap",
               }}
             >
               <svg
@@ -705,15 +713,32 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ flexShrink: 0 }}
               >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              <span style={{ fontSize: 11, color: "#64748B" }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#64748B",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {analysis.location}
               </span>
-              <span style={{ fontSize: 11, color: "#CBD5E1" }}>·</span>
-              <span style={{ fontSize: 11, color: "#94A3B8" }}>
+              <span
+                className="header-date-sep"
+                style={{ fontSize: 11, color: "#CBD5E1", flexShrink: 0 }}
+              >
+                ·
+              </span>
+              <span
+                className="header-date"
+                style={{ fontSize: 11, color: "#94A3B8", flexShrink: 0 }}
+              >
                 {analysis.date}
               </span>
             </div>
@@ -721,6 +746,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
 
           {analysis.score > 0 && (
             <div
+              className="score-badge"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -745,8 +771,15 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#15803D", whiteSpace: "nowrap" }}>
-                {businesses.length} bisnis
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "#15803D",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {businesses.length} businesses
               </span>
             </div>
           )}
@@ -963,7 +996,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                     flexShrink: 0,
                   }}
                 >
-                  Radius Analisis
+                  Analysis Radius
                 </span>
               </div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
@@ -1032,7 +1065,8 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
                 gap: 16,
               }}
             >
@@ -1085,7 +1119,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                   <span
                     style={{ fontSize: 13, fontWeight: 700, color: "#1E293B" }}
                   >
-                    Bisnis Terdekat
+                    Nearby Businesses
                   </span>
                   <div
                     style={{
@@ -1337,13 +1371,19 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               </span>
               {selectedCluster && (
                 <>
-                  <span style={{ fontSize: 12, color: "#64748B", flexShrink: 0 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#64748B",
+                      flexShrink: 0,
+                    }}
+                  >
                     ·{" "}
                     {
                       businesses.filter((b) => b.area === selectedCluster)
                         .length
                     }{" "}
-                    bisnis
+                    business
                   </span>
                   <button
                     onClick={() => setSelectedCluster(null)}
@@ -1437,10 +1477,10 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                     color: "#1E293B",
                   }}
                 >
-                  Distribusi Cluster
+                  Cluster Distribution
                 </span>
                 <span style={{ fontSize: 12, color: "#94A3B8" }}>
-                  Klik kartu untuk filter peta
+                  Click cards to filter map
                 </span>
               </div>
               <ClusterStatsCard
@@ -1463,8 +1503,11 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
         ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
 
-        @media (max-width: 480px) {
-          [data-score-badge] { display: none !important; }
+        @media (max-width: 540px) {
+          .header-date-sep,
+          .header-date { display: none !important; }
+          .score-badge { display: none !important; }
+          .back-label { display: none !important; }
         }
       `}</style>
     </div>
