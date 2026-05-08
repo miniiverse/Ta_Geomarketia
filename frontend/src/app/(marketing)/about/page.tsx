@@ -219,7 +219,6 @@ function VisionMission() {
         </div>
 
         <div className="vm-divider" />
-
         <div className="vm-row">
           <div ref={missionLabel} className="vm-label-col">
             <div className="vm-icon">

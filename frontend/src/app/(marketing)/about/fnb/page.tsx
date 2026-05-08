@@ -4,8 +4,6 @@ import { useRef, useState, useEffect } from "react";
 import ContactSection from "../../../components/user/ContactSection";
 import CTASection from "../../../components/user/CTASection";
 
-
-
 function FnbIcon() {
     return (
       <div
@@ -32,15 +30,17 @@ function FnbIcon() {
               <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.35" />
               <stop offset="100%" stopColor="#1A56DB" stopOpacity="0.15" />
             </linearGradient>
+
             <linearGradient id="fnbWin2" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#34D399" stopOpacity="0.3" />
               <stop offset="100%" stopColor="#059669" stopOpacity="0.12" />
             </linearGradient>
+
             <linearGradient id="fnbWin3" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#818CF8" stopOpacity="0.3" />
               <stop offset="100%" stopColor="#4F46E5" stopOpacity="0.12" />
             </linearGradient>
-           
+
             <linearGradient id="fnbGround" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#0B1E5B" stopOpacity="0.9" />
               <stop offset="100%" stopColor="#040F2E" stopOpacity="0" />
@@ -81,7 +81,6 @@ function FnbIcon() {
           <ellipse cx="270" cy="338" rx="80" ry="14" fill="#059669" opacity="0.16" style={{filter:"blur(12px)"}}/>
           <ellipse cx="400" cy="338" rx="85" ry="15" fill="#4F46E5" opacity="0.17" style={{filter:"blur(12px)"}}/>
   
-        
           <rect x="40" y="100" width="168" height="240" rx="6" fill="url(#fnbBldg1)" stroke="rgba(96,165,250,0.25)" strokeWidth="1"/>
           <rect x="40" y="100" width="168" height="8" rx="3" fill="#1A56DB" opacity="0.75"/>
       
@@ -125,7 +124,6 @@ function FnbIcon() {
           <rect x="203" y="237" width="5" height="14" rx="2" fill="rgba(96,165,250,0.5)"/>
           <ellipse cx="205" cy="237" rx="5" ry="3" fill="#60A5FA" opacity="0.75" style={{animation:"fnbLamp 2s 0.3s ease-in-out infinite"}}/>
   
-        
           <rect x="185" y="78" width="166" height="262" rx="6" fill="url(#fnbBldg2)" stroke="rgba(52,211,153,0.22)" strokeWidth="1"/>
           <rect x="185" y="78" width="166" height="8" rx="3" fill="#059669" opacity="0.78"/>
           
@@ -170,7 +168,6 @@ function FnbIcon() {
           <rect x="349" y="241" width="5" height="14" rx="2" fill="rgba(52,211,153,0.5)"/>
           <ellipse cx="351" cy="241" rx="5" ry="3" fill="#34D399" opacity="0.75" style={{animation:"fnbLamp 2.2s 0.5s ease-in-out infinite"}}/>
   
-         
           <rect x="330" y="108" width="170" height="232" rx="6" fill="url(#fnbBldg3)" stroke="rgba(129,140,248,0.22)" strokeWidth="1"/>
           <rect x="330" y="108" width="170" height="8" rx="3" fill="#4F46E5" opacity="0.72"/>
           
@@ -219,7 +216,6 @@ function FnbIcon() {
           <rect x="494" y="247" width="5" height="14" rx="2" fill="rgba(129,140,248,0.5)"/>
           <ellipse cx="496" cy="247" rx="5" ry="3" fill="#818CF8" opacity="0.75" style={{animation:"fnbLamp 1.9s 1.1s ease-in-out infinite"}}/>
   
-        
           <g style={{animation:"fnbBadgeFloat 3.5s ease-in-out infinite"}}>
             <rect x="4" y="44" width="132" height="48" rx="10" fill="rgba(8,18,60,0.93)" stroke="rgba(96,165,250,0.45)" strokeWidth="1"/>
             <text x="16" y="63" fontSize="8" fontWeight="600" fill="rgba(255,255,255,0.38)" fontFamily="'Inter',sans-serif" letterSpacing="0.06em">FOOT TRAFFIC</text>
@@ -255,7 +251,6 @@ function FnbIcon() {
       </div>
     );
   }
-
 
 function useSlideIn(direction: "left" | "right", delay = 0) {
   const ref = useRef<HTMLDivElement>(null);

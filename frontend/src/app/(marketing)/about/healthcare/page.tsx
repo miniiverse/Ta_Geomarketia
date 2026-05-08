@@ -4,8 +4,6 @@ import { useRef, useState, useEffect } from "react";
 import ContactSection from "../../../components/user/ContactSection";
 import CTASection from "../../../components/user/CTASection";
 
-
-
 function HealthcareIcon() {
     return (
       <div
@@ -40,8 +38,7 @@ function HealthcareIcon() {
               <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
             </radialGradient>
           </defs>
-  
-         
+ 
           {[80, 160, 240, 320, 400, 480].map((x, i) => (
             <line key={`v${i}`} x1={x} y1="20" x2={x} y2="410" stroke="#3B82F6" strokeWidth="0.4" opacity="0.08" />
           ))}
@@ -60,8 +57,7 @@ function HealthcareIcon() {
   
           <circle cx="330" cy="120" r="70" fill="url(#z3)" />
           <circle cx="330" cy="120" r="70" stroke="#7C3AED" strokeWidth="1" strokeDasharray="5 4" opacity="0.25" />
-  
-        
+
           <line x1="200" y1="230" x2="330" y2="120" stroke="#60A5FA" strokeWidth="1" strokeDasharray="5 4" opacity="0.35" />
           <line x1="330" y1="120" x2="390" y2="260" stroke="#60A5FA" strokeWidth="1" strokeDasharray="5 4" opacity="0.35" />
           <line x1="200" y1="230" x2="390" y2="260" stroke="#60A5FA" strokeWidth="1.5" strokeDasharray="5 4" opacity="0.28" />
@@ -77,16 +73,14 @@ function HealthcareIcon() {
           <circle cx="183" cy="262" r="4" fill="#60A5FA" opacity="0.6" />
           <circle cx="165" cy="243" r="3.5" fill="#60A5FA" opacity="0.4" />
           <circle cx="122" cy="262" r="4" fill="#60A5FA" opacity="0.5" />
-  
-         
+
           <circle cx="430" cy="295" r="5" fill="#34D399" opacity="0.65" />
           <circle cx="415" cy="308" r="4" fill="#34D399" opacity="0.5" />
           <circle cx="445" cy="312" r="4" fill="#34D399" opacity="0.55" />
           <circle cx="425" cy="278" r="4" fill="#34D399" opacity="0.45" />
           <circle cx="455" cy="300" r="3.5" fill="#34D399" opacity="0.4" />
           <circle cx="410" cy="288" r="3" fill="#34D399" opacity="0.5" />
-  
-        
+
           <circle cx="100" cy="340" r="5" fill="#60A5FA" opacity="0.55" />
           <circle cx="113" cy="355" r="4" fill="#60A5FA" opacity="0.4" />
           <circle cx="480" cy="360" r="5" fill="#34D399" opacity="0.55" />
@@ -110,8 +104,7 @@ function HealthcareIcon() {
           <rect x="216" y="178" width="80" height="22" rx="6" fill="rgba(8,18,60,0.9)" />
           <rect x="216" y="178" width="80" height="22" rx="6" stroke="#1A56DB" strokeWidth="1" fill="none" opacity="0.6" />
           <text x="256" y="193" textAnchor="middle" fontFamily="'Inter',sans-serif" fontSize="10" fontWeight="700" fill="#93C5FD">Hospital</text>
-  
-        
+
           <g style={{ animation: "hcPinFloat 3.6s 0.9s ease-in-out infinite" }}>
             <ellipse cx="390" cy="270" rx="11" ry="4.5" fill="#059669" opacity="0.22" />
             <path d="M390 212 C377 212 367 223 367 234 C367 251 390 270 390 270 C390 270 413 251 413 234 C413 223 403 212 390 212Z" fill="#059669" />
@@ -125,7 +118,6 @@ function HealthcareIcon() {
           <rect x="406" y="215" width="60" height="22" rx="6" stroke="#059669" strokeWidth="1" fill="none" opacity="0.6" />
           <text x="436" y="230" textAnchor="middle" fontFamily="'Inter',sans-serif" fontSize="10" fontWeight="700" fill="#6EE7B7">Clinic</text>
   
-        
           <g style={{ animation: "hcPinFloat 2.9s 1.5s ease-in-out infinite" }}>
             <ellipse cx="330" cy="129" rx="10" ry="4" fill="#7C3AED" opacity="0.22" />
             <path d="M330 72 C319 72 310 81 310 92 C310 107 330 127 330 127 C330 127 350 107 350 92 C350 81 341 72 330 72Z" fill="#7C3AED" />
@@ -139,7 +131,6 @@ function HealthcareIcon() {
           <rect x="346" y="74" width="86" height="22" rx="6" stroke="#7C3AED" strokeWidth="1" fill="none" opacity="0.6" />
           <text x="389" y="89" textAnchor="middle" fontFamily="'Inter',sans-serif" fontSize="10" fontWeight="700" fill="#C4B5FD">Pharmacy</text>
   
-       
           <g style={{ animation: "hcBadgeFloat 3.5s ease-in-out infinite" }}>
             <rect x="20" y="28" width="148" height="52" rx="10" fill="rgba(8,18,60,0.93)" stroke="rgba(96,165,250,0.45)" strokeWidth="1" />
             <text x="32" y="47" fontSize="8" fontWeight="600" fill="rgba(255,255,255,0.38)" fontFamily="'Inter',sans-serif" letterSpacing="0.06em">CATCHMENT AREA</text>
