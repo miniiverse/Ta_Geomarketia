@@ -394,7 +394,7 @@ export default function LoginPage() {
           zIndex: 10,
           width: "100%",
           maxWidth: 440,
-          margin: "0 24px",
+          margin: "0 clamp(12px, 4vw, 24px)",
           background: "rgba(255,255,255,0.97)",
           borderRadius: 20,
           boxShadow:
@@ -410,7 +410,7 @@ export default function LoginPage() {
           }}
         />
 
-        <div style={{ padding: "36px 40px 40px" }}>
+        <div style={{ padding: "clamp(24px, 5vw, 36px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 40px)", }}>
           <div
             style={{
               display: "flex",
@@ -449,7 +449,7 @@ export default function LoginPage() {
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 fontWeight: 700,
-                fontSize: 28,
+                fontSize: "clamp(22px, 5vw, 28px)",
                 color: C.text,
                 letterSpacing: "-0.04em",
                 margin: "0 0 6px",
@@ -700,7 +700,7 @@ export default function LoginPage() {
           style={{
             background: C.blueLight,
             borderTop: `1px solid ${C.border}`,
-            padding: "10px 40px",
+            padding: "10px clamp(20px, 5vw, 40px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

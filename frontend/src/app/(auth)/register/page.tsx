@@ -449,7 +449,7 @@ export default function RegisterPage() {
           zIndex: 10,
           width: "100%",
           maxWidth: 440,
-          margin: "0 24px",
+          margin: "0 clamp(12px, 4vw, 24px)",
           background: "rgba(255,255,255,0.97)",
           borderRadius: 20,
           boxShadow:
@@ -465,7 +465,7 @@ export default function RegisterPage() {
           }}
         />
 
-        <div style={{ padding: "36px 40px 40px" }}>
+        <div style={{ padding: "clamp(24px, 5vw, 36px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 40px)", }}>
           <div
             style={{
               display: "flex",
@@ -794,7 +794,7 @@ export default function RegisterPage() {
           style={{
             background: C.blueLight,
             borderTop: `1px solid ${C.border}`,
-            padding: "10px 40px",
+            padding: "10px clamp(20px, 5vw, 40px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

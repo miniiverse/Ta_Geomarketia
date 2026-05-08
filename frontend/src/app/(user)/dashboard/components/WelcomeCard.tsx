@@ -19,6 +19,7 @@ export default function WelcomeCard() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [initials, setInitials] = useState<string>("U");
 
+  // Fetch user info on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -50,7 +51,6 @@ export default function WelcomeCard() {
           setPhotoUrl(user.profile_photo);
         }
       } catch {
-        // gagal fetch — biarkan default value
       }
     };
 
