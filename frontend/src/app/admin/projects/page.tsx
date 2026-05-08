@@ -47,6 +47,9 @@ export default function ProjectsPage() {
   const [description, setDescription] = useState("");
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
+  // Menyimpan set db_id yang sudah dipakai sebagai project
+  const [usedDbIds, setUsedDbIds] = useState<Set<string>>(new Set());
+
   const labelStyle: React.CSSProperties = {
     display: "block",
     fontSize: "12px",
@@ -93,18 +96,35 @@ export default function ProjectsPage() {
     },
   ];
 
-  // Fetch jumlah project & kategori untuk kartu statistik
+  /**
+   * Fetch jumlah project & kategori untuk kartu statistik.
+   * Sekaligus ekstrak db_id dari api_url setiap project yang sudah ada,
+   * untuk dipakai sebagai daftar dataset yang sudah digunakan.
+   */
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
       .then((json) => {
         const data = json.data || [];
         setTotalProjects(data.length);
+
         const uniqueCats = [
           ...new Set(data.map((p: any) => p.category?.name).filter(Boolean)),
         ] as string[];
         setTotalCategories(uniqueCats.length);
         setCategoryNames(uniqueCats.join(" · "));
+
+        // Format api_url: http://127.0.0.1:8080/api/v1/{db_id}/places
+        const ids = new Set<string>(
+          data
+            .map((p: any) => {
+              if (!p.api_url) return null;
+              const match = p.api_url.match(/\/api\/v1\/([^/]+)\/places/);
+              return match ? match[1] : null;
+            })
+            .filter(Boolean) as string[]
+        );
+        setUsedDbIds(ids);
       })
       .catch(() => {});
   }, [refreshKey]);
@@ -150,6 +170,12 @@ export default function ProjectsPage() {
       return;
     }
 
+    // Guard: pastikan dataset belum digunakan (double-check di sisi client)
+    if (usedDbIds.has(autoFilled.db_id)) {
+      alert(`Dataset "${autoFilled.project_name}" sudah digunakan sebagai project.`);
+      return;
+    }
+
     const resolvedCategoryId = CATEGORY_MAP[autoFilled.category] ?? null;
     const resolvedCityId = CITY_MAP[autoFilled.regency] ?? null;
 
@@ -187,6 +213,11 @@ export default function ProjectsPage() {
       setIsSaving(false);
     }
   }
+
+  // Hitung jumlah dataset yang sudah dipakai vs total tersedia
+  const availableCount = fastapiProjects.filter(
+    (p) => !usedDbIds.has(p.db_id)
+  ).length;
 
   return (
     <div
@@ -494,12 +525,87 @@ export default function ProjectsPage() {
               }}
             >
               <div>
-                <label style={labelStyle}>
-                  Dataset <span style={{ color: "#E24B4A" }}>*</span>
-                </label>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "6px",
+                  }}
+                >
+                  <label style={{ ...labelStyle, marginBottom: 0 }}>
+                    Dataset <span style={{ color: "#E24B4A" }}>*</span>
+                  </label>
+                  {!metaLoading && fastapiProjects.length > 0 && (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                        color: availableCount === 0 ? "#ef4444" : "#059669",
+                        background: availableCount === 0 ? "#fff5f5" : "#f0fdf4",
+                        border: `1px solid ${availableCount === 0 ? "#fecaca" : "#bbf7d0"}`,
+                        padding: "2px 8px",
+                        borderRadius: "20px",
+                      }}
+                    >
+                      {availableCount} of {fastapiProjects.length} available
+                    </span>
+                  )}
+                </div>
+
                 {metaLoading ? (
                   <div style={{ ...inputStyle, color: "#94a3b8" }}>
                     Loading dataset...
+                  </div>
+                ) : fastapiProjects.length === 0 ? (
+                  <div
+                    style={{
+                      ...inputStyle,
+                      color: "#94a3b8",
+                      background: "#f8fafc",
+                      textAlign: "center",
+                    }}
+                  >
+                    No datasets found from FastAPI.
+                  </div>
+                ) : availableCount === 0 ? (
+                  <div
+                    style={{
+                      padding: "14px 16px",
+                      borderRadius: "10px",
+                      border: "1px solid #fecaca",
+                      background: "#fff5f5",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "10px",
+                    }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#ef4444"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ flexShrink: 0, marginTop: "1px" }}
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span
+                      style={{
+                        fontSize: "13px",
+                        color: "#ef4444",
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 500,
+                      }}
+                    >
+                      All available datasets have already been added as projects.
+                    </span>
                   </div>
                 ) : (
                   <select
@@ -508,12 +614,24 @@ export default function ProjectsPage() {
                     style={inputStyle}
                   >
                     <option value="">-- Pilih Dataset --</option>
-                    {fastapiProjects.map((p) => (
-                      <option key={p.db_id} value={p.db_id}>
-                        {p.project_name} · {p.regency} (
-                        {p.total_data.toLocaleString()} data)
-                      </option>
-                    ))}
+                    {fastapiProjects.map((p) => {
+                      const isUsed = usedDbIds.has(p.db_id);
+                      return (
+                        <option
+                          key={p.db_id}
+                          value={p.db_id}
+                          disabled={isUsed}
+                          style={{
+                            color: isUsed ? "#cbd5e1" : "#0f172a",
+                          }}
+                        >
+                          {isUsed ? "✓ " : ""}
+                          {p.project_name} · {p.regency} (
+                          {p.total_data.toLocaleString()} data)
+                          {isUsed ? " — Already added" : ""}
+                        </option>
+                      );
+                    })}
                   </select>
                 )}
               </div>
@@ -735,18 +853,24 @@ export default function ProjectsPage() {
                 </button>
                 <button
                   onClick={handleSave}
-                  disabled={isSaving}
+                  disabled={isSaving || availableCount === 0 || !selectedDbId}
                   style={{
                     flex: 2,
                     padding: "10px",
                     borderRadius: "10px",
                     border: "none",
-                    background: isSaving ? "#93c5fd" : "#1A56DB",
+                    background:
+                      isSaving || availableCount === 0 || !selectedDbId
+                        ? "#93c5fd"
+                        : "#1A56DB",
                     color: "#fff",
                     fontSize: "13px",
                     fontWeight: 600,
                     fontFamily: "'Inter', sans-serif",
-                    cursor: isSaving ? "not-allowed" : "pointer",
+                    cursor:
+                      isSaving || availableCount === 0 || !selectedDbId
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 >
                   {isSaving ? "Menyimpan..." : "Save Project"}
@@ -822,8 +946,6 @@ export default function ProjectsPage() {
           .prj-modal-body {
             padding: 14px 14px !important;
           }
-
-          /* [DIUBAH] Kolom autofill jadi 1 di layar sangat kecil */
           .prj-autofill-3col {
             grid-template-columns: 1fr !important;
           }
