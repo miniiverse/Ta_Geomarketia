@@ -576,8 +576,13 @@ export default function AboutPage() {
         .wc-card-title { font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:#1A56DB; letter-spacing:-0.01em; line-height:1.3; }
         .wc-card-desc { font-family:'Inter',sans-serif; font-size:13.5px; color:#64748b; line-height:1.65; }
 
-        /* responsive */
-        @media (max-width:1024px) { .wd-grid, .wc-grid { grid-template-columns:repeat(2,1fr); } }
+
+        /* ── Tablet landscape (≤1024px) ── */
+        @media (max-width:1024px) {
+          .wd-grid, .wc-grid { grid-template-columns:repeat(2,1fr); }
+        }
+
+        /* ── Tablet portrait (≤900px) ── */
         @media (max-width:900px) {
           .gma-hero-inner { grid-template-columns:1fr; gap:40px; }
           .gma-hero { min-height:unset; padding:100px 0 60px; }
@@ -585,10 +590,98 @@ export default function AboutPage() {
           .vm-label-col { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
           .vm-label-bar { display:none; }
         }
+
+        /* ── Mobile (≤600px) ── */
         @media (max-width:600px) {
-          .gma-container, .vm-container, .wd-container, .wc-container { padding:0 20px; }
+          .gma-container,
+          .vm-container,
+          .wd-container,
+          .wc-container { padding:0 20px; }
+          .vm-section { padding:60px 0 72px; }
           .vm-card { padding:24px 20px; }
+          .vm-vision-text { font-size:15px; }
+          .vm-list-text { font-size:14px; }
+          .wd-section { padding:40px 0 80px; }
           .wd-grid, .wc-grid { grid-template-columns:1fr; }
+          .wd-header { margin-bottom:36px; }
+          .wc-section { padding:72px 0 72px; }
+          .wc-header { margin-bottom:36px; }
+        }
+
+        /* ── Small mobile (≤480px) ── */
+        @media (max-width:480px) {
+          .gma-container { padding:0 16px; }
+          .gma-hero { padding:80px 0 48px; }
+          .gma-hero-inner { gap:32px; padding:0; }
+
+          /* ClusterMap: scale down to fit narrow screens */
+          .gma-hero-inner > div:last-child {
+            transform: scale(0.72);
+            transform-origin: top center;
+            margin-bottom: -80px;
+          }
+
+          .vm-container,
+          .wd-container,
+          .wc-container { padding:0 16px; }
+          .vm-section { padding:48px 0 56px; }
+          .vm-row { padding:24px 0; gap:12px; }
+          .vm-card { padding:20px 16px; border-radius:16px; }
+          .vm-label { font-size:28px; }
+          .vm-icon { width:40px; height:40px; border-radius:12px; }
+
+          .wd-section { padding:32px 0 64px; }
+          .wd-card { padding:22px 18px 20px; border-radius:16px; }
+          .wd-card-icon-wrap { width:44px; height:44px; border-radius:12px; }
+
+          .wc-section { padding:56px 0 56px; }
+          .wc-card { padding:22px 18px; border-radius:16px; }
+          .wc-card-num { font-size:30px; }
+        }
+
+        /* ── Extra small / 360px ── */
+        @media (max-width:390px) {
+          .gma-container,
+          .vm-container,
+          .wd-container,
+          .wc-container { padding:0 14px; }
+
+          .gma-hero { padding:72px 0 40px; }
+          .gma-hero-inner { gap:24px; }
+
+          /* Scale ClusterMap further for 360px */
+          .gma-hero-inner > div:last-child {
+            transform: scale(0.62);
+            transform-origin: top center;
+            margin-bottom: -120px;
+          }
+
+          .vm-section { padding:40px 0 48px; }
+          .vm-row { gap:10px; padding:20px 0; }
+          .vm-card { padding:18px 14px; border-radius:14px; }
+          .vm-vision-text { font-size:14px; line-height:1.75; }
+          .vm-list { gap:14px; }
+          .vm-list-text { font-size:13px; }
+          .vm-list-item { gap:10px; }
+          .vm-check { width:22px; height:22px; border-radius:7px; }
+          .vm-label { font-size:26px; }
+          .vm-icon { width:36px; height:36px; border-radius:10px; }
+
+          .wd-section { padding:28px 0 56px; }
+          .wd-header { margin-bottom:28px; }
+          .wd-sub { font-size:14px; }
+          .wd-card { padding:18px 14px 18px; border-radius:14px; gap:8px; }
+          .wd-card-icon-wrap { width:40px; height:40px; border-radius:10px; }
+          .wd-card-title { font-size:14px; }
+          .wd-card-desc { font-size:13px; }
+
+          .wc-section { padding:48px 0 48px; }
+          .wc-header { margin-bottom:28px; }
+          .wc-card { padding:18px 14px; border-radius:14px; gap:8px; }
+          .wc-card-num { font-size:26px; }
+          .wc-card-title { font-size:14px; }
+          .wc-card-desc { font-size:13px; }
+          .wc-card-icon { width:34px; height:34px; border-radius:10px; }
         }
       `}</style>
     </>

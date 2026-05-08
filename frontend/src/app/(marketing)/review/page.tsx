@@ -199,7 +199,7 @@ function HeroVisual() {
         <Stars count={5} />
         <p
           style={{
-            fontFamily: "'',sans-serif",
+            fontFamily: "'Inter',sans-serif",
             fontSize: 12.5,
             color: "rgba(255,255,255,0.65)",
             lineHeight: 1.7,
@@ -555,7 +555,7 @@ function HeroReview() {
               style={{
                 fontFamily: "'Inter',sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(28px,3.6vw,48px)",
+                fontSize: "clamp(1.8rem,3.6vw,3rem)",
                 lineHeight: 1.12,
                 color: "#ffffff",
                 marginBottom: 20,
@@ -577,7 +577,7 @@ function HeroReview() {
 
             <p
               style={{
-                fontFamily: "'',sans-serif",
+                fontFamily: "'Inter',sans-serif",
                 fontSize: 16,
                 color: "rgba(255,255,255,0.55)",
                 lineHeight: 1.78,
@@ -591,13 +591,7 @@ function HeroReview() {
             </p>
           </div>
 
-          <div
-            style={{
-              animation: "rvFadeUp 0.8s 0.2s ease both",
-              position: "relative",
-              zIndex: 2,
-            }}
-          >
+          <div className="rv-hero-visual" style={{ animation: "rvFadeUp 0.8s 0.2s ease both", position: "relative", zIndex: 2 }}>
             <HeroVisual />
           </div>
         </div>
@@ -715,7 +709,6 @@ function ReviewsSection() {
 export default function ReviewPage() {
   return (
     <>
-    
       <main>
         <HeroReview />
         <ReviewsSection />
@@ -724,39 +717,34 @@ export default function ReviewPage() {
       </main>
 
       <style>{`
-       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         /* ── SHARED ─────────────────────── */
-        .rv-container { max-width:1440px; margin:0 auto; padding:0 3.5rem; position:relative; z-index:1; }
-        .rv-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; margin-top:-66px; }
-        .rv-hero-inner { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; padding:6rem 0 4rem; }
-        
+        .rv-container {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 3.5rem;
+          position: relative;
+          z-index: 1;
+        }
 
-        /* stats row */
-        .rv-hero-stats {
+        /* ── HERO ───────────────────────── */
+        .rv-hero {
+          background: #040F2E;
+          position: relative;
+          overflow: hidden;
+          min-height: 100vh;
           display: flex;
-          gap: 28px;
-          flex-wrap: wrap;
+          align-items: center;
+          margin-top: -66px;
         }
-        .rv-hero-stat {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .rv-hero-stat-value {
-          font-family: 'Inter', sans-serif;
-          font-size: 24px;
-          font-weight: 800;
-          color: #60A5FA;
-          letter-spacing: -0.03em;
-          line-height: 1;
-        }
-        .rv-hero-stat-label {
-          font-family: 'Inter', sans-serif;
-          font-size: 11px;
-          color: rgba(255,255,255,0.4);
-          line-height: 1.4;
+        .rv-hero-inner {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          align-items: center;
+          padding: 6rem 0 4rem;
         }
 
         /* ── REVIEWS SECTION ────────────── */
@@ -785,7 +773,7 @@ export default function ReviewPage() {
         }
         .rv-section-title {
           font-family: 'Inter', sans-serif;
-          font-size: clamp(26px, 3vw, 38px);
+          font-size: clamp(22px, 3vw, 38px);
           font-weight: 800;
           color: #1A56DB;
           letter-spacing: -0.03em;
@@ -793,7 +781,7 @@ export default function ReviewPage() {
           line-height: 1.15;
         }
         .rv-section-sub {
-          font-family: '', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 16px;
           color: #64748b;
           line-height: 1.72;
@@ -852,7 +840,7 @@ export default function ReviewPage() {
           align-self: flex-start;
         }
         .rv-card-text {
-          font-family: '', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 14px;
           color: #475569;
           line-height: 1.75;
@@ -886,7 +874,7 @@ export default function ReviewPage() {
           color: #1A56DB;
         }
         .rv-card-role {
-          font-family: '', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 11px;
           color: #94A3B8;
           margin-top: 1px;
@@ -899,17 +887,126 @@ export default function ReviewPage() {
         @keyframes rvFloatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
         /* ── RESPONSIVE ─────────────────── */
+
+        /* Tablet landscape */
         @media (max-width: 1024px) {
-          .rv-grid { grid-template-columns: repeat(2, 1fr); }
+          .rv-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
+
+        /* Tablet portrait */
         @media (max-width: 900px) {
-          .rv-hero-inner { grid-template-columns: 1fr; gap: 40px; }
-          .rv-hero { min-height: unset; padding: 100px 0 60px; }
+          .rv-hero-inner {
+            grid-template-columns: 1fr;
+            gap: 0;
+          }
+          .rv-hero-visual {
+            display: none;
+          }
+          .rv-hero {
+            min-height: unset;
+          }
+          .rv-container {
+            padding: 0 2rem;
+          }
+          .rv-hero-inner {
+            padding: 5rem 0 3rem;
+          }
+          .rv-section {
+            padding: 72px 0 88px;
+          }
+          .rv-section-header {
+            margin-bottom: 44px;
+          }
         }
-        @media (max-width: 640px) {
-          .rv-container { padding: 0 20px; }
-          .rv-grid { grid-template-columns: 1fr; }
-          .rv-hero-stats { gap: 18px; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+          .rv-container {
+            padding: 0 1.5rem;
+          }
+          .rv-hero-inner {
+            padding: 5rem 0 2.5rem;
+          }
+          .rv-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .rv-section {
+            padding: 60px 0 72px;
+          }
+          .rv-section-sub {
+            font-size: 14px;
+          }
+          .rv-card {
+            padding: 22px 20px 20px;
+          }
+        }
+
+        /* Small mobile */
+        @media (max-width: 480px) {
+          .rv-container {
+            padding: 0 1.25rem;
+          }
+          .rv-hero-inner {
+            padding: 4.5rem 0 2rem;
+          }
+          .rv-section {
+            padding: 50px 0 60px;
+          }
+          .rv-section-header {
+            margin-bottom: 32px;
+          }
+          .rv-section-title {
+            font-size: 22px;
+          }
+          .rv-section-sub {
+            font-size: 13.5px;
+          }
+          .rv-card {
+            padding: 20px 16px 18px;
+            border-radius: 16px;
+            gap: 10px;
+          }
+          .rv-eyebrow {
+            font-size: 10px;
+            padding: 4px 12px;
+          }
+        }
+
+        /* 360px target */
+        @media (max-width: 390px) {
+          .rv-container {
+            padding: 0 1rem;
+          }
+          .rv-hero-inner {
+            padding: 4rem 0 2rem;
+          }
+          .rv-section {
+            padding: 40px 0 50px;
+          }
+          .rv-section-title {
+            font-size: 20px;
+            letter-spacing: -0.02em;
+          }
+          .rv-section-sub {
+            font-size: 13px;
+            line-height: 1.65;
+          }
+          .rv-section-header {
+            margin-bottom: 28px;
+          }
+          .rv-grid {
+            gap: 14px;
+          }
+          .rv-card {
+            padding: 18px 14px 16px;
+            gap: 9px;
+          }
+          .rv-card-text {
+            font-size: 13.5px;
+          }
         }
       `}</style>
     </>

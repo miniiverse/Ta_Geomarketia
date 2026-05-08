@@ -9,6 +9,7 @@ import CTASection from "../../../components/user/CTASection";
 function HealthcareIcon() {
     return (
       <div
+        className="hc-icon-wrap"
         style={{
           position: "relative",
           width: "100%",
@@ -206,25 +207,27 @@ const challenges = [
     accentColor: "#0891B2", accentBg: "#ECFEFF", accentBorder: "#A5F3FC",
     icon: (<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#0891B2" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.4"/><circle cx="12" cy="12" r="5" stroke="#0891B2" strokeWidth="1.5" opacity="0.7"/><path d="M12 7v10M7 12h10" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/><circle cx="12" cy="12" r="2" fill="#0891B2"/></svg>),
   },
-
 ];
 
 function ChallengeRow({ item, index }: { item: (typeof challenges)[0]; index: number }) {
   const leftAnim = useSlideIn("left", index * 100);
   const rightAnim = useSlideIn("right", index * 100 + 80);
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 28px 1fr", alignItems:"center", marginBottom:32 }} className="cs-row">
+    <div className="cs-row" style={{ marginBottom:32 }}>
+
       <div ref={leftAnim.ref} style={{ ...leftAnim.style, background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:14, padding:"20px 22px", display:"flex", alignItems:"center", gap:14, boxShadow:"0 2px 12px rgba(0,0,0,0.05)" }}>
         <div style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:"#FFFBEB", border:"1.5px solid #FDE68A", display:"flex", alignItems:"center", justifyContent:"center" }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 21h20L12 3z" fill="#F59E0B" opacity="0.15" stroke="#F59E0B" strokeWidth="1.5" strokeLinejoin="round"/><line x1="12" y1="10" x2="12" y2="14" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="17" r="1" fill="#F59E0B"/></svg>
         </div>
         <p style={{ fontFamily:"'Inter',sans-serif", fontSize:"0.875rem", fontWeight:600, color:"#1E293B", lineHeight:1.45, margin:0 }}>{item.problem}</p>
       </div>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", position:"relative", zIndex:2 }}>
+
+      <div className="hc-cs-arrow" style={{ display:"flex", alignItems:"center", justifyContent:"center", position:"relative", zIndex:2 }}>
         <div style={{ width:36, height:36, borderRadius:"50%", background:item.accentColor, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 0 0 5px ${item.accentBg},0 0 0 6px ${item.accentBorder}`, flexShrink:0 }}>
           <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M3 7h8M7 3l4 4-4 4"/></svg>
         </div>
       </div>
+
       <div ref={rightAnim.ref} style={{ ...rightAnim.style, background:"#fff", border:`1.5px solid ${item.accentBorder}`, borderLeft:`4px solid ${item.accentColor}`, borderRadius:14, padding:"22px 26px", boxShadow:`0 4px 24px ${item.accentColor}14` }}>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:item.accentBg, border:`1px solid ${item.accentBorder}`, borderRadius:8, padding:"5px 12px", marginBottom:14 }}>
           <div style={{ width:28, height:28, borderRadius:7, background:"#fff", border:`1px solid ${item.accentBorder}`, display:"flex", alignItems:"center", justifyContent:"center" }}>{item.icon}</div>
@@ -239,15 +242,19 @@ function ChallengeRow({ item, index }: { item: (typeof challenges)[0]; index: nu
 export default function HealthcarePage() {
   return (
     <main style={{ fontFamily:"'Inter',system-ui,sans-serif", overflowX:"hidden" }}>
+
       <section style={{ width:"100%", minHeight:"100vh", background:"#040F2E", position:"relative", overflow:"hidden", display:"flex", alignItems:"center" }}>
         <div style={{ position:"absolute", inset:0, backgroundImage:"radial-gradient(rgba(26,86,219,0.22) 1px, transparent 1px)", backgroundSize:"32px 32px", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", right:"-120px", top:"50%", transform:"translateY(-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle, rgba(26,86,219,0.28) 0%, transparent 65%)", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", left:"18%", top:"8%", width:360, height:360, borderRadius:"50%", background:"radial-gradient(circle, rgba(22,163,74,0.1) 0%, transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", left:"-100px", bottom:"-60px", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%)", pointerEvents:"none" }}/>
+
         {[{l:"7%",t:"18%",s:4,d:"0s"},{l:"14%",t:"68%",s:3,d:"0.7s"},{l:"24%",t:"38%",s:5,d:"1.4s"},{l:"72%",t:"14%",s:3,d:"0.3s"},{l:"88%",t:"72%",s:4,d:"1s"},{l:"62%",t:"88%",s:3,d:"1.8s"},{l:"4%",t:"82%",s:5,d:"2.2s"},{l:"48%",t:"6%",s:3,d:"0.9s"}].map((p,i)=>(
           <span key={i} style={{ position:"absolute", left:p.l, top:p.t, width:p.s, height:p.s, borderRadius:"50%", background:"rgba(99,179,237,0.6)", animation:`hcBlink 3s ${p.d} infinite`, pointerEvents:"none" }}/>
         ))}
-        <div className="hc-hero-grid" style={{ position:"relative", zIndex:2, width:"100%", padding:"6rem 3.5rem 4rem", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3rem", alignItems:"center", maxWidth:1440, margin:"0 auto" }}>
+
+        <div className="hc-hero-grid" style={{ position:"relative", zIndex:2 }}>
+
           <div style={{ animation:"hcFadeUp 0.8s ease both" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(26,86,219,0.15)", border:"1px solid rgba(26,86,219,0.45)", borderRadius:100, padding:"5px 14px", marginBottom:24 }}>
               <span style={{ width:7, height:7, borderRadius:"50%", background:"#22D3EE", boxShadow:"0 0 8px #22D3EE", display:"inline-block", animation:"hcBlink 2s infinite" }}/>
@@ -262,17 +269,19 @@ export default function HealthcarePage() {
               Geomarketia helps healthcare organizations plan smarter facilities, optimize health campaigns, and support public health decisions through accurate geospatial data and interactive visualization.
             </p>
           </div>
+
           <div style={{ animation:"hcFadeUp 0.9s 0.15s ease both", display:"flex", alignItems:"center", justifyContent:"center" }}>
             <HealthcareIcon />
           </div>
         </div>
       </section>
 
-      <section style={{ background:"#F8FAFF", padding:"96px 0 80px", position:"relative", overflow:"hidden" }}>
+      <section className="hc-challenges-section" style={{ background:"#F8FAFF", padding:"96px 0 80px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", inset:0, backgroundImage:"radial-gradient(rgba(26,86,219,0.055) 1px, transparent 1px)", backgroundSize:"28px 28px", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", top:-80, left:-80, width:320, height:320, borderRadius:"50%", background:"radial-gradient(circle, rgba(26,86,219,0.07) 0%, transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", bottom:-60, right:-60, width:280, height:280, borderRadius:"50%", background:"radial-gradient(circle, rgba(5,150,105,0.07) 0%, transparent 70%)", pointerEvents:"none" }}/>
-        <div style={{ maxWidth:1180, margin:"0 auto", padding:"0 2.5rem", position:"relative", zIndex:1 }}>
+
+        <div className="hc-challenges-inner" style={{ maxWidth:1180, margin:"0 auto", padding:"0 2.5rem", position:"relative", zIndex:1 }}>
           <div style={{ marginBottom:64, maxWidth:560 }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:100, padding:"5px 16px", marginBottom:20 }}>
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#1A56DB", display:"inline-block" }}/>
@@ -286,8 +295,9 @@ export default function HealthcarePage() {
               Healthcare organizations face complex challenges in facility planning and patient access. Geomarketia transforms geospatial data into clear, actionable insights to support smarter public health decisions.
             </p>
           </div>
+
           <div style={{ position:"relative" }}>
-            <div style={{ position:"absolute", left:"50%", top:0, bottom:0, width:1, borderLeft:"2px dashed #BFDBFE", transform:"translateX(-50%)", pointerEvents:"none", zIndex:0 }}/>
+            <div className="hc-cs-dashed-line" style={{ position:"absolute", left:"50%", top:0, bottom:0, width:1, borderLeft:"2px dashed #BFDBFE", transform:"translateX(-50%)", pointerEvents:"none", zIndex:0 }}/>
             {challenges.map((item,i)=><ChallengeRow key={i} item={item} index={i}/>)}
           </div>
         </div>
@@ -298,14 +308,116 @@ export default function HealthcarePage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
         @keyframes hcBlink  { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:1;transform:scale(1.6)} }
         @keyframes hcFadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-        .hc-hero-grid { display:grid; grid-template-columns:1fr 1fr; }
-        .cs-row { display:grid; grid-template-columns:1fr 56px 1fr; align-items:center; margin-bottom:32px; }
-        @media (max-width:900px) {
-          .hc-hero-grid { grid-template-columns:1fr !important; padding:5rem 1.5rem 3rem !important; }
-          .cs-row { grid-template-columns:1fr !important; gap:12px !important; }
-          .cs-row > :nth-child(2) { display:none; }
+
+        /* ── Hero grid ── */
+        .hc-hero-grid {
+          width: 100%;
+          padding: 6rem 3.5rem 4rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          align-items: center;
+          max-width: 1440px;
+          margin: 0 auto;
+          box-sizing: border-box;
+        }
+
+        /* ── Challenge row ── */
+        .cs-row {
+          display: grid;
+          grid-template-columns: 1fr 56px 1fr;
+          align-items: center;
+          margin-bottom: 32px;
+          box-sizing: border-box;
+        }
+
+        /* ── Tablet: 1024px ── */
+        @media (max-width: 1024px) {
+          .hc-hero-grid {
+            padding: 5.5rem 2.5rem 3.5rem;
+            gap: 2rem;
+          }
+        }
+
+        /* ── Tablet kecil / landscape mobile: 900px ── */
+        @media (max-width: 900px) {
+          .hc-hero-grid {
+            grid-template-columns: 1fr;
+            padding: 5rem 2rem 3rem;
+            gap: 2.5rem;
+          }
+
+          .cs-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .hc-cs-arrow { display: none !important; }
+          .hc-cs-dashed-line { display: none !important; }
+
+          .hc-icon-wrap {
+            max-width: 400px !important;
+          }
+        }
+
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .hc-hero-grid {
+            padding: 4rem 1.25rem 2.5rem;
+          }
+
+          .hc-challenges-section {
+            padding: 60px 0 48px !important;
+          }
+
+          .hc-challenges-inner {
+            padding: 0 1.25rem !important;
+          }
+
+          .hc-icon-wrap {
+            max-width: 300px !important;
+          }
+
+          .cs-row {
+            margin-bottom: 20px;
+          }
+        }
+
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .hc-hero-grid {
+            padding: 3.5rem 1rem 2rem;
+          }
+
+          .hc-challenges-inner {
+            padding: 0 1rem !important;
+          }
+        }
+
+        /* ── Mobile 360px (Android mid-range: Samsung Galaxy A, Xiaomi, Oppo) ── */
+        @media (max-width: 360px) {
+          .hc-hero-grid {
+            padding: 3rem 0.875rem 1.75rem;
+          }
+
+          .hc-challenges-inner {
+            padding: 0 0.875rem !important;
+          }
+
+          .hc-icon-wrap {
+            max-width: 260px !important;
+          }
+
+          .hc-hero-grid h1 {
+            font-size: 1.55rem;
+          }
+
+          .cs-row {
+            margin-bottom: 16px;
+          }
         }
       `}</style>
     </main>

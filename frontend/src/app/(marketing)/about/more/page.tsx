@@ -553,6 +553,7 @@ export default function SeeMoreSolutionsPage() {
             }}
           />
         ))}
+
         <div
           style={{
             position: "relative",
@@ -763,6 +764,7 @@ export default function SeeMoreSolutionsPage() {
               market around it.
             </p>
           </div>
+
           <div
             className="sms-cards-grid"
             style={{
@@ -873,6 +875,7 @@ export default function SeeMoreSolutionsPage() {
             opacity="0.25"
           />
         </svg>
+
         <div
           style={{
             maxWidth: 1180,
@@ -941,20 +944,50 @@ export default function SeeMoreSolutionsPage() {
       <ContactSection />
       <CTASection />
 
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        @keyframes gmBlink  { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:1;transform:scale(1.6)} }
-        @keyframes gmFadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
 
+        @keyframes gmBlink { 
+          0%, 100% { opacity: 0.2; transform: scale(1); } 
+          50% { opacity: 1; transform: scale(1.6); } 
+        }
+        @keyframes gmFadeUp { 
+          from { opacity: 0; transform: translateY(28px); } 
+          to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Responsive */
         @media (max-width: 1024px) {
           .sms-industry-grid { grid-template-columns: repeat(3, 1fr) !important; }
         }
-        @media (max-width: 900px) {
-          .sms-cards-grid    { grid-template-columns: 1fr !important; }
-          .sms-industry-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+        @media (max-width: 768px) {
+          section { padding: 64px 0 72px !important; }
+          .sms-cards-grid { 
+            grid-template-columns: 1fr !important; 
+            gap: 24px !important; 
+          }
+          .sms-industry-grid { 
+            grid-template-columns: repeat(2, 1fr) !important; 
+            gap: 20px !important; 
+          }
+          section:first-of-type > div[style*="padding: 7rem"] {
+            padding: 5rem 1.5rem 4rem !important;
+          }
         }
-        @media (max-width: 520px) {
+
+        @media (max-width: 480px) {
           .sms-industry-grid { grid-template-columns: 1fr !important; }
+          section { padding: 56px 0 64px !important; }
+        }
+
+        @media (max-width: 360px) {
+          section:first-of-type > div[style*="padding:"] {
+            padding: 4.5rem 1.25rem 3.5rem !important;
+          }
+          h1 { font-size: clamp(1.9rem, 7vw, 2.8rem) !important; }
+          h2 { font-size: clamp(1.65rem, 6.5vw, 2.2rem) !important; }
         }
       `}</style>
     </main>
