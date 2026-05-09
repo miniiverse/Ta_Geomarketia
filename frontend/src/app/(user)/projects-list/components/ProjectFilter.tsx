@@ -90,6 +90,9 @@ export default function ProjectsFilterSidebar({
   const [lastUpdateYears, setLastUpdateYears] = useState<number[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Fetch categories and provinces on mount
   useEffect(() => {
     fetch("/api/filters?type=categories")
       .then((r) => r.json())
@@ -107,11 +110,11 @@ export default function ProjectsFilterSidebar({
   }, []);
 
   useEffect(() => {
-    const currentYear = new Date().getFullYear(); 
+    const currentYear = new Date().getFullYear();
     const years = Array.from(
       { length: currentYear - 2024 + 1 },
       (_, i) => 2024 + i,
-    ).reverse(); 
+    ).reverse();
 
     setProjectDateYears(years);
     setLastUpdateYears(years);
@@ -146,92 +149,103 @@ export default function ProjectsFilterSidebar({
     setCityId("");
   };
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: 280,
-        background:
-          "linear-gradient(160deg, #EBF3FF 0%, #F0F7FF 60%, #E8F1FF 100%)",
-        borderRadius: 18,
-        padding: "22px 20px",
-        border: "1.5px solid #DBEAFE",
-        fontFamily: "'Inter', sans-serif",
-        position: "relative",
-        overflow: "hidden",
-        boxShadow: "0 4px 20px rgba(26,86,219,0.08)",
-        alignSelf: "start",
-      }}
-    >
+  const filterContent = (
+    <div style={{ position: "relative", zIndex: 1 }}>
       <div
         style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "radial-gradient(rgba(26,86,219,0.07) 1px, transparent 1px)",
-          backgroundSize: "20px 20px",
-          pointerEvents: "none",
-          borderRadius: 18,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 22,
         }}
-      />
-
-      <div style={{ position: "relative", zIndex: 1 }}>
+      >
         <div
           style={{
+            width: 30,
+            height: 30,
+            borderRadius: 8,
+            background: "#1A56DB",
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            marginBottom: 22,
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(26,86,219,0.3)",
           }}
         >
-          <div
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3 6h18M7 12h10M11 18h2"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        <div style={{ flex: 1 }}>
+          <h3
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 8,
-              background: "#1A56DB",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(26,86,219,0.3)",
+              margin: 0,
+              fontSize: 14,
+              fontWeight: 800,
+              color: "#1A56DB",
+              letterSpacing: "-0.02em",
             }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 6h18M7 12h10M11 18h2"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: 800,
-                color: "#1A56DB",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Filter Projects
-            </h3>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 9,
-                fontWeight: 700,
-                color: "rgba(26,86,219,0.45)",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
-            >
-              SPATIAL SEARCH
-            </p>
-          </div>
+            Filter Projects
+          </h3>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 9,
+              fontWeight: 700,
+              color: "rgba(26,86,219,0.45)",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}
+          >
+            SPATIAL SEARCH
+          </p>
         </div>
 
+        <button
+          className="filter-toggle-btn"
+          onClick={() => setIsOpen((o) => !o)}
+          style={{
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: "#EBF3FF",
+            border: "1.5px solid #BFDBFE",
+            cursor: "pointer",
+            color: "#1A56DB",
+            flexShrink: 0,
+          }}
+          aria-label={isOpen ? "Collapse filters" : "Expand filters"}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            style={{
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+            }}
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div className="filter-body">
         <div
           style={{
             height: 1,
@@ -444,10 +458,72 @@ export default function ProjectsFilterSidebar({
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div
+        className="filter-sidebar"
+        style={{
+          width: "100%",
+          maxWidth: 280,
+          background:
+            "linear-gradient(160deg, #EBF3FF 0%, #F0F7FF 60%, #E8F1FF 100%)",
+          borderRadius: 18,
+          padding: "22px 20px",
+          border: "1.5px solid #DBEAFE",
+          fontFamily: "'Inter', sans-serif",
+          position: "relative",
+          overflow: "hidden",
+          boxShadow: "0 4px 20px rgba(26,86,219,0.08)",
+          alignSelf: "start",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "radial-gradient(rgba(26,86,219,0.07) 1px, transparent 1px)",
+            backgroundSize: "20px 20px",
+            pointerEvents: "none",
+            borderRadius: 18,
+          }}
+        />
+        {filterContent}
+      </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        .filter-sidebar {
+          max-width: 280px;
+        }
+
+        @media (max-width: 768px) {
+          .filter-sidebar {
+            max-width: 100% !important;
+            width: 100% !important;
+            border-radius: 14px;
+            padding: 16px !important;
+          }
+
+          .filter-toggle-btn {
+            display: flex !important;
+          }
+
+          .filter-body {
+            display: none;
+          }
+        }
       `}</style>
-    </div>
+
+      {isOpen && (
+        <style>{`
+          .filter-body { display: block !important; }
+        `}</style>
+      )}
+    </>
   );
 }

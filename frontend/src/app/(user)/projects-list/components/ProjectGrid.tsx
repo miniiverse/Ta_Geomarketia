@@ -9,8 +9,8 @@ export interface ProjectFilters {
   category?: string;
   city_id?: string;
   sort?: string;
-  project_date_year?: string; 
-  last_update_year?: string; 
+  project_date_year?: string;
+  last_update_year?: string;
   page?: number;
 }
 
@@ -57,6 +57,7 @@ function resolveImage(thumbnail: string | null, category: string): string {
   return FALLBACK_IMAGE[category] ?? FALLBACK_IMAGE.default;
 }
 
+// Add error handling and loading states
 export default function ProjectGrid({
   filters = {},
   onPageChange,
@@ -321,127 +322,151 @@ export default function ProjectGrid({
   }
 
   return (
-    <div>
-      <div
-        style={{
-          marginBottom: 16,
-          fontFamily: "'Inter', system-ui, sans-serif",
-        }}
-      >
-        <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
-          Showing{" "}
-          <strong style={{ color: "#0F172A" }}>{projects.length}</strong> of{" "}
-          {meta?.total ?? projects.length} results
-        </span>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-          gap: 18,
-        }}
-      >
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            id={project.id}
-            title={project.title}
-            description={project.description}
-            region={project.region}
-            category={project.category}
-            price={project.price}
-            status={project.status}
-            image={resolveImage(project.thumbnail, project.category)}
-            totalData={project.total_data}
-            lastUpdate={project.last_update}
-            projectDate={project.project_date ?? undefined}
-            onPreview={() => router.push(`/project-detail/${project.id}`)}
-          />
-        ))}
-      </div>
-
-      {totalPages > 1 && (
+    <>
+      <div>
         <div
           style={{
-            marginTop: 28,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 6,
+            marginBottom: 16,
+            fontFamily: "'Inter', system-ui, sans-serif",
           }}
         >
-          <button
-            onClick={() => goToPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            style={btnStyle(false, currentPage === 1)}
-            onMouseEnter={(e) => {
-              if (currentPage !== 1)
-                (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== 1)
-                (e.currentTarget as HTMLElement).style.background = "#ffffff";
+          <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
+            Showing{" "}
+            <strong style={{ color: "#0F172A" }}>{projects.length}</strong> of{" "}
+            {meta?.total ?? projects.length} results
+          </span>
+        </div>
+
+        <div
+          className="project-card-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+            gap: 18,
+          }}
+        >
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              id={project.id}
+              title={project.title}
+              description={project.description}
+              region={project.region}
+              category={project.category}
+              price={project.price}
+              status={project.status}
+              image={resolveImage(project.thumbnail, project.category)}
+              totalData={project.total_data}
+              lastUpdate={project.last_update}
+              projectDate={project.project_date ?? undefined}
+              onPreview={() => router.push(`/project-detail/${project.id}`)}
+            />
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div
+            className="pagination-bar"
+            style={{
+              marginTop: 28,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 6,
+              flexWrap: "wrap",
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <button
-              key={p}
-              onClick={() => goToPage(p)}
-              style={btnStyle(currentPage === p)}
+              onClick={() => goToPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              style={btnStyle(false, currentPage === 1)}
               onMouseEnter={(e) => {
-                if (currentPage !== p)
+                if (currentPage !== 1)
                   (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
               }}
               onMouseLeave={(e) => {
-                if (currentPage !== p)
+                if (currentPage !== 1)
                   (e.currentTarget as HTMLElement).style.background = "#ffffff";
               }}
             >
-              {p}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M15 18l-6-6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
-          ))}
 
-          <button
-            onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            style={btnStyle(false, currentPage === totalPages)}
-            onMouseEnter={(e) => {
-              if (currentPage !== totalPages)
-                (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== totalPages)
-                (e.currentTarget as HTMLElement).style.background = "#ffffff";
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 18l6-6-6-6"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => goToPage(p)}
+                style={btnStyle(currentPage === p)}
+                onMouseEnter={(e) => {
+                  if (currentPage !== p)
+                    (e.currentTarget as HTMLElement).style.background =
+                      "#F1F5F9";
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== p)
+                    (e.currentTarget as HTMLElement).style.background =
+                      "#ffffff";
+                }}
+              >
+                {p}
+              </button>
+            ))}
+
+            <button
+              onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              style={btnStyle(false, currentPage === totalPages)}
+              onMouseEnter={(e) => {
+                if (currentPage !== totalPages)
+                  (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== totalPages)
+                  (e.currentTarget as HTMLElement).style.background = "#ffffff";
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M9 18l6-6-6-6"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        @media (max-width: 768px) {
+          .project-card-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .project-card-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .pagination-bar {
+            gap: 4px !important;
+          }
+        }
       `}</style>
-    </div>
+    </>
   );
 }
