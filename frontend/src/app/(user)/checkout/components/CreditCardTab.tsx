@@ -78,24 +78,24 @@ function CreditCardIcon() {
 export function CreditCardTab() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-
-      <div style={{
-        borderRadius: 16, padding: "1.1rem",
-        background: "linear-gradient(135deg, #1A56DB 0%, #2563EB 50%, #3B82F6 100%)",
-        color: "#fff", marginBottom: 4,
-        position: "relative", overflow: "hidden",
-        boxShadow: "0 8px 24px rgba(26,86,219,0.35)",
-      }}>
+      <div
+        className="cc-preview"
+        style={{
+          borderRadius: 16, padding: "1.1rem",
+          background: "linear-gradient(135deg, #1A56DB 0%, #2563EB 50%, #3B82F6 100%)",
+          color: "#fff", marginBottom: 4,
+          position: "relative", overflow: "hidden",
+          boxShadow: "0 8px 24px rgba(26,86,219,0.35)",
+        }}
+      >
         <div style={{ position: "absolute", top: -30, right: -20, width: 130, height: 130, borderRadius: "50%", background: "rgba(255,255,255,0.07)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -40, right: 50, width: 110, height: 110, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", top: 20, left: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
 
-        <div style={{ display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 20,
-          gap: 12,
-          flexWrap: "wrap", }}>
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          marginBottom: 20, gap: 12, flexWrap: "wrap",
+        }}>
           <div style={{
             width: 36, height: 28, borderRadius: 5,
             background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
@@ -110,15 +110,17 @@ export function CreditCardTab() {
           <span style={{ fontSize: "0.65rem", opacity: 0.65, letterSpacing: "0.12em", fontWeight: 600 }}>CREDIT CARD</span>
         </div>
 
-        <div style={{ fontSize: "clamp(0.9rem, 3vw, 1.15rem)", fontWeight: 700, letterSpacing: "0.14em", marginBottom: 22, opacity: 0.9, fontFamily: "monospace" }}>
+        <div style={{
+          fontSize: "clamp(0.9rem, 3vw, 1.15rem)", fontWeight: 700,
+          letterSpacing: "0.14em", marginBottom: 22, opacity: 0.9, fontFamily: "monospace",
+        }}>
           •••• •••• •••• ••••
         </div>
 
-        <div style={{display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          gap: 12,
-          flexWrap: "wrap",}}>
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "flex-end",
+          gap: 12, flexWrap: "wrap",
+        }}>
           <div>
             <div style={{ fontSize: "0.6rem", opacity: 0.55, letterSpacing: "0.1em", marginBottom: 2 }}>CARDHOLDER NAME</div>
             <div style={{ fontSize: "0.8rem", fontWeight: 600, opacity: 0.9 }}>Full Name</div>
@@ -132,7 +134,8 @@ export function CreditCardTab() {
 
       <InputField label="Card Number" placeholder="0000 0000 0000 0000" maxLength={19} />
       <InputField label="Cardholder Name" placeholder="Full name on card" />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+
+      <div className="cc-expiry-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
         <InputField label="Expiry Date" placeholder="MM / YY" maxLength={7} />
         <InputField label="CVV" placeholder="•••" type="password" maxLength={4} />
       </div>
@@ -153,14 +156,40 @@ export function CreditCardTab() {
       </div>
 
       <PayButton label="Pay with Credit Card" icon={<CreditCardIcon />} />
+
+      <style>{`
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .cc-preview {
+            padding: 0.9rem !important;
+          }
+        }
+
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .cc-preview {
+            padding: 0.8rem !important;
+            border-radius: 12px !important;
+          }
+
+          .cc-expiry-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+
+        /* ── Mobile 360px (Android mid-range) ── */
+        @media (max-width: 360px) {
+          .cc-preview {
+            padding: 0.75rem !important;
+          }
+
+          /* Stack Expiry + CVV jadi 1 kolom di layar sangat sempit */
+          .cc-expiry-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+          }
+        }
+      `}</style>
     </div>
-    
   );
-  <style>{`
-  @media (max-width: 640px) {
-    .credit-card-preview {
-      padding: 1rem !important;
-    }
-  }
-`}</style>
 }

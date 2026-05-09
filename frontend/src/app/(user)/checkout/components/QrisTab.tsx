@@ -41,14 +41,17 @@ function PayButton({ label, icon }: { label: string; icon: React.ReactNode }) {
 
 function QRCode() {
   return (
-    <div style={{
-      width: 196, height: 196, aspectRatio: "1 / 1",
-      border: "2px solid #BFDBFE",
-      borderRadius: 16, padding: 14,
-      background: "#fff",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      boxShadow: "0 4px 16px rgba(26,86,219,0.1)",
-    }}>
+    <div
+      className="qris-qrcode"
+      style={{
+        width: 196, height: 196, aspectRatio: "1 / 1",
+        border: "2px solid #BFDBFE",
+        borderRadius: 16, padding: 14,
+        background: "#fff",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        boxShadow: "0 4px 16px rgba(26,86,219,0.1)",
+      }}
+    >
       <svg width="100%" height="100%" viewBox="0 0 156 156" fill="none" style={{ maxWidth: 168, maxHeight: 168 }}>
         <rect x="0" y="0" width="52" height="52" fill="#1A56DB" rx="4" /><rect x="6" y="6" width="40" height="40" fill="white" rx="2" /><rect x="13" y="13" width="26" height="26" fill="#1A56DB" rx="1" />
         <rect x="104" y="0" width="52" height="52" fill="#1A56DB" rx="4" /><rect x="110" y="6" width="40" height="40" fill="white" rx="2" /><rect x="117" y="13" width="26" height="26" fill="#1A56DB" rx="1" />
@@ -79,11 +82,14 @@ export function QrisTab() {
         Scan QR Code to Pay
       </p>
 
-      <div style={{
-        padding: 10, borderRadius: 20,
-        background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
-        border: "1.5px solid #BFDBFE",
-      }}>
+      <div
+        className="qris-wrap"
+        style={{
+          padding: 10, borderRadius: 20,
+          background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
+          border: "1.5px solid #BFDBFE",
+        }}
+      >
         <QRCode />
       </div>
 
@@ -123,6 +129,41 @@ export function QrisTab() {
       <div style={{ width: "100%" }}>
         <PayButton label="Pay with QRIS" icon={<QrisIcon />} />
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .qris-qrcode {
+            width: 160px !important;
+            height: 160px !important;
+            padding: 10px !important;
+          }
+        }
+
+        @media (max-width: 400px) {
+          .qris-wrap {
+            padding: 8px !important;
+            border-radius: 16px !important;
+          }
+          .qris-qrcode {
+            width: 140px !important;
+            height: 140px !important;
+            padding: 8px !important;
+            border-radius: 12px !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .qris-wrap {
+            padding: 6px !important;
+          }
+          .qris-qrcode {
+            width: 128px !important;
+            height: 128px !important;
+            padding: 6px !important;
+            border-radius: 10px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

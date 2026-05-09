@@ -40,7 +40,6 @@ export default function PaymentPage() {
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       <PaymentHeader />
-      
       <div style={{
         background: "#fff",
         borderBottom: "1px solid #E5E7EB",
@@ -64,7 +63,7 @@ export default function PaymentPage() {
             <p style={{ margin: 0, fontSize: "14px", color: "#94a3b8", fontWeight: 500 }}>Product purchased</p>
             <p style={{ margin: 0, fontSize: "clamp(15px, 2vw, 18px)", fontWeight: 700, color: "#0f172a" }}>{title}</p>
             {description && (
-              <p style={{ margin: "2px 0 0", fontSize: "14px", color: "#64748b", fontWeight: 400, maxWidth: "100%"}}>
+              <p style={{ margin: "2px 0 0", fontSize: "14px", color: "#64748b", fontWeight: 400, maxWidth: "100%" }}>
                 {description}
               </p>
             )}
@@ -73,11 +72,7 @@ export default function PaymentPage() {
 
         <div
           className="payment-divider"
-          style={{
-            height: "32px",
-            width: "1px",
-            background: "#E5E7EB",
-          }}
+          style={{ height: "32px", width: "1px", background: "#E5E7EB" }}
         />
 
         <span style={{
@@ -98,12 +93,9 @@ export default function PaymentPage() {
         </div>
 
         <div
-            style={{
-              marginLeft: "auto",
-              width: "100%",
-            }}
-            className="payment-total"
-          >
+          className="payment-total"
+          style={{ marginLeft: "auto", width: "100%" }}
+        >
           <span style={{ fontSize: "14px", color: "#94a3b8" }}>Total Payment: </span>
           <span style={{ fontSize: "15px", fontWeight: 800, color: "#1A56DB" }}>{formatRp(total)}</span>
         </div>
@@ -144,24 +136,47 @@ export default function PaymentPage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-       @media (max-width: 768px) {
-        .payment-grid {
-          grid-template-columns: 1fr !important;
-          padding: 1rem !important;
+
+        /* ── Tablet: 768px ── */
+        @media (max-width: 768px) {
+          .payment-grid {
+            grid-template-columns: 1fr !important;
+            padding: 1rem !important;
+          }
+          .tab-label {
+            display: none;
+          }
+          .payment-divider {
+            display: none;
+          }
+          .payment-total {
+            margin-left: 0 !important;
+          }
         }
 
-        .tab-label {
-          display: none;
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .payment-grid {
+            padding: 0.75rem !important;
+            gap: 0.75rem !important;
+          }
         }
 
-        .payment-divider {
-          display: none;
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .payment-grid {
+            padding: 0.5rem !important;
+            gap: 0.5rem !important;
+          }
         }
 
-        .payment-total {
-          margin-left: 0 !important;
+        /* ── Mobile 360px (Android mid-range) ── */
+        @media (max-width: 360px) {
+          .payment-grid {
+            padding: 0.4rem !important;
+            gap: 0.4rem !important;
+          }
         }
-      }
       `}</style>
     </main>
   );

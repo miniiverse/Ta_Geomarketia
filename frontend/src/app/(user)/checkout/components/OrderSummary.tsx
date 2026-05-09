@@ -9,16 +9,17 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ subtotal, tax, total, formatRp, title, category }: OrderSummaryProps) {
   return (
-    <div 
-    className="order-summary"
-    style={{
-      background: "#fff", borderRadius: 16,
-      border: "1px solid #E5E7EB",
-      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-      overflow: "hidden",
-      position: "sticky", 
-      top: "1.5rem",
-    }}>
+    <div
+      className="order-summary"
+      style={{
+        background: "#fff", borderRadius: 16,
+        border: "1px solid #E5E7EB",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+        overflow: "hidden",
+        position: "sticky",
+        top: "1.5rem",
+      }}
+    >
 
       <div style={{
         padding: "1rem 1.25rem",
@@ -46,10 +47,9 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
       </div>
 
       <div style={{ padding: "1.15rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-
         <div style={{ paddingBottom: "0.75rem", borderBottom: "1px dashed #E5E7EB" }}>
           <div style={{
-           display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap",
+            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap",
             padding: "8px 10px", borderRadius: 8,
             background: "#F8FAFF", border: "1px solid #EEF2FF",
           }}>
@@ -75,7 +75,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
                 )}
               </div>
             </div>
-            <span style={{fontSize: "0.78rem",color: "#111827",fontWeight: 700, flexShrink: 0, wordBreak: "break-word",}}>
+            <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0, wordBreak: "break-word" }}>
               {formatRp(subtotal)}
             </span>
           </div>
@@ -85,6 +85,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
           <span style={{ fontSize: "0.83rem", color: "#6B7280", fontWeight: 500 }}>Subtotal</span>
           <span style={{ fontSize: "0.85rem", color: "#374151", fontWeight: 600 }}>{formatRp(subtotal)}</span>
         </div>
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: "0.83rem", color: "#6B7280", fontWeight: 500 }}>Tax</span>
           <span style={{ fontSize: "0.85rem", color: "#374151", fontWeight: 600 }}>{formatRp(tax)}</span>
@@ -114,14 +115,37 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
           Protected by SSL encryption
         </div>
       </div>
+
       <style>{`
-  @media (max-width: 768px) {
-    .order-summary {
-      position: static !important;
-      top: unset !important;
-    }
-  }
-`}</style>
+        /* ── Tablet: 768px — lepas sticky ── */
+        @media (max-width: 768px) {
+          .order-summary {
+            position: static !important;
+            top: unset !important;
+          }
+        }
+
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .order-summary {
+            border-radius: 12px !important;
+          }
+        }
+
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .order-summary {
+            border-radius: 10px !important;
+          }
+        }
+
+        /* ── Mobile 360px (Android mid-range) ── */
+        @media (max-width: 360px) {
+          .order-summary {
+            border-radius: 8px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

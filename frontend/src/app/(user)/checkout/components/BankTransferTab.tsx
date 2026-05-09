@@ -70,15 +70,15 @@ export function BankTransferTab() {
 
       {banks.map((bank) => (
         <div
-        key={bank.name}
-        className="bank-card"
-        style={{
-          padding: "0.9rem 1rem", borderRadius: 12,
-          border: "1.5px solid #EEF2FF",
-          background: "#FAFBFF",
-          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
-          transition: "border-color 0.15s, box-shadow 0.15s",
-        }}
+          key={bank.name}
+          className="bank-card"
+          style={{
+            padding: "0.9rem 1rem", borderRadius: 12,
+            border: "1.5px solid #EEF2FF",
+            background: "#FAFBFF",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+            transition: "border-color 0.15s, box-shadow 0.15s",
+          }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLElement).style.borderColor = "#BFDBFE";
             (e.currentTarget as HTMLElement).style.boxShadow = "0 3px 12px rgba(26,86,219,0.08)";
@@ -110,7 +110,7 @@ export function BankTransferTab() {
           </div>
 
           <button
-          className="copy-btn"
+            className="copy-btn"
             onClick={() => navigator.clipboard.writeText(bank.account)}
             style={{
               display: "inline-flex", alignItems: "center", gap: 5,
@@ -160,23 +160,38 @@ export function BankTransferTab() {
           </div>
         ))}
       </div>
-    
+
       <PayButton label="Confirm Transfer" icon={<BankIcon />} />
-      
-          <style>{`
-      @media (max-width: 640px) {
-        .bank-card {
-          flex-direction: column;
-          align-items: flex-start !important;
+
+      <style>{`
+        @media (max-width: 640px) {
+          .bank-card {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .copy-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
         }
 
-        .copy-btn {
-          width: 100%;
-          justify-content: center;
+        @media (max-width: 400px) {
+          .bank-card {
+            padding: 0.75rem 0.875rem !important;
+          }
         }
-      }
-    `}</style>
+
+        @media (max-width: 360px) {
+          .bank-card {
+            padding: 0.65rem 0.75rem !important;
+            border-radius: 10px !important;
+          }
+          .copy-btn {
+            font-size: 0.7rem !important;
+            padding: 8px 10px !important;
+          }
+        }
+      `}</style>
     </div>
   );
-  
 }
