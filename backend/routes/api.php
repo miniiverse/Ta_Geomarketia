@@ -2,14 +2,24 @@
 
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\User\UserProjectController;
 use App\Http\Controllers\User\FilterController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Public
-Route::post('/login',    [AuthController::class, 'login']);
+// ── Public routes (tidak perlu token) ───────────────────────
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login',    [AuthController::class, 'login']);
+ 
+// Password Reset — OTP Flow
+Route::prefix('password')->group(function () {
+    Route::post('/forgot',         [PasswordResetController::class, 'sendOtp']);       // Step 1: kirim OTP
+    Route::post('/verify-otp',     [PasswordResetController::class, 'verifyOtp']);     // Step 2: verifikasi OTP
+    Route::post('/reset',          [PasswordResetController::class, 'resetPassword']); // Step 3: reset password
+});
+
+// Public
 Route::get('/user/projects',   [UserProjectController::class, 'index']);
 Route::get('/user/categories', [FilterController::class, 'categories']);
 Route::get('/user/provinces',  [FilterController::class, 'provinces']);

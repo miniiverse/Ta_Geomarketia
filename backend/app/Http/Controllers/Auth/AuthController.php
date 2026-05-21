@@ -3,28 +3,21 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\RateLimiter; 
-use Illuminate\Support\Str;                 
+use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
     /**
      * Register a new user.
+     * Email wajib @gmail.com (divalidasi oleh RegisterRequest).
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'username' => 'required|string|max:50|unique:users,username',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $user = User::create([
             'role_id'  => 2,
             'fullname' => $request->fullname,
@@ -41,6 +34,7 @@ class AuthController extends Controller
 
     /**
      * Log in an existing user.
+     * Token dikembalikan di response body, lalu Next.js yang set HTTP Only Cookie.
      */
     public function login(Request $request)
     {
@@ -62,23 +56,23 @@ class AuthController extends Controller
             ->where('username', $request->username)
             ->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            RateLimiter::hit($key, 60); 
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($key, 60);
             return response()->json([
                 'success' => false,
                 'message' => 'Username or password is incorrect.',
             ], 401);
         }
 
-        // Reset counter
         RateLimiter::clear($key);
 
+        // Hapus semua token lama sebelum buat yang baru
         $user->tokens()->delete();
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'success' => true,
-            'message' => 'Login berhasil.',
+            'message' => 'Login successful.',
             'token'   => $token,
             'user'    => [
                 'id'            => $user->user_id,
@@ -111,7 +105,7 @@ class AuthController extends Controller
                     : null,
                 'created_at'    => $user->created_at,
             ],
-        ])->header('Cache-Control', 'no-store'); 
+        ])->header('Cache-Control', 'no-store');
     }
 
     /**
@@ -160,9 +154,9 @@ class AuthController extends Controller
         }
 
         $folder = $user->role_id === 1 ? 'photos/admin' : 'photos';
-        $path = $request->file('photo')->store($folder, 'public');
+        $path   = $request->file('photo')->store($folder, 'public');
 
-        $user->update(['profile_photo' => $path]); 
+        $user->update(['profile_photo' => $path]);
 
         return response()->json([
             'success'   => true,
