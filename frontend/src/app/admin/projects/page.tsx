@@ -46,8 +46,6 @@ export default function ProjectsPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-
-  // Menyimpan set db_id yang sudah dipakai sebagai project
   const [usedDbIds, setUsedDbIds] = useState<Set<string>>(new Set());
 
   const labelStyle: React.CSSProperties = {
@@ -96,11 +94,6 @@ export default function ProjectsPage() {
     },
   ];
 
-  /**
-   * Fetch jumlah project & kategori untuk kartu statistik.
-   * Sekaligus ekstrak db_id dari api_url setiap project yang sudah ada,
-   * untuk dipakai sebagai daftar dataset yang sudah digunakan.
-   */
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
@@ -114,7 +107,6 @@ export default function ProjectsPage() {
         setTotalCategories(uniqueCats.length);
         setCategoryNames(uniqueCats.join(" · "));
 
-        // Format api_url: http://127.0.0.1:8080/api/v1/{db_id}/places
         const ids = new Set<string>(
           data
             .map((p: any) => {
@@ -129,7 +121,6 @@ export default function ProjectsPage() {
       .catch(() => {});
   }, [refreshKey]);
 
-  // Fetch daftar dataset dari FastAPI saat modal Add dibuka
   useEffect(() => {
     if (!showAdd) return;
     setMetaLoading(true);
@@ -140,7 +131,6 @@ export default function ProjectsPage() {
       .finally(() => setMetaLoading(false));
   }, [showAdd]);
 
-  // Auto-fill form saat user memilih dataset dari dropdown
   useEffect(() => {
     if (!selectedDbId) {
       setAutoFilled(null);
@@ -154,7 +144,6 @@ export default function ProjectsPage() {
     }
   }, [selectedDbId, fastapiProjects]);
 
-  // Reset semua field form ke kondisi awal
   function resetForm() {
     setSelectedDbId("");
     setAutoFilled(null);
@@ -163,14 +152,12 @@ export default function ProjectsPage() {
     setThumbnailFile(null);
   }
 
-  // Kirim data project baru ke API
   async function handleSave() {
     if (!autoFilled) {
       alert("Pilih dataset terlebih dahulu.");
       return;
     }
 
-    // Guard: pastikan dataset belum digunakan (double-check di sisi client)
     if (usedDbIds.has(autoFilled.db_id)) {
       alert(`Dataset "${autoFilled.project_name}" sudah digunakan sebagai project.`);
       return;
@@ -179,10 +166,19 @@ export default function ProjectsPage() {
     const resolvedCategoryId = CATEGORY_MAP[autoFilled.category] ?? null;
     const resolvedCityId = CITY_MAP[autoFilled.regency] ?? null;
 
+    // ── Generate project name dari db_id ──
+    // Format db_id: "Indonesia.Batam.Kuliner.202410290644"
+    // Hasil: "Kuliner Batam Indonesia"
+    const dbParts = autoFilled.db_id.split(".");
+    const generatedTitle =
+      dbParts.length >= 3
+        ? `${dbParts[2]} ${dbParts[1]}, ${dbParts[0]}`
+        : autoFilled.project_name; 
+
     setIsSaving(true);
     try {
       const formData = new FormData();
-      formData.append("title", autoFilled.project_name);
+      formData.append("title", generatedTitle);
       formData.append("total_data", String(autoFilled.total_data));
       formData.append("project_date", parseDate(autoFilled.date));
       formData.append(
@@ -214,7 +210,6 @@ export default function ProjectsPage() {
     }
   }
 
-  // Hitung jumlah dataset yang sudah dipakai vs total tersedia
   const availableCount = fastapiProjects.filter(
     (p) => !usedDbIds.has(p.db_id)
   ).length;
@@ -663,7 +658,14 @@ export default function ProjectsPage() {
                     <label style={labelStyle}>Project Name</label>
                     <input
                       readOnly
-                      value={autoFilled.project_name}
+                      value={
+                        (() => {
+                          const parts = autoFilled.db_id.split(".");
+                          return parts.length >= 3
+                            ? `${parts[2]} ${parts[1]}, ${parts[0]}`
+                            : autoFilled.project_name;
+                        })()
+                      }
                       style={readonlyStyle}
                     />
                   </div>
@@ -745,7 +747,6 @@ export default function ProjectsPage() {
                 </div>
               )}
 
-              {/* Input harga manual */}
               <div>
                 <label style={labelStyle}>Price (Rp)</label>
                 <div style={{ position: "relative" }}>
@@ -771,7 +772,6 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
-              {/* Input deskripsi project */}
               <div>
                 <label style={labelStyle}>Description</label>
                 <textarea
@@ -783,7 +783,6 @@ export default function ProjectsPage() {
                 />
               </div>
 
-              {/* Upload thumbnail project */}
               <div>
                 <label style={labelStyle}>Thumbnail</label>
                 <label
@@ -881,7 +880,6 @@ export default function ProjectsPage() {
         </>
       )}
 
-      {/* ── Responsive CSS ── */}
       <style>{`
         @media (max-width: 1024px) {
           .prj-stats-grid {
