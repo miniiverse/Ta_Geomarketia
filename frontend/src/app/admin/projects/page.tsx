@@ -150,7 +150,7 @@ export default function ProjectsPage() {
     const found = fastapiProjects.find((p) => p.db_id === selectedDbId);
     setAutoFilled(found || null);
     if (found) {
-      setPrice(String(found.total_data * 1000));
+      setPrice(String(Math.max(found.total_data * 100, 50000)));
     }
   }, [selectedDbId, fastapiProjects]);
 

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import ProjectsDetail from "./ProjectsDetail";
 import { useToast, ToastContainer } from "../../../components/admin/ToastAdmin";
+import { useRouter } from "next/navigation";
 
-// Tipe data project yang ditampilkan di tabel
 type Project = {
   id: number;
   name: string;
@@ -164,7 +163,6 @@ function ConfirmDialog({
             </span>
             ? Deleted data cannot be recovered.
           </p>
-
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               onClick={onCancel}
@@ -203,7 +201,6 @@ function ConfirmDialog({
           </div>
         </div>
       </div>
-
       <style>{`
         @keyframes dialogIn {
           from { opacity: 0; transform: scale(0.93) translateY(8px); }
@@ -260,6 +257,7 @@ export default function ProjectsTable({
   onDelete?: () => void;
 }) {
   const { showToast, toasts, removeToast } = useToast();
+  const router = useRouter();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -267,7 +265,6 @@ export default function ProjectsTable({
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Project | null>(null);
 
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -276,16 +273,11 @@ export default function ProjectsTable({
   const [editThumbnail, setEditThumbnail] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  /**
-   * Mengambil seluruh data project dari API internal (/api/project),
-   * kemudian memetakan respons ke format tipe Project untuk ditampilkan di tabel.
-   */
   const fetchProjects = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch("/api/project");
       const json = await res.json();
-
       const mapped: Project[] = (json.data || []).map((p: any) => ({
         id: p.project_id,
         name: p.title,
@@ -300,7 +292,6 @@ export default function ProjectsTable({
         city: p.city?.name,
         thumbnail: p.thumbnail,
       }));
-
       setProjects(mapped);
     } catch (err) {
       console.error("Gagal fetch projects:", err);
@@ -317,17 +308,12 @@ export default function ProjectsTable({
     setConfirmDelete(project);
   }
 
-  /**
-   * Mengirim permintaan DELETE ke API (/api/project/:id)
-   * setelah pengguna mengonfirmasi penghapusan melalui dialog.
-   */
   async function handleConfirmDelete() {
     if (!confirmDelete) return;
     const id = confirmDelete.id;
     const name = confirmDelete.name;
     setConfirmDelete(null);
     setDeletingId(id);
-
     try {
       const res = await fetch(`/api/project/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Gagal hapus");
@@ -357,10 +343,6 @@ export default function ProjectsTable({
     setEditThumbnail(null);
   }
 
-  /**
-   * Mengirim permintaan PUT ke API (/api/project/:id) dengan data yang telah diubah,
-   * kemudian memuat ulang daftar project setelah pembaruan berhasil.
-   */
   async function handleSaveEdit() {
     if (!editingProject) return;
     setIsSaving(true);
@@ -397,11 +379,9 @@ export default function ProjectsTable({
     ...Array.from(new Set(projects.map((p) => p.category))),
   ];
 
-  // Filter project berdasarkan kategori dan kata kunci pencarian
   const filtered = projects.filter((p) => {
     const matchCategory =
       filterCategory === "All" || p.category === filterCategory;
-
     const q = search.toLowerCase().trim();
     const matchSearch =
       q === "" ||
@@ -411,11 +391,9 @@ export default function ProjectsTable({
       p.price.toLowerCase().includes(q) ||
       p.date.toLowerCase().includes(q) ||
       (p.city ?? "").toLowerCase().includes(q);
-
     return matchCategory && matchSearch;
   });
 
-  // Kalkulasi total halaman dan data yang ditampilkan per halaman
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -544,7 +522,7 @@ export default function ProjectsTable({
             lineHeight: 1.3,
             cursor: "pointer",
           }}
-          onClick={() => setSelectedProject(project)}
+          onClick={() => router.push(`/admin/projects/${project.id}`)}
         >
           {project.name}
         </p>
@@ -666,7 +644,7 @@ export default function ProjectsTable({
 
           <div style={{ display: "flex", gap: "6px" }}>
             <button
-              onClick={() => setSelectedProject(project)}
+              onClick={() => router.push(`/admin/projects/${project.id}`)}
               style={{
                 background: "#EBF3FF",
                 color: "#1A56DB",
@@ -761,13 +739,6 @@ export default function ProjectsTable({
         />
       )}
 
-      {selectedProject && (
-        <ProjectsDetail
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
-
       {editingProject && (
         <div
           style={{
@@ -831,7 +802,6 @@ export default function ProjectsTable({
                     {editingProject.name}
                   </p>
                 </div>
-
                 <button
                   onClick={closeEdit}
                   style={{
@@ -871,7 +841,6 @@ export default function ProjectsTable({
                   style={readonlyStyle}
                 />
               </FieldRow>
-
               <FieldRow label="Category">
                 <input
                   readOnly
@@ -879,7 +848,6 @@ export default function ProjectsTable({
                   style={readonlyStyle}
                 />
               </FieldRow>
-
               <FieldRow label="City">
                 <input
                   readOnly
@@ -887,7 +855,6 @@ export default function ProjectsTable({
                   style={readonlyStyle}
                 />
               </FieldRow>
-
               <FieldRow label="Total Data">
                 <input
                   readOnly
@@ -895,7 +862,6 @@ export default function ProjectsTable({
                   style={readonlyStyle}
                 />
               </FieldRow>
-
               <FieldRow label="Price (Rp)">
                 <div style={{ position: "relative" }}>
                   <span
@@ -921,7 +887,6 @@ export default function ProjectsTable({
                   />
                 </div>
               </FieldRow>
-
               <FieldRow label="Description">
                 <textarea
                   rows={3}
@@ -931,7 +896,6 @@ export default function ProjectsTable({
                   style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
                 />
               </FieldRow>
-
               <FieldRow label="Thumbnail">
                 <label
                   style={{
@@ -1292,13 +1256,14 @@ export default function ProjectsTable({
                           color: "#0f172a",
                           cursor: "pointer",
                         }}
-                        onClick={() => setSelectedProject(project)}
+                        onClick={() =>
+                          router.push(`/admin/projects/${project.id}`)
+                        }
                       >
                         <span style={{ borderBottom: "1px dashed #BFDBFE" }}>
                           {project.name}
                         </span>
                       </td>
-
                       <td
                         style={{ padding: "14px 18px", whiteSpace: "nowrap" }}
                       >
@@ -1316,7 +1281,6 @@ export default function ProjectsTable({
                           {project.category}
                         </span>
                       </td>
-
                       <td
                         style={{
                           padding: "14px 18px",
@@ -1329,7 +1293,6 @@ export default function ProjectsTable({
                       >
                         {project.totalData.toLocaleString()}
                       </td>
-
                       <td
                         style={{
                           padding: "14px 18px",
@@ -1342,7 +1305,6 @@ export default function ProjectsTable({
                       >
                         {project.price}
                       </td>
-
                       <td
                         style={{
                           padding: "14px 18px",
@@ -1354,7 +1316,6 @@ export default function ProjectsTable({
                       >
                         {project.projectDate}
                       </td>
-
                       <td
                         style={{
                           padding: "14px 18px",
@@ -1366,7 +1327,6 @@ export default function ProjectsTable({
                       >
                         {project.date}
                       </td>
-
                       <td
                         className="pt-action-cell"
                         style={{ padding: "14px 18px", whiteSpace: "nowrap" }}
@@ -1376,7 +1336,9 @@ export default function ProjectsTable({
                           style={{ display: "flex", gap: "8px" }}
                         >
                           <button
-                            onClick={() => setSelectedProject(project)}
+                            onClick={() =>
+                              router.push(`/admin/projects/${project.id}`)
+                            }
                             className="pt-btn-detail"
                             style={{
                               background: "#EBF3FF",
@@ -1691,84 +1653,33 @@ export default function ProjectsTable({
         )}
       </div>
 
-      {/* ── Responsive CSS & Animasi ── */}
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
           to   { transform: rotate(360deg); }
         }
-
         .pt-desktop-table { display: block; }
         .pt-mobile-cards  { display: none; }
-
         @media (max-width: 768px) {
           .pt-desktop-table { display: none !important; }
           .pt-mobile-cards  { display: block !important; }
-
-          .pt-edit-overlay {
-            padding: 16px !important;
-          }
-
-          .pt-edit-box {
-            max-height: 92vh !important;
-            overflow-y: auto !important;
-            border-radius: 16px !important;
-          }
-
-          .pt-edit-body {
-            padding: 8px 18px 20px !important;
-          }
-
-          .pt-field-row {
-            grid-template-columns: 1fr !important;
-            gap: 6px !important;
-          }
-
-          .pt-search-input {
-            width: 180px !important;
-          }
-
-          .pt-pagination {
-            flex-wrap: wrap !important;
-            padding: 12px 16px !important;
-          }
+          .pt-edit-overlay { padding: 16px !important; }
+          .pt-edit-box { max-height: 92vh !important; overflow-y: auto !important; border-radius: 16px !important; }
+          .pt-edit-body { padding: 8px 18px 20px !important; }
+          .pt-field-row { grid-template-columns: 1fr !important; gap: 6px !important; }
+          .pt-search-input { width: 180px !important; }
+          .pt-pagination { flex-wrap: wrap !important; padding: 12px 16px !important; }
         }
-
         @media (max-width: 600px) {
-          .pt-filter-bar {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            padding: 14px 16px !important;
-          }
-
-          .pt-search-input {
-            width: 100% !important;
-          }
-
-          .pt-btn-label {
-            display: none;
-          }
-
-          .pt-btn-detail,
-          .pt-btn-edit,
-          .pt-btn-delete {
-            padding: 6px 8px !important;
-          }
-
-          .pt-action-group {
-            gap: 5px !important;
-          }
+          .pt-filter-bar { flex-direction: column !important; align-items: stretch !important; padding: 14px 16px !important; }
+          .pt-search-input { width: 100% !important; }
+          .pt-btn-label { display: none; }
+          .pt-btn-detail, .pt-btn-edit, .pt-btn-delete { padding: 6px 8px !important; }
+          .pt-action-group { gap: 5px !important; }
         }
-
         @media (max-width: 480px) {
-          .pt-edit-body {
-            padding: 8px 14px 16px !important;
-          }
-
-          .pt-edit-box {
-            max-height: 96vh !important;
-            border-radius: 12px !important;
-          }
+          .pt-edit-body { padding: 8px 14px 16px !important; }
+          .pt-edit-box { max-height: 96vh !important; border-radius: 12px !important; }
         }
       `}</style>
     </>

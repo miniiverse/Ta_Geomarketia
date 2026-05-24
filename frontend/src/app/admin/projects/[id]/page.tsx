@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Project = {
   id: number;
@@ -29,6 +31,22 @@ type PlaceData = {
 
 type Tab = "overview" | "sp-map" | "cluster";
 
+function formatPrice(price: string | number | null): string {
+  if (!price) return "Rp0";
+  const num = typeof price === "string" ? parseFloat(price) : price;
+  return "Rp" + num.toLocaleString("id-ID");
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function useWindowWidth() {
   const [width, setWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1200,
@@ -40,12 +58,6 @@ function useWindowWidth() {
   }, []);
   return width;
 }
-
-const categoryColors: Record<string, { color: string; bg: string }> = {
-  Retail: { color: "#1A56DB", bg: "#EBF3FF" },
-  "Food and Beverage": { color: "#d97706", bg: "#FFFBEB" },
-  Healthcare: { color: "#059669", bg: "#ECFDF5" },
-};
 
 const tabs: { key: Tab; label: string; icon: string }[] = [
   {
@@ -95,7 +107,7 @@ const IconTag = () => (
     <line x1="7" y1="7" x2="7.01" y2="7" />
   </svg>
 );
-const IconMap = () => (
+const IconMapIcon = () => (
   <svg
     width="18"
     height="18"
@@ -174,6 +186,7 @@ const IconLoading = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    style={{ animation: "spin 1s linear infinite" }}
   >
     <path d="M21 12a9 9 0 11-6.219-8.56" />
   </svg>
@@ -195,36 +208,41 @@ const IconImage = () => (
   </svg>
 );
 
-const MapComponent = dynamic(() => import("./MapComponent"), {
-  ssr: false,
-  loading: () => (
-    <div
-      style={{
-        height: "400px",
-        background: "#f0f7ff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: "12px",
-      }}
-    >
-      <div style={{ textAlign: "center", color: "#1A56DB" }}>
-        <div style={{ marginBottom: "8px" }}>
+const MapComponent = dynamic<{ places: PlaceData[] }>(
+  () => import("../components/MapComponent"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "clamp(400px, 65vh, 700px)",
+          background: "#f0f7ff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "12px",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
           <IconLoading />
+          <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "8px" }}>
+            Loading map...
+          </div>
         </div>
-        <div style={{ fontSize: "13px", fontWeight: 600 }}>Loading map...</div>
       </div>
-    </div>
-  ),
-});
+    ),
+  },
+);
 
-export default function ProjectsDetail({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
+export default function ProjectDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params?.id as string;
+
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   const [tab, setTab] = useState<Tab>("overview");
   const [places, setPlaces] = useState<PlaceData[]>([]);
   const [mapLoading, setMapLoading] = useState(false);
@@ -235,23 +253,39 @@ export default function ProjectsDetail({
   const isMobile = windowWidth < 640;
   const isTablet = windowWidth >= 640 && windowWidth < 1024;
 
-  const dbId = project.api_url
-    ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "-")
-    : "-";
-
-  const apiBase = project.api_url
-    ? project.api_url.replace("/places", "")
-    : null;
-
-  const SERVER = process.env.NEXT_PUBLIC_SERVER;
-
-  const thumbnailUrl = project.thumbnail
-    ? `${SERVER}/storage/${project.thumbnail}`
-    : null;
-
+  // Fetch data project berdasarkan ID dari URL
   useEffect(() => {
-    // Fetch data lokasi dari /api/places
-    if (tab !== "sp-map" || !apiBase || hasFetchedMap.current) return;
+    if (!id) return;
+    setIsLoading(true);
+    fetch(`/api/project/${id}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (!json.success) throw new Error("Project not found");
+        const p = json.data;
+        setProject({
+          id: p.project_id,
+          name: p.title,
+          category: p.category?.name || "-",
+          totalData: p.total_data ?? 0,
+          price: formatPrice(p.price),
+          projectDate: formatDate(p.project_date),
+          description: p.description,
+          api_url: p.api_url,
+          city: p.city?.name,
+          thumbnail: p.thumbnail,
+        });
+      })
+      .catch((err) => setFetchError(err.message))
+      .finally(() => setIsLoading(false));
+  }, [id]);
+
+  // Fetch data map saat tab sp-map dibuka
+  useEffect(() => {
+    if (!project || tab !== "sp-map" || hasFetchedMap.current) return;
+    const apiBase = project.api_url
+      ? project.api_url.replace("/places", "")
+      : null;
+    if (!apiBase) return;
     hasFetchedMap.current = true;
     setMapLoading(true);
     setMapError(null);
@@ -266,7 +300,7 @@ export default function ProjectsDetail({
       })
       .catch((err) => setMapError(err.message))
       .finally(() => setMapLoading(false));
-  }, [tab, apiBase]);
+  }, [tab, project]);
 
   const labelStyle: React.CSSProperties = {
     display: "block",
@@ -290,50 +324,182 @@ export default function ProjectsDetail({
     boxSizing: "border-box" as const,
   };
 
+  // ── Loading state ──
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f8fafc",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <IconLoading />
+          <div style={{ marginTop: "12px", fontSize: "14px", fontWeight: 600 }}>
+            Loading project...
+          </div>
+        </div>
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // ── Error state ──
+  if (fetchError || !project) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f8fafc",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <IconWarning />
+          <div
+            style={{
+              marginTop: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#ef4444",
+            }}
+          >
+            {fetchError || "Project not found."}
+          </div>
+          <button
+            onClick={() => router.push("/admin/projects")}
+            style={{
+              marginTop: "16px",
+              padding: "9px 20px",
+              borderRadius: "10px",
+              border: "none",
+              background: "#1A56DB",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Back to Projects
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Data sudah ada, render halaman ──
+  const SERVER = process.env.NEXT_PUBLIC_SERVER;
+  const thumbnailUrl = project.thumbnail
+    ? `${SERVER}/storage/${project.thumbnail}`
+    : null;
+  const dbId = project.api_url
+    ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "-")
+    : "-";
+
   return (
     <div
       style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(15,23,42,0.45)",
-        zIndex: 300,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: isMobile ? "0" : isTablet ? "20px" : "40px",
-        paddingTop: isMobile ? "0" : "68px",
+        minHeight: "100vh",
+        background: "#f8fafc",
+        fontFamily: "'Inter', sans-serif",
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
+      {/* ── Topbar ── */}
       <div
         style={{
           background: "#fff",
-          borderRadius: isMobile ? "20px 20px 0 0" : "20px",
-          width: isMobile
-            ? "100%"
-            : isTablet
-              ? "calc(100vw - 40px)"
-              : "calc(100vw - 80px)",
-          maxWidth: "1200px",
-          height: isMobile
-            ? "calc(100vh - 48px)"
-            : isTablet
-              ? "calc(100vh - 40px)"
-              : "calc(100vh - 68px)",
-          ...(isMobile
-            ? { position: "fixed" as const, bottom: 0, left: 0, right: 0 }
-            : {}),
-          overflow: "hidden",
+          borderBottom: "1px solid #f1f5f9",
+          padding: "0 32px",
+          height: "64px",
           display: "flex",
-          flexDirection: "column",
-          boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
+          alignItems: "center",
+          justifyContent: "space-between",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
         }}
       >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link
+            href="/admin/dashboard-admin"
+            style={{
+              fontSize: "13px",
+              color: "#94a3b8",
+              textDecoration: "none",
+            }}
+          >
+            Dashboard
+          </Link>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <Link
+            href="/admin/projects"
+            style={{
+              fontSize: "13px",
+              color: "#94a3b8",
+              textDecoration: "none",
+            }}
+          >
+            Projects
+          </Link>
+          <span style={{ color: "#cbd5e1" }}>/</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "#1A56DB" }}>
+            Detail
+          </span>
+        </div>
+        <button
+          onClick={() => router.push("/admin/projects")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "8px 16px",
+            borderRadius: "10px",
+            border: "1px solid #e2e8f0",
+            background: "#fff",
+            color: "#64748b",
+            fontSize: "13px",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back
+        </button>
+      </div>
+
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: isMobile ? "16px" : "32px",
+        }}
+      >
+        {/* ── Header Card ── */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
-            padding: isMobile ? "16px 16px 12px" : "24px 28px 20px",
-            flexShrink: 0,
+            borderRadius: "20px",
+            padding: isMobile ? "20px" : "28px",
+            marginBottom: "24px",
           }}
         >
           <div
@@ -341,7 +507,7 @@ export default function ProjectsDetail({
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "space-between",
-              marginBottom: "16px",
+              marginBottom: "20px",
             }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -350,7 +516,7 @@ export default function ProjectsDetail({
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
-                  marginBottom: "6px",
+                  marginBottom: "8px",
                   flexWrap: "wrap",
                 }}
               >
@@ -358,12 +524,10 @@ export default function ProjectsDetail({
                   style={{
                     background: "rgba(255,255,255,0.2)",
                     color: "#fff",
-                    fontSize: isMobile ? "10px" : "11px",
+                    fontSize: "11px",
                     fontWeight: 600,
-                    fontFamily: "'Inter', sans-serif",
                     padding: "3px 10px",
                     borderRadius: "20px",
-                    letterSpacing: "0.04em",
                   }}
                 >
                   {project.category || "-"}
@@ -373,9 +537,8 @@ export default function ProjectsDetail({
                     style={{
                       background: "rgba(255,255,255,0.15)",
                       color: "#e2e8f0",
-                      fontSize: isMobile ? "10px" : "11px",
+                      fontSize: "11px",
                       fontWeight: 600,
-                      fontFamily: "'Inter', sans-serif",
                       padding: "3px 10px",
                       borderRadius: "20px",
                       display: "flex",
@@ -399,71 +562,36 @@ export default function ProjectsDetail({
                   </span>
                 )}
               </div>
-              <h2
+              <h1
                 style={{
                   margin: 0,
-                  fontSize: isMobile ? "16px" : isTablet ? "18px" : "22px",
+                  fontSize: isMobile ? "18px" : "24px",
                   fontWeight: 700,
-                  fontFamily: "'Inter', sans-serif",
                   color: "#fff",
                   letterSpacing: "-0.03em",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: isMobile ? "nowrap" : "normal",
                 }}
               >
                 {project.name}
-              </h2>
+              </h1>
               <p
                 style={{
-                  margin: "4px 0 0",
-                  fontSize: isMobile ? "11px" : "13px",
+                  margin: "6px 0 0",
+                  fontSize: "13px",
                   color: "rgba(255,255,255,0.6)",
-                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 Project Date: {project.projectDate} · {project.price}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "none",
-                borderRadius: "10px",
-                width: "36px",
-                height: "36px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "#fff",
-                flexShrink: 0,
-                marginLeft: "12px",
-              }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
           </div>
 
+          {/* ── Tabs ── */}
           <div
             style={{
               display: "flex",
               gap: "4px",
-              overflowX: isMobile ? "auto" : "visible",
+              overflowX: "auto",
               scrollbarWidth: "none",
-              msOverflowStyle: "none",
             }}
           >
             {tabs.map((t) => (
@@ -484,7 +612,6 @@ export default function ProjectsDetail({
                   fontWeight: 600,
                   fontFamily: "'Inter', sans-serif",
                   cursor: "pointer",
-                  transition: "all 0.15s",
                   whiteSpace: "nowrap",
                   flexShrink: 0,
                 }}
@@ -507,16 +634,20 @@ export default function ProjectsDetail({
           </div>
         </div>
 
+        {/* ── Tab Content ── */}
         <div
           style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: isMobile ? "16px" : "24px 28px",
+            background: "#fff",
+            borderRadius: "20px",
+            border: "1px solid #f1f5f9",
+            padding: isMobile ? "20px" : "28px",
+            boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           }}
         >
+          {/* Overview */}
           {tab === "overview" && (
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
             >
               <div
                 style={{
@@ -538,6 +669,7 @@ export default function ProjectsDetail({
                       width: "100%",
                       height: "auto",
                       display: "block",
+                      maxHeight: "320px",
                       objectFit: "cover",
                     }}
                     onError={(e) => {
@@ -554,13 +686,7 @@ export default function ProjectsDetail({
                     }}
                   >
                     <IconImage />
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        marginTop: "8px",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
+                    <div style={{ fontSize: "12px", marginTop: "8px" }}>
                       No thumbnail available
                     </div>
                   </div>
@@ -655,9 +781,44 @@ export default function ProjectsDetail({
                 <label style={labelStyle}>DB ID</label>
                 <input readOnly value={dbId} style={readonlyStyle} />
               </div>
+
+              {project.api_url && (
+                <div>
+                  <a
+                    href={project.api_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontSize: "13px",
+                      color: "#1A56DB",
+                      textDecoration: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    >
+                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                    Open API URL
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
+          {/* Map Analysis */}
           {tab === "sp-map" && (
             <div>
               <div
@@ -682,7 +843,7 @@ export default function ProjectsDetail({
                   {
                     label: "Kota",
                     value: project.city || "-",
-                    icon: <IconMap />,
+                    icon: <IconMapIcon />,
                   },
                 ].map((item) => (
                   <div
@@ -712,13 +873,7 @@ export default function ProjectsDetail({
                       {item.icon}
                     </div>
                     <div>
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          color: "#64748b",
-                          fontFamily: "'Inter', sans-serif",
-                        }}
-                      >
+                      <div style={{ fontSize: "11px", color: "#64748b" }}>
                         {item.label}
                       </div>
                       <div
@@ -726,7 +881,6 @@ export default function ProjectsDetail({
                           fontSize: "16px",
                           fontWeight: 700,
                           color: "#0f172a",
-                          fontFamily: "'Inter', sans-serif",
                         }}
                       >
                         {item.value}
@@ -739,7 +893,7 @@ export default function ProjectsDetail({
               {mapLoading && (
                 <div
                   style={{
-                    height: isMobile ? "280px" : "400px",
+                    height: "clamp(400px, 65vh, 700px)",
                     background: "#f0f7ff",
                     borderRadius: "14px",
                     display: "flex",
@@ -749,20 +903,12 @@ export default function ProjectsDetail({
                   }}
                 >
                   <div style={{ textAlign: "center", color: "#1A56DB" }}>
-                    <div
-                      style={{
-                        marginBottom: "12px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconLoading />
-                    </div>
+                    <IconLoading />
                     <div
                       style={{
                         fontSize: "13px",
                         fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
+                        marginTop: "12px",
                       }}
                     >
                       Loading {project.totalData.toLocaleString()} data
@@ -773,7 +919,6 @@ export default function ProjectsDetail({
                         fontSize: "11.5px",
                         color: "#64748b",
                         marginTop: "4px",
-                        fontFamily: "'Inter', sans-serif",
                       }}
                     >
                       This may take a few seconds.
@@ -785,7 +930,7 @@ export default function ProjectsDetail({
               {mapError && (
                 <div
                   style={{
-                    height: isMobile ? "280px" : "400px",
+                    height: "clamp(400px, 65vh, 700px)",
                     background: "#fff5f5",
                     borderRadius: "14px",
                     display: "flex",
@@ -795,21 +940,13 @@ export default function ProjectsDetail({
                   }}
                 >
                   <div style={{ textAlign: "center" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <IconWarning />
-                    </div>
+                    <IconWarning />
                     <div
                       style={{
                         fontSize: "13px",
                         fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
                         color: "#ef4444",
+                        marginTop: "12px",
                       }}
                     >
                       Failed to load map data
@@ -819,7 +956,6 @@ export default function ProjectsDetail({
                         fontSize: "11.5px",
                         color: "#64748b",
                         marginTop: "4px",
-                        fontFamily: "'Inter', sans-serif",
                       }}
                     >
                       {mapError}
@@ -843,7 +979,7 @@ export default function ProjectsDetail({
               {!mapLoading && !mapError && places.length === 0 && (
                 <div
                   style={{
-                    height: isMobile ? "280px" : "400px",
+                    height: "clamp(400px, 65vh, 700px)",
                     background: "#f8fafc",
                     borderRadius: "14px",
                     display: "flex",
@@ -853,21 +989,8 @@ export default function ProjectsDetail({
                   }}
                 >
                   <div style={{ textAlign: "center", color: "#94a3b8" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <IconMapEmpty />
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "13px",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
+                    <IconMapEmpty />
+                    <div style={{ fontSize: "13px", marginTop: "12px" }}>
                       No location data available.
                     </div>
                   </div>
@@ -876,31 +999,24 @@ export default function ProjectsDetail({
             </div>
           )}
 
+          {/* Cluster */}
           {tab === "cluster" && (
             <div
               style={{
-                height: "100%",
+                minHeight: "400px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
               <div style={{ textAlign: "center", color: "#94a3b8" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginBottom: "16px",
-                  }}
-                >
-                  <IconMicroscope />
-                </div>
+                <IconMicroscope />
                 <div
                   style={{
                     fontSize: "16px",
                     fontWeight: 600,
                     color: "#64748b",
-                    fontFamily: "'Inter', sans-serif",
+                    marginTop: "16px",
                     marginBottom: "8px",
                   }}
                 >
@@ -909,16 +1025,13 @@ export default function ProjectsDetail({
                 <div
                   style={{
                     fontSize: "13.5px",
-                    color: "#94a3b8",
-                    fontFamily: "'Inter', sans-serif",
                     lineHeight: 1.6,
                     maxWidth: "280px",
                     margin: "0 auto",
                   }}
                 >
                   This feature is coming soon! We are working hard to bring you
-                  insights on data clusters and patterns. Stay tuned for
-                  updates.
+                  insights on data clusters and patterns.
                 </div>
                 <div
                   style={{
@@ -930,13 +1043,7 @@ export default function ProjectsDetail({
                     display: "inline-block",
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      color: "#64748b",
-                      fontFamily: "'Inter', sans-serif",
-                    }}
-                  >
+                  <span style={{ fontSize: "12px", color: "#64748b" }}>
                     Total data:{" "}
                     <strong style={{ color: "#0f172a" }}>
                       {project.totalData.toLocaleString()} points
@@ -946,71 +1053,6 @@ export default function ProjectsDetail({
               </div>
             </div>
           )}
-        </div>
-
-        <div
-          style={{
-            padding: isMobile ? "12px 16px" : "16px 28px",
-            borderTop: "1px solid #f1f5f9",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          {project.api_url ? (
-            <a
-              href={project.api_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontSize: "12px",
-                color: "#1A56DB",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                maxWidth: isMobile ? "160px" : "unset",
-              }}
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-              Open API URL
-            </a>
-          ) : (
-            <div />
-          )}
-
-          <button
-            onClick={onClose}
-            style={{
-              padding: isMobile ? "8px 16px" : "9px 20px",
-              borderRadius: "10px",
-              border: "1px solid #e2e8f0",
-              background: "#fff",
-              color: "#64748b",
-              fontSize: "13px",
-              fontWeight: 600,
-              fontFamily: "'Inter', sans-serif",
-              cursor: "pointer",
-            }}
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

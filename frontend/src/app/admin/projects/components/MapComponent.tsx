@@ -114,8 +114,7 @@ function FitBounds({ places }: { places: PlaceData[] }) {
           map.fitBounds(bounds, { padding: [40, 40] });
           fitted.current = true;
         }
-      } catch {
-      }
+      } catch {}
     };
 
     const t1 = setTimeout(tryFit, 150);
@@ -138,9 +137,8 @@ export default function MapComponent({ places }: { places: PlaceData[] }) {
     <MapContainer
       center={center}
       zoom={12}
-      style={{ height: "clamp(280px, 45vh, 450px)", width: "100%" }}
+      style={{ height: "clamp(400px, 65vh, 700px)", width: "100%" }}
       scrollWheelZoom={true}
-      whenReady={() => {}}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
