@@ -50,7 +50,6 @@ export default function ProjectLayout({
             gap: 16px !important;
           }
         }
-
         @media (max-width: 768px) {
           .project-layout-grid {
             grid-template-columns: 1fr !important;

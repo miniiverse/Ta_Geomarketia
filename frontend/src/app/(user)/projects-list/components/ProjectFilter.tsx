@@ -22,16 +22,12 @@ interface FilterSidebarProps {
   onFilterChange?: (filters: {
     category?: string;
     city_id?: string;
-    sort?: string;
     project_date_year?: string;
-    last_update_year?: string;
   }) => void;
   currentFilters?: {
     category?: string;
     city_id?: string;
-    sort?: string;
     project_date_year?: string;
-    last_update_year?: string;
   };
 }
 
@@ -76,23 +72,17 @@ export default function ProjectsFilterSidebar({
   const [projectDateYear, setProjectDateYear] = useState(
     currentFilters?.project_date_year ?? "",
   );
-  const [lastUpdateYear, setLastUpdateYear] = useState(
-    currentFilters?.last_update_year ?? "",
-  );
   const [provinceId, setProvinceId] = useState("");
   const [cityId, setCityId] = useState(currentFilters?.city_id ?? "");
-  const [sort, setSort] = useState(currentFilters?.sort ?? "");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [projectDateYears, setProjectDateYears] = useState<number[]>([]);
-  const [lastUpdateYears, setLastUpdateYears] = useState<number[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // Fetch categories and provinces on mount
   useEffect(() => {
     fetch("/api/filters?type=categories")
       .then((r) => r.json())
@@ -115,9 +105,7 @@ export default function ProjectsFilterSidebar({
       { length: currentYear - 2024 + 1 },
       (_, i) => 2024 + i,
     ).reverse();
-
     setProjectDateYears(years);
-    setLastUpdateYears(years);
   }, []);
 
   useEffect(() => {
@@ -138,11 +126,9 @@ export default function ProjectsFilterSidebar({
     onFilterChange?.({
       category: category === "ALL" ? undefined : category,
       city_id: cityId || undefined,
-      sort,
       project_date_year: projectDateYear || undefined,
-      last_update_year: lastUpdateYear || undefined,
     });
-  }, [category, projectDateYear, lastUpdateYear, cityId, sort]);
+  }, [category, projectDateYear, cityId]);
 
   const handleProvinceChange = (val: string) => {
     setProvinceId(val);
@@ -327,40 +313,7 @@ export default function ProjectsFilterSidebar({
           </div>
         </div>
 
-        <div style={{ marginBottom: 22 }}>
-          <p style={labelStyle}>LAST UPDATE YEAR</p>
-          <div style={{ position: "relative" }}>
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              style={iconStyle}
-            >
-              <path
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <select
-              value={lastUpdateYear}
-              onChange={(e) => setLastUpdateYear(e.target.value)}
-              style={selectStyle}
-            >
-              <option value="">All Years</option>
-              {lastUpdateYears.map((y) => (
-                <option key={y} value={String(y)}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 22 }}>
+        <div style={{ marginBottom: 4 }}>
           <p style={labelStyle}>LOCATION</p>
           <div style={{ position: "relative", marginBottom: 9 }}>
             <svg
@@ -425,35 +378,6 @@ export default function ProjectsFilterSidebar({
                   {c.name}
                 </option>
               ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 4 }}>
-          <p style={labelStyle}>SORT BY</p>
-          <div style={{ position: "relative" }}>
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              style={iconStyle}
-            >
-              <path
-                d="M3 6h18M7 12h10M11 18h2"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              style={selectStyle}
-            >
-              <option value="">All</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
             </select>
           </div>
         </div>

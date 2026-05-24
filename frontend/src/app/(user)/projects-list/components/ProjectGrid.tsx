@@ -8,9 +8,8 @@ export interface ProjectFilters {
   search?: string;
   category?: string;
   city_id?: string;
-  sort?: string;
   project_date_year?: string;
-  last_update_year?: string;
+  price_sort?: string;
   page?: number;
 }
 
@@ -20,7 +19,6 @@ interface Project {
   description: string;
   price: string;
   total_data: number;
-  last_update: string;
   project_date: string | null;
   category: string;
   region: string;
@@ -51,13 +49,11 @@ const FALLBACK_IMAGE: Record<string, string> = {
 
 function resolveImage(thumbnail: string | null, category: string): string {
   if (thumbnail && thumbnail.trim() !== "") {
-    const fixedUrl = thumbnail.replace("http://localhost/", `${SERVER_URL}/`);
-    return fixedUrl;
+    return thumbnail.replace("http://localhost/", `${SERVER_URL}/`);
   }
   return FALLBACK_IMAGE[category] ?? FALLBACK_IMAGE.default;
 }
 
-// Add error handling and loading states
 export default function ProjectGrid({
   filters = {},
   onPageChange,
@@ -71,16 +67,8 @@ export default function ProjectGrid({
   const [error, setError] = useState<string | null>(null);
 
   const currentPage = filters.page ?? 1;
-
-  const {
-    search,
-    category,
-    city_id,
-    sort,
-    project_date_year,
-    last_update_year,
-    page,
-  } = filters;
+  const { search, category, city_id, project_date_year, price_sort, page } =
+    filters;
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -90,9 +78,8 @@ export default function ProjectGrid({
     if (search) params.set("search", search);
     if (category && category !== "ALL") params.set("category", category);
     if (city_id) params.set("city_id", city_id);
-    if (sort) params.set("sort", sort);
     if (project_date_year) params.set("project_date_year", project_date_year);
-    if (last_update_year) params.set("last_update_year", last_update_year);
+    if (price_sort) params.set("sort", price_sort);
     if (page && page > 1) params.set("page", String(page));
 
     try {
@@ -107,8 +94,8 @@ export default function ProjectGrid({
       setMeta(json.meta ?? null);
       onTotalChange?.(json.meta?.total ?? 0);
 
-      if (json.available_years && onYearsLoaded) {
-        onYearsLoaded(json.available_years);
+      if (json.project_date_years && onYearsLoaded) {
+        onYearsLoaded(json.project_date_years);
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load data.");
@@ -119,9 +106,8 @@ export default function ProjectGrid({
     search,
     category,
     city_id,
-    sort,
     project_date_year,
-    last_update_year,
+    price_sort,
     page,
     onTotalChange,
     onYearsLoaded,
@@ -354,10 +340,8 @@ export default function ProjectGrid({
               region={project.region}
               category={project.category}
               price={project.price}
-              status={project.status}
               image={resolveImage(project.thumbnail, project.category)}
               totalData={project.total_data}
-              lastUpdate={project.last_update}
               projectDate={project.project_date ?? undefined}
               onPreview={() => router.push(`/project-detail/${project.id}`)}
             />

@@ -10,19 +10,11 @@ interface ProjectCardProps {
   region?: string;
   category?: string;
   price?: string;
-  layerCount?: number;
-  status?: "New" | "Oldest";
   image?: string;
   totalData?: number;
-  lastUpdate?: string;
   projectDate?: string;
   onPreview?: () => void;
 }
-
-const statusConfig = {
-  New: { color: "#1A56DB", bg: "#EBF3FF", border: "#BFDBFE" },
-  Oldest: { color: "#64748B", bg: "#F1F5F9", border: "#CBD5E1" },
-};
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80&fit=crop";
@@ -45,17 +37,14 @@ export default function ProjectCard({
   region = "Jakarta",
   category = "Retail",
   price = "Rp 850.000",
-  status = "New",
   image = FALLBACK_IMAGE,
   totalData = 0,
-  lastUpdate = "-",
   projectDate,
   onPreview,
 }: ProjectCardProps) {
   const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
   const router = useRouter();
-  const cfg = statusConfig[status] ?? statusConfig["New"];
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,38 +116,6 @@ export default function ProjectCard({
                 "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.25) 100%)",
             }}
           />
-
-          <div style={{ position: "absolute", top: 10, left: 12 }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "4px 10px",
-                borderRadius: 6,
-                fontSize: 10,
-                fontWeight: 700,
-                background: cfg.bg,
-                color: cfg.color,
-                border: `1px solid ${cfg.border}`,
-                backdropFilter: "blur(6px)",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                fontFamily: "'JetBrains Mono',monospace",
-              }}
-            >
-              <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  background: cfg.color,
-                  display: "inline-block",
-                }}
-              />
-              {status}
-            </span>
-          </div>
 
           <div
             style={{
@@ -237,14 +194,7 @@ export default function ProjectCard({
         </div>
 
         <div className="card-body" style={{ padding: "16px 18px 18px" }}>
-          <div
-            style={{
-              marginBottom: 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+          <div style={{ marginBottom: 8 }}>
             <span
               style={{
                 fontSize: 10,
@@ -255,15 +205,6 @@ export default function ProjectCard({
               }}
             >
               {category}
-            </span>
-            <span
-              style={{
-                fontSize: 9,
-                color: "#94A3B8",
-                fontFamily: "'Inter', system-ui, sans-serif",
-              }}
-            >
-              Last Update {lastUpdate}
             </span>
           </div>
 
@@ -326,18 +267,9 @@ export default function ProjectCard({
             {description}
           </p>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: 2,
-              marginBottom: 12,
-            }}
-          >
+          <div style={{ marginBottom: 12 }}>
             <span
               style={{
-                alignSelf: "flex-start",
                 fontSize: 20,
                 fontWeight: 800,
                 color: "#1A56DB",
@@ -438,19 +370,10 @@ export default function ProjectCard({
         }
 
         @media (max-width: 480px) {
-          .card-image {
-            height: 160px !important;
-          }
-          .card-body {
-            padding: 14px 14px 16px !important;
-          }
-          .card-footer {
-            flex-wrap: wrap;
-          }
-          .card-footer button {
-            width: 100%;
-            justify-content: center;
-          }
+          .card-image { height: 160px !important; }
+          .card-body { padding: 14px 14px 16px !important; }
+          .card-footer { flex-wrap: wrap; }
+          .card-footer button { width: 100%; justify-content: center; }
         }
       `}</style>
     </>

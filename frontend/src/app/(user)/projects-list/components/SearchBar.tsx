@@ -18,7 +18,6 @@ export default function ProjectsHeader({
   const [focused, setFocused] = useState(false);
   const [priceSort, setPriceSort] = useState("");
 
-  // Keep a ref to the latest onSearch callback to avoid stale closures in the debounce effect
   const onSearchRef = useRef(onSearch);
   useEffect(() => {
     onSearchRef.current = onSearch;
@@ -45,7 +44,8 @@ export default function ProjectsHeader({
       const val = e.target.value;
       setPriceSort(val);
       onFilterChange?.({
-        sort: val === "low" ? "price_asc" : val === "high" ? "price_desc" : "",
+        price_sort:
+          val === "low" ? "price_asc" : val === "high" ? "price_desc" : "",
       });
     },
     [onFilterChange],
@@ -53,8 +53,10 @@ export default function ProjectsHeader({
 
   return (
     <>
-      <div className="search-bar-wrapper" style={{ padding: "28px 0 10px", fontFamily: "'Inter', sans-serif" }}>
-        {/* Title row */}
+      <div
+        className="search-bar-wrapper"
+        style={{ padding: "28px 0 10px", fontFamily: "'Inter', sans-serif" }}
+      >
         <div
           className="search-title-row"
           style={{
@@ -126,7 +128,6 @@ export default function ProjectsHeader({
           </div>
         </div>
 
-        {/* Search + sort row */}
         <div
           className="search-input-row"
           style={{
@@ -136,7 +137,10 @@ export default function ProjectsHeader({
             flexWrap: "wrap",
           }}
         >
-          <div className="search-input-wrap" style={{ flex: 1, minWidth: 0, position: "relative" }}>
+          <div
+            className="search-input-wrap"
+            style={{ flex: 1, minWidth: 0, position: "relative" }}
+          >
             <div
               style={{
                 display: "flex",
@@ -156,7 +160,10 @@ export default function ProjectsHeader({
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                style={{ color: focused ? "#1A56DB" : "#93C5FD", flexShrink: 0 }}
+                style={{
+                  color: focused ? "#1A56DB" : "#93C5FD",
+                  flexShrink: 0,
+                }}
               >
                 <circle
                   cx="11"
@@ -174,7 +181,7 @@ export default function ProjectsHeader({
               </svg>
               <input
                 type="text"
-                placeholder="Search by title, category, description..."
+                placeholder="Search by title, description, price, date, total data..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => setFocused(true)}
@@ -216,7 +223,10 @@ export default function ProjectsHeader({
             </div>
           </div>
 
-          <div className="sort-select-wrap" style={{ position: "relative", flexShrink: 0 }}>
+          <div
+            className="sort-select-wrap"
+            style={{ position: "relative", flexShrink: 0 }}
+          >
             <svg
               width="14"
               height="14"
@@ -292,41 +302,21 @@ export default function ProjectsHeader({
         @keyframes sbDot { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
         @media (max-width: 1024px) {
-          .search-bar-wrapper {
-            padding: 20px 0 8px !important;
-          }
-          .search-heading {
-            font-size: 22px !important;
-          }
+          .search-bar-wrapper { padding: 20px 0 8px !important; }
+          .search-heading { font-size: 22px !important; }
         }
 
         @media (max-width: 768px) {
-          .search-bar-wrapper {
-            padding: 16px 0 8px !important;
-          }
-          .search-heading {
-            font-size: 20px !important;
-          }
-          .search-input-row {
-            flex-direction: column !important;
-            align-items: stretch !important;
-          }
-          .search-input-wrap {
-            width: 100% !important;
-          }
-          .sort-select-wrap {
-            width: 100% !important;
-          }
+          .search-bar-wrapper { padding: 16px 0 8px !important; }
+          .search-heading { font-size: 20px !important; }
+          .search-input-row { flex-direction: column !important; align-items: stretch !important; }
+          .search-input-wrap { width: 100% !important; }
+          .sort-select-wrap { width: 100% !important; }
         }
 
         @media (max-width: 480px) {
-          .search-heading {
-            font-size: 18px !important;
-          }
-          .search-title-row {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-          }
+          .search-heading { font-size: 18px !important; }
+          .search-title-row { flex-direction: column !important; align-items: flex-start !important; }
         }
       `}</style>
     </>

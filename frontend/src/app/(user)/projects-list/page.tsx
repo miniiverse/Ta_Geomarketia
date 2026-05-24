@@ -8,16 +8,13 @@ export interface ProjectFilters {
   search?: string;
   category?: string;
   city_id?: string;
-  sort?: string;
   project_date_year?: string;
-  last_update_year?: string;
+  price_sort?: string;
   page?: number;
 }
 
 export default function ProjectsPage() {
-  const [filters, setFilters] = useState<ProjectFilters>({
-    sort: "",
-  });
+  const [filters, setFilters] = useState<ProjectFilters>({});
   const [totalProjects, setTotalProjects] = useState<number | undefined>(
     undefined,
   );
@@ -58,26 +55,16 @@ export default function ProjectsPage() {
       </div>
 
       <style>{`
-        .projects-page-wrapper {
-          padding: 0 40px 40px;
-        }
+        .projects-page-wrapper { padding: 0 40px 40px; }
 
         @media (max-width: 1024px) {
-          .projects-page-wrapper {
-            padding: 0 24px 32px;
-          }
+          .projects-page-wrapper { padding: 0 24px 32px; }
         }
-
         @media (max-width: 768px) {
-          .projects-page-wrapper {
-            padding: 0 16px 24px;
-          }
+          .projects-page-wrapper { padding: 0 16px 24px; }
         }
-
         @media (max-width: 480px) {
-          .projects-page-wrapper {
-            padding: 0 12px 20px;
-          }
+          .projects-page-wrapper { padding: 0 12px 20px; }
         }
       `}</style>
     </>
