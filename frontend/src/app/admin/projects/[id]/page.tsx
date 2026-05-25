@@ -27,6 +27,7 @@ type PlaceData = {
   address: string;
   rating: number;
   review: number;
+  cluster?: number | null;
 };
 
 type Tab = "overview" | "sp-map" | "cluster";
@@ -253,7 +254,6 @@ export default function ProjectDetailPage() {
   const isMobile = windowWidth < 640;
   const isTablet = windowWidth >= 640 && windowWidth < 1024;
 
-  // Fetch data project berdasarkan ID dari URL
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
@@ -279,7 +279,6 @@ export default function ProjectDetailPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
-  // Fetch data map saat tab sp-map dibuka
   useEffect(() => {
     if (!project || tab !== "sp-map" || hasFetchedMap.current) return;
     const apiBase = project.api_url
@@ -324,7 +323,6 @@ export default function ProjectDetailPage() {
     boxSizing: "border-box" as const,
   };
 
-  // ── Loading state ──
   if (isLoading) {
     return (
       <div
@@ -348,7 +346,6 @@ export default function ProjectDetailPage() {
     );
   }
 
-  // ── Error state ──
   if (fetchError || !project) {
     return (
       <div
@@ -394,7 +391,6 @@ export default function ProjectDetailPage() {
     );
   }
 
-  // ── Data sudah ada, render halaman ──
   const SERVER = process.env.NEXT_PUBLIC_SERVER;
   const thumbnailUrl = project.thumbnail
     ? `${SERVER}/storage/${project.thumbnail}`
@@ -413,7 +409,6 @@ export default function ProjectDetailPage() {
     >
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
-      {/* ── Topbar ── */}
       <div
         style={{
           background: "#fff",
@@ -493,7 +488,6 @@ export default function ProjectDetailPage() {
           padding: isMobile ? "16px" : "32px",
         }}
       >
-        {/* ── Header Card ── */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -585,7 +579,6 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* ── Tabs ── */}
           <div
             style={{
               display: "flex",
@@ -634,7 +627,6 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* ── Tab Content ── */}
         <div
           style={{
             background: "#fff",
@@ -644,7 +636,6 @@ export default function ProjectDetailPage() {
             boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           }}
         >
-          {/* Overview */}
           {tab === "overview" && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "16px" }}
@@ -818,7 +809,6 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* Map Analysis */}
           {tab === "sp-map" && (
             <div>
               <div
@@ -999,7 +989,6 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* Cluster */}
           {tab === "cluster" && (
             <div
               style={{
