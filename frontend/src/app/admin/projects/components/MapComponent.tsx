@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -11,6 +11,8 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import NearbyBusinessSidebar from "./NearbyBusinessSidebar";
+import ClusterSummaryCard from "./ClusterSummaryCard";
+import MapStatsCard from "./MapStatsCard";
 
 type PlaceData = {
   id: number;
@@ -127,9 +129,7 @@ function runDBSCAN(
     clusterId++;
   }
 
-  for (let i = 0; i < n; i++) {
-    result.set(indices[i], labels[i]);
-  }
+  for (let i = 0; i < n; i++) result.set(indices[i], labels[i]);
   return result;
 }
 
@@ -198,7 +198,6 @@ function renderStars(rating: number) {
 function FitBounds({ places }: { places: PlaceData[] }) {
   const map = useMap();
   const fitted = useRef(false);
-
   useEffect(() => {
     if (places.length === 0 || fitted.current) return;
     const tryFit = () => {
@@ -222,6 +221,44 @@ function FitBounds({ places }: { places: PlaceData[] }) {
       clearTimeout(t2);
     };
   }, [places, map]);
+  return null;
+}
+
+function ZoomToCluster({
+  targetCluster,
+  places,
+  geoClusterMap,
+}: {
+  targetCluster: number | null;
+  places: PlaceData[];
+  geoClusterMap: Map<number, number>;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (targetCluster === null) return;
+
+    let targetPlaces: PlaceData[];
+
+    if (targetCluster === -999) {
+      targetPlaces = places;
+    } else {
+      targetPlaces = places.filter((p, idx) => {
+        const apiCluster = parseCluster(p.cluster);
+        const gc = apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
+        return gc === targetCluster;
+      });
+    }
+
+    if (targetPlaces.length === 0) return;
+
+    const bounds = L.latLngBounds(
+      targetPlaces.map((p) => [p.latitude, p.longitude] as [number, number]),
+    );
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
+    }
+  }, [targetCluster, places, geoClusterMap, map]);
 
   return null;
 }
@@ -236,6 +273,7 @@ export default function MapWithNearby({
     (PlaceData & { distance: number })[]
   >([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [zoomTarget, setZoomTarget] = useState<number | null>(null);
 
   const center: [number, number] =
     places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
@@ -269,17 +307,14 @@ export default function MapWithNearby({
 
   function handleMarkerClick(place: PlaceData) {
     const { latitude: lat, longitude: lng } = place;
-
     if (selectedId === place.id) {
       setSelectedId(null);
       setClickedPoint(null);
       setNearbyList([]);
       return;
     }
-
     setSelectedId(place.id);
     setClickedPoint({ lat, lng });
-
     const nearby = places
       .map((p) => ({
         ...p,
@@ -287,292 +322,303 @@ export default function MapWithNearby({
       }))
       .filter((p) => p.distance <= NEARBY_RADIUS_M)
       .sort((a, b) => a.distance - b.distance);
-
     setNearbyList(nearby);
   }
 
+  const handleZoomToCluster = useCallback((geoCluster: number) => {
+    setZoomTarget(null);
+    setTimeout(() => setZoomTarget(geoCluster), 0);
+  }, []);
+
   return (
-    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
-      {/* Map */}
-      <div
-        style={{
-          flex: 1,
-          minWidth: 0,
-          position: "relative",
-          borderRadius: "14px",
-          overflow: "hidden",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <MapContainer
-          center={center}
-          zoom={12}
-          style={{ height: "clamp(400px, 65vh, 700px)", width: "100%" }}
-          scrollWheelZoom={true}
+    <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+      <MapStatsCard places={places} />
+      <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            position: "relative",
+            borderRadius: "14px",
+            overflow: "hidden",
+            border: "1px solid #e2e8f0",
+          }}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <FitBounds places={places} />
+          <MapContainer
+            center={center}
+            zoom={12}
+            style={{ height: "clamp(400px, 65vh, 700px)", width: "100%" }}
+            scrollWheelZoom={true}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <FitBounds places={places} />
+            <ZoomToCluster
+              targetCluster={zoomTarget}
+              places={places}
+              geoClusterMap={geoClusterMap}
+            />
 
-          {places.map((place, idx) => {
-            const apiCluster = parseCluster(place.cluster);
-            const geoCluster =
-              apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
-            const color = getClusterColor(geoCluster);
-            const isSelected = selectedId === place.id;
-            const isNearby = nearbyList.some((n) => n.id === place.id);
+            {places.map((place, idx) => {
+              const apiCluster = parseCluster(place.cluster);
+              const geoCluster =
+                apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
+              const color = getClusterColor(geoCluster);
+              const isSelected = selectedId === place.id;
+              const isNearby = nearbyList.some((n) => n.id === place.id);
 
-            return (
-              <CircleMarker
-                key={place.id}
-                center={[place.latitude, place.longitude]}
-                radius={isSelected ? 10 : isNearby && clickedPoint ? 7 : 6}
-                pathOptions={{
-                  fillColor: color,
-                  fillOpacity: isSelected
-                    ? 1
-                    : isNearby && clickedPoint
-                      ? 0.95
-                      : 0.75,
-                  color: isSelected
-                    ? "#1A56DB"
-                    : isNearby && clickedPoint
-                      ? "#fff"
-                      : "#fff",
-                  weight: isSelected ? 3 : isNearby && clickedPoint ? 2 : 1.2,
-                }}
-                eventHandlers={{
-                  click: () => handleMarkerClick(place),
-                }}
-              >
-                <Popup minWidth={200}>
-                  <div style={{ fontFamily: "'Inter', sans-serif" }}>
-                    <div
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "13px",
-                        color: "#0f172a",
-                        marginBottom: "6px",
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {place.name}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "6px",
-                        marginBottom: "8px",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      {place.category && (
+              return (
+                <CircleMarker
+                  key={place.id}
+                  center={[place.latitude, place.longitude]}
+                  radius={isSelected ? 10 : isNearby && clickedPoint ? 7 : 6}
+                  pathOptions={{
+                    fillColor: color,
+                    fillOpacity: isSelected
+                      ? 1
+                      : isNearby && clickedPoint
+                        ? 0.95
+                        : 0.75,
+                    color: isSelected
+                      ? "#1A56DB"
+                      : isNearby && clickedPoint
+                        ? "#fff"
+                        : "#fff",
+                    weight: isSelected ? 3 : isNearby && clickedPoint ? 2 : 1.2,
+                  }}
+                  eventHandlers={{ click: () => handleMarkerClick(place) }}
+                >
+                  <Popup minWidth={200}>
+                    <div style={{ fontFamily: "'Inter', sans-serif" }}>
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: "13px",
+                          color: "#0f172a",
+                          marginBottom: "6px",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {place.name}
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          marginBottom: "8px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {place.category && (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              color: "#1A56DB",
+                              fontWeight: 600,
+                              background: "#EBF3FF",
+                              padding: "2px 8px",
+                              borderRadius: "20px",
+                            }}
+                          >
+                            {place.category}
+                          </span>
+                        )}
                         <span
                           style={{
                             fontSize: "11px",
-                            color: "#1A56DB",
                             fontWeight: 600,
-                            background: "#EBF3FF",
+                            color: "#fff",
+                            background: color,
                             padding: "2px 8px",
                             borderRadius: "20px",
                           }}
                         >
-                          {place.category}
+                          {clusterLabel(geoCluster)}
                         </span>
-                      )}
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          color: "#fff",
-                          background: color,
-                          padding: "2px 8px",
-                          borderRadius: "20px",
-                        }}
-                      >
-                        {clusterLabel(geoCluster)}
-                      </span>
-                    </div>
-                    {place.address && (
-                      <div
-                        style={{
-                          fontSize: "11.5px",
-                          color: "#64748b",
-                          marginBottom: "5px",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {place.address}
                       </div>
-                    )}
-                    {place.rating > 0 && (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "11.5px",
-                          color: "#64748b",
-                        }}
-                      >
-                        <span style={{ fontWeight: 600, color: "#0f172a" }}>
-                          {place.rating}
-                        </span>
-                        <div style={{ display: "flex", gap: "1px" }}>
-                          {renderStars(place.rating)}
+                      {place.address && (
+                        <div
+                          style={{
+                            fontSize: "11.5px",
+                            color: "#64748b",
+                            marginBottom: "5px",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {place.address}
                         </div>
-                        <span>({place.review} ulasan)</span>
-                      </div>
-                    )}
-                  </div>
-                </Popup>
-              </CircleMarker>
-            );
-          })}
-        </MapContainer>
+                      )}
+                      {place.rating > 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "11.5px",
+                            color: "#64748b",
+                          }}
+                        >
+                          <span style={{ fontWeight: 600, color: "#0f172a" }}>
+                            {place.rating}
+                          </span>
+                          <div style={{ display: "flex", gap: "1px" }}>
+                            {renderStars(place.rating)}
+                          </div>
+                          <span>({place.review} reviews)</span>
+                        </div>
+                      )}
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              );
+            })}
+          </MapContainer>
 
-        {/* Legend */}
-        {uniqueGeoClusters.length > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: "16px",
-              left: "16px",
-              zIndex: 1000,
-              background: "#fff",
-              borderRadius: "10px",
-              border: "1px solid #e2e8f0",
-              padding: "10px 14px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              fontFamily: "'Inter', sans-serif",
-              minWidth: "130px",
-              maxHeight: "200px",
-              overflowY: "auto",
-            }}
-          >
+          {/* Legend */}
+          {uniqueGeoClusters.length > 0 && (
             <div
               style={{
-                fontSize: "11px",
-                fontWeight: 700,
-                color: "#374151",
-                marginBottom: "8px",
+                position: "absolute",
+                bottom: "16px",
+                left: "16px",
+                zIndex: 1000,
+                background: "#fff",
+                borderRadius: "10px",
+                border: "1px solid #e2e8f0",
+                padding: "10px 14px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                fontFamily: "'Inter', sans-serif",
+                minWidth: "130px",
+                maxHeight: "200px",
+                overflowY: "auto",
               }}
             >
-              LEGEND
-            </div>
-            {uniqueGeoClusters.map((c) => (
               <div
-                key={c}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  marginBottom: "5px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#374151",
+                  marginBottom: "8px",
                 }}
               >
-                <div
-                  style={{
-                    width: "10px",
-                    height: "10px",
-                    borderRadius: "50%",
-                    background: getClusterColor(c),
-                    flexShrink: 0,
-                    border: "1.5px solid #fff",
-                    boxShadow: "0 0 0 1px rgba(0,0,0,0.15)",
-                  }}
-                />
-                <span style={{ fontSize: "11.5px", color: "#374151" }}>
-                  {clusterLabel(c)}
-                </span>
+                LEGEND
               </div>
-            ))}
-          </div>
-        )}
+              {uniqueGeoClusters.map((c) => (
+                <div
+                  key={c}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "5px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      background: getClusterColor(c),
+                      flexShrink: 0,
+                      border: "1.5px solid #fff",
+                      boxShadow: "0 0 0 1px rgba(0,0,0,0.15)",
+                    }}
+                  />
+                  <span style={{ fontSize: "11.5px", color: "#374151" }}>
+                    {clusterLabel(c)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Hint: no marker selected yet */}
-        {!clickedPoint && (
-          <div
-            style={{
-              position: "absolute",
-              top: "12px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1000,
-              background: "rgba(15,23,42,0.75)",
-              color: "#fff",
-              fontSize: "12px",
-              fontWeight: 500,
-              padding: "6px 14px",
-              borderRadius: "20px",
-              fontFamily: "'Inter', sans-serif",
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-            }}
-          >
-            Click a location marker to see nearby businesses
-          </div>
-        )}
-
-        {/* Active point indicator */}
-        {clickedPoint && (
-          <div
-            style={{
-              position: "absolute",
-              top: "12px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1000,
-              background: "rgba(26,86,219,0.88)",
-              color: "#fff",
-              fontSize: "12px",
-              fontWeight: 500,
-              padding: "6px 14px",
-              borderRadius: "20px",
-              fontFamily: "'Inter', sans-serif",
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
+          {!clickedPoint && (
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 1000,
+                background: "rgba(15,23,42,0.75)",
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: 500,
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontFamily: "'Inter', sans-serif",
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+              }}
             >
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            {nearbyList.length} businesses within a 1.5 km radius
-          </div>
-        )}
+              Click a location marker to see nearby businesses
+            </div>
+          )}
+
+          {clickedPoint && (
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 1000,
+                background: "rgba(26,86,219,0.88)",
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: 500,
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontFamily: "'Inter', sans-serif",
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              {nearbyList.length} businesses within a 1.5 km radius
+            </div>
+          )}
+        </div>
+
+        <NearbyBusinessSidebar
+          clickedPoint={clickedPoint}
+          nearbyList={nearbyList}
+          selectedId={selectedId}
+          onSelectPlace={(id) => {
+            if (id === null) {
+              setSelectedId(null);
+              setClickedPoint(null);
+              setNearbyList([]);
+            } else {
+              const place = places.find((p) => p.id === id);
+              if (place) handleMarkerClick(place);
+            }
+          }}
+          getClusterColor={getColorForPlaceIdx}
+          places={places}
+        />
       </div>
 
-      {/* Nearby Sidebar */}
-      <NearbyBusinessSidebar
-        clickedPoint={clickedPoint}
-        nearbyList={nearbyList}
-        selectedId={selectedId}
-        onSelectPlace={(id) => {
-          // Clicking sidebar item re-selects that marker as the center
-          if (id === null) {
-            setSelectedId(null);
-            setClickedPoint(null);
-            setNearbyList([]);
-          } else {
-            const place = places.find((p) => p.id === id);
-            if (place) handleMarkerClick(place);
-          }
-        }}
-        getClusterColor={getColorForPlaceIdx}
+      <ClusterSummaryCard
         places={places}
+        geoClusterMap={geoClusterMap}
+        onZoomToCluster={handleZoomToCluster}
       />
     </div>
   );
