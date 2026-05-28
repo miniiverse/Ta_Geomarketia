@@ -19,6 +19,7 @@ export default function WelcomeCard() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [initials, setInitials] = useState<string>("U");
 
+  // Fetch user info on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -50,7 +51,6 @@ export default function WelcomeCard() {
           setPhotoUrl(user.profile_photo);
         }
       } catch {
-        // gagal fetch — biarkan default value
       }
     };
 
@@ -122,7 +122,7 @@ export default function WelcomeCard() {
         style={{
           position: "relative",
           zIndex: 2,
-          padding: "22px 28px",
+          padding: "clamp(16px, 3vw, 22px) clamp(16px, 3vw, 28px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -135,7 +135,7 @@ export default function WelcomeCard() {
             <h1
               style={{
                 margin: "0 0 8px",
-                fontSize: 22,
+                fontSize: "clamp(16px, 3vw, 22px)",
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
                 lineHeight: 1.15,
@@ -156,7 +156,7 @@ export default function WelcomeCard() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
           <div
             style={{
               display: "flex",

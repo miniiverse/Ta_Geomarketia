@@ -34,7 +34,6 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// ── Stat Card ──────────────────────────────────────────────────────────────
 function StatCard({
   label,
   value,
@@ -51,19 +50,20 @@ function StatCard({
   return (
     <div
       style={{
-        padding: "14px 16px",
+        padding: "12px 14px",
         background: "white",
         borderRadius: 14,
         border: "1px solid #E8EEF8",
         display: "flex",
         alignItems: "flex-start",
-        gap: 12,
+        gap: 10,
       }}
     >
       <div
         style={{
-          width: 36,
-          height: 36,
+          width: 32,
+          height: 32,
+          minWidth: 32,
           borderRadius: 10,
           background: `${color}14`,
           border: `1px solid ${color}30`,
@@ -75,7 +75,7 @@ function StatCard({
       >
         {icon}
       </div>
-      <div>
+      <div style={{ minWidth: 0 }}>
         <div
           style={{
             fontSize: 11,
@@ -88,17 +88,29 @@ function StatCard({
         </div>
         <div
           style={{
-            fontSize: 20,
+            fontSize: "clamp(16px, 3vw, 20px)",
             fontWeight: 800,
             color: "#0F172A",
             letterSpacing: "-0.03em",
             lineHeight: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
           {value}
         </div>
         {sub && (
-          <div style={{ fontSize: 11, color: "#64748B", marginTop: 3 }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#64748B",
+              marginTop: 3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {sub}
           </div>
         )}
@@ -107,7 +119,6 @@ function StatCard({
   );
 }
 
-// ── Cluster Stats Card ─────────────────────────────────────────────────────
 function ClusterStatsCard({
   stats,
   selected,
@@ -128,7 +139,7 @@ function ClusterStatsCard({
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
         gap: 10,
       }}
     >
@@ -164,7 +175,6 @@ function ClusterStatsCard({
                   "#E5E7EB";
             }}
           >
-            {/* Header */}
             <div
               style={{
                 display: "flex",
@@ -197,7 +207,6 @@ function ClusterStatsCard({
               </span>
             </div>
 
-            {/* Count */}
             <div
               style={{
                 fontSize: 22,
@@ -211,7 +220,6 @@ function ClusterStatsCard({
               {s.count}
             </div>
 
-            {/* Bar */}
             <div
               style={{
                 height: 4,
@@ -232,7 +240,6 @@ function ClusterStatsCard({
               />
             </div>
 
-            {/* Meta */}
             <div
               style={{
                 display: "flex",
@@ -261,7 +268,6 @@ function ClusterStatsCard({
               )}
             </div>
 
-            {/* Open now badge */}
             {s.openNow > 0 && isSelected && (
               <div
                 style={{
@@ -285,12 +291,11 @@ function ClusterStatsCard({
                 <span
                   style={{ fontSize: 10.5, color: "#15803D", fontWeight: 600 }}
                 >
-                  {s.openNow} buka skrg
+                  {s.openNow} open now
                 </span>
               </div>
             )}
 
-            {/* Top category */}
             {s.categories[0] && (
               <div
                 style={{
@@ -316,7 +321,6 @@ function ClusterStatsCard({
   );
 }
 
-// ── Nearby Bisnis List (Map tab) ───────────────────────────────────────────
 function NearbyList({
   businesses: bizList,
   limit = 5,
@@ -341,7 +345,7 @@ function NearbyList({
       >
         <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
         <div style={{ fontSize: 13, color: "#64748B" }}>
-          Tidak ada bisnis dalam radius ini
+          No businesses found in this area. Try expanding the radius or selecting a different cluster?
         </div>
       </div>
     );
@@ -499,7 +503,6 @@ function NearbyList({
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────
 export default function AnalysisDetail({ analysis, onBack }: Props) {
   const [activeTab, setActiveTab] = useState<"map" | "cluster">("map");
   const [radiusKm, setRadiusKm] = useState(2);
@@ -542,7 +545,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
     setClusterStats(stats);
   }, []);
 
-  // Context untuk AI
   const aiContext = useMemo(() => {
     if (activeTab === "map") {
       return {
@@ -578,7 +580,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
           "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
     >
-      {/* ── Header ── */}
       <div
         style={{
           background: "white",
@@ -593,11 +594,11 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
           style={{
             maxWidth: 1280,
             margin: "0 auto",
-            padding: "0 32px",
-            height: 68,
+            padding: "0 clamp(12px, 4vw, 32px)",
+            height: 60,
             display: "flex",
             alignItems: "center",
-            gap: 16,
+            gap: 12,
           }}
         >
           <button
@@ -606,7 +607,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               display: "flex",
               alignItems: "center",
               gap: 6,
-              padding: "7px 14px",
+              padding: "7px 12px",
               background: "white",
               border: "1.5px solid #E2E8F0",
               borderRadius: 10,
@@ -640,7 +641,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
             >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            Kembali
+            <span className="back-label">Back</span>
           </button>
 
           <div
@@ -654,8 +655,9 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
 
           <div
             style={{
-              width: 38,
-              height: 38,
+              width: 36,
+              height: 36,
+              minWidth: 36,
               borderRadius: 12,
               background: `linear-gradient(135deg, ${color}, #1D4ED8)`,
               display: "flex",
@@ -666,8 +668,8 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
             }}
           >
             <svg
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="white"
@@ -682,7 +684,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1
               style={{
-                fontSize: 16,
+                fontSize: "clamp(13px, 2.5vw, 16px)",
                 fontWeight: 800,
                 color: "#0F172A",
                 margin: 0,
@@ -711,28 +713,45 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ flexShrink: 0 }}
               >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              <span style={{ fontSize: 12, color: "#64748B" }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#64748B",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {analysis.location}
               </span>
-              <span style={{ fontSize: 11, color: "#CBD5E1" }}>·</span>
-              <span style={{ fontSize: 12, color: "#94A3B8" }}>
+              <span
+                className="header-date-sep"
+                style={{ fontSize: 11, color: "#CBD5E1", flexShrink: 0 }}
+              >
+                ·
+              </span>
+              <span
+                className="header-date"
+                style={{ fontSize: 11, color: "#94A3B8", flexShrink: 0 }}
+              >
                 {analysis.date}
               </span>
             </div>
           </div>
 
-          {/* Score badge */}
           {analysis.score > 0 && (
             <div
+              className="score-badge"
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 7,
-                padding: "7px 14px",
+                gap: 6,
+                padding: "6px 12px",
                 background: "#F0FDF4",
                 border: "1px solid #BBF7D0",
                 borderRadius: 12,
@@ -740,8 +759,8 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               }}
             >
               <svg
-                width="14"
-                height="14"
+                width="13"
+                height="13"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#16A34A"
@@ -752,13 +771,27 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#15803D" }}>
-                {businesses.length} bisnis terdaftar
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "#15803D",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {businesses.length} businesses
               </span>
             </div>
           )}
+        </div>
 
-          {/* Tabs */}
+        <div
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "0 clamp(12px, 4vw, 32px) 10px",
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -767,7 +800,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               borderRadius: 12,
               padding: 4,
               border: "1px solid #E2E8F0",
-              flexShrink: 0,
+              width: "fit-content",
             }}
           >
             {(["map", "cluster"] as const).map((tab) => {
@@ -780,16 +813,17 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    padding: "8px 16px",
+                    padding: "8px clamp(12px, 3vw, 16px)",
                     borderRadius: 9,
                     border: "none",
                     cursor: "pointer",
-                    fontSize: 13,
+                    fontSize: "clamp(12px, 2vw, 13px)",
                     fontWeight: isActive ? 700 : 500,
                     background: isActive ? "white" : "transparent",
                     color: isActive ? color : "#64748B",
                     boxShadow: isActive ? "0 1px 6px rgba(0,0,0,0.08)" : "none",
                     transition: "all 0.15s",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {tab === "map" ? (
@@ -829,20 +863,21 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
         </div>
       </div>
 
-      {/* ── Main Content ── */}
       <div
-        style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 32px 80px" }}
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "clamp(16px, 3vw, 24px) clamp(12px, 4vw, 32px) 80px",
+        }}
       >
         {activeTab === "map" ? (
-          /* ════════ MAP TAB ════════ */
           <div>
-            {/* Stats row */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 12,
-                marginBottom: 20,
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: 10,
+                marginBottom: 16,
               }}
             >
               <StatCard
@@ -926,12 +961,12 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               />
             </div>
 
-            {/* Toolbar */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
+                flexWrap: "wrap",
+                gap: 10,
                 marginBottom: 14,
                 padding: "12px 16px",
                 background: "white",
@@ -939,36 +974,38 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 border: "1px solid #E8EEF8",
               }}
             >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={color}
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: "#1E293B",
-                  flexShrink: 0,
-                }}
-              >
-                Radius Analisis
-              </span>
-              <div style={{ display: "flex", gap: 5 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={color}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#1E293B",
+                    flexShrink: 0,
+                  }}
+                >
+                  Analysis Radius
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                 {[1, 2, 3, 4, 5].map((km) => (
                   <button
                     key={km}
                     onClick={() => setRadiusKm(km)}
                     style={{
-                      padding: "5px 14px",
+                      padding: "5px 12px",
                       borderRadius: 9,
                       border: `${radiusKm === km ? "2px" : "1.5px"} solid`,
                       fontSize: 13,
@@ -987,7 +1024,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 ))}
               </div>
 
-              {/* Density indicator */}
               <div
                 style={{
                   marginLeft: "auto",
@@ -1026,22 +1062,21 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               </div>
             </div>
 
-            {/* Map + Sidebar layout */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 320px",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
                 gap: 16,
               }}
             >
-              {/* Map */}
               <div
                 style={{
                   borderRadius: 16,
                   overflow: "hidden",
                   border: "1px solid #E8EEF8",
                   boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-                  height: 520,
+                  height: "clamp(320px, 50vw, 520px)",
                   position: "relative",
                 }}
               >
@@ -1054,11 +1089,9 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 />
               </div>
 
-              {/* Sidebar: bisnis terdekat */}
               <div
                 style={{ display: "flex", flexDirection: "column", gap: 12 }}
               >
-                {/* Header */}
                 <div
                   style={{
                     padding: "12px 16px",
@@ -1086,7 +1119,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                   <span
                     style={{ fontSize: 13, fontWeight: 700, color: "#1E293B" }}
                   >
-                    Bisnis Terdekat
+                    Nearby Businesses
                   </span>
                   <div
                     style={{
@@ -1103,7 +1136,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                   </div>
                 </div>
 
-                {/* List */}
                 <div
                   style={{
                     flex: 1,
@@ -1118,7 +1150,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               </div>
             </div>
 
-            {/* Legend */}
             <div
               style={{
                 marginTop: 14,
@@ -1185,15 +1216,13 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
             </div>
           </div>
         ) : (
-          /* ════════ CLUSTER TAB ════════ */
           <div>
-            {/* Stats row untuk cluster */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 12,
-                marginBottom: 20,
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: 10,
+                marginBottom: 16,
               }}
             >
               <StatCard
@@ -1296,12 +1325,12 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               />
             </div>
 
-            {/* Toolbar */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
+                flexWrap: "wrap",
+                gap: 10,
                 marginBottom: 14,
                 padding: "12px 16px",
                 background: "white",
@@ -1318,6 +1347,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ flexShrink: 0 }}
               >
                 <circle cx="18" cy="18" r="3" />
                 <circle cx="6" cy="6" r="3" />
@@ -1328,6 +1358,11 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                   fontSize: 13,
                   fontWeight: 700,
                   color: "#1E293B",
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {selectedCluster
@@ -1336,13 +1371,19 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               </span>
               {selectedCluster && (
                 <>
-                  <span style={{ fontSize: 12, color: "#64748B" }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#64748B",
+                      flexShrink: 0,
+                    }}
+                  >
                     ·{" "}
                     {
                       businesses.filter((b) => b.area === selectedCluster)
                         .length
                     }{" "}
-                    bisnis
+                    business
                   </span>
                   <button
                     onClick={() => setSelectedCluster(null)}
@@ -1360,6 +1401,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                       color: "#DC2626",
                       fontWeight: 500,
                       transition: "all 0.15s",
+                      flexShrink: 0,
                     }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLButtonElement).style.background =
@@ -1388,14 +1430,13 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               )}
             </div>
 
-            {/* Map */}
             <div
               style={{
                 borderRadius: 16,
                 overflow: "hidden",
                 border: "1px solid #E8EEF8",
                 boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-                height: 480,
+                height: "clamp(300px, 50vw, 480px)",
                 marginBottom: 20,
                 position: "relative",
               }}
@@ -1410,7 +1451,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
               />
             </div>
 
-            {/* Cluster cards grid */}
             <div>
               <div
                 style={{
@@ -1418,6 +1458,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                   alignItems: "center",
                   gap: 8,
                   marginBottom: 12,
+                  flexWrap: "wrap",
                 }}
               >
                 <div
@@ -1426,6 +1467,7 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                     height: 16,
                     borderRadius: 99,
                     background: "#D97706",
+                    flexShrink: 0,
                   }}
                 />
                 <span
@@ -1435,10 +1477,10 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
                     color: "#1E293B",
                   }}
                 >
-                  Distribusi Cluster
+                  Cluster Distribution
                 </span>
                 <span style={{ fontSize: 12, color: "#94A3B8" }}>
-                  Klik kartu untuk filter peta
+                  Click cards to filter map
                 </span>
               </div>
               <ClusterStatsCard
@@ -1451,7 +1493,6 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
         )}
       </div>
 
-      {/* ── AI Chatbot ── */}
       <AIChatPanel context={aiContext} />
 
       <style>{`
@@ -1461,6 +1502,13 @@ export default function AnalysisDetail({ analysis, onBack }: Props) {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+
+        @media (max-width: 540px) {
+          .header-date-sep,
+          .header-date { display: none !important; }
+          .score-badge { display: none !important; }
+          .back-label { display: none !important; }
+        }
       `}</style>
     </div>
   );

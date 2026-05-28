@@ -484,6 +484,7 @@ function HeroContact() {
         </div>
 
         <div
+          className="ct-hero-visual"
           style={{
             animation: "ctFadeUp 0.8s 0.2s ease both",
             position: "relative",
@@ -583,7 +584,7 @@ function ContactInfoSection() {
         <div ref={titleRef} className="ct-info-header">
           <span className="ct-eyebrow">Get In Touch</span>
           <h2 className="ct-section-title">
-            We're Here to{" "}
+            Were Here to{" "}
             <span
               style={{
                 background: "linear-gradient(90deg, #60A5FA, #34D399)",
@@ -647,7 +648,16 @@ export default function ContactPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .ct-hero { background:#040F2E; position:relative; overflow:hidden; min-height:100vh; display:flex; align-items:center; margin-top:-66px; }
+        /* ── HERO ───────────────────────── */
+        .ct-hero {
+          background: #040F2E;
+          position: relative;
+          overflow: hidden;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          margin-top: -66px;
+        }
         .ct-hero-grid {
           position: relative;
           z-index: 2;
@@ -659,7 +669,7 @@ export default function ContactPage() {
           align-items: center;
           max-width: 1440px;
           margin: 0 auto;
-          }
+        }
 
         .ct-wa-btn {
           display: inline-flex;
@@ -690,6 +700,11 @@ export default function ContactPage() {
           padding: 100px 0 120px;
           overflow: hidden;
         }
+        .ct-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+        }
         .ct-info-header {
           text-align: center;
           margin-bottom: 60px;
@@ -718,7 +733,7 @@ export default function ContactPage() {
           line-height: 1.15;
         }
         .ct-section-sub {
-          font-family: 'Inter',sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 16px;
           color: #64748b;
           line-height: 1.72;
@@ -727,106 +742,98 @@ export default function ContactPage() {
         }
 
         .ct-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 380px));
-        gap: 24px;
-        margin-bottom: 40px;
-        justify-content: center;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 380px));
+          gap: 24px;
+          margin-bottom: 40px;
+          justify-content: center;
         }
 
         .ct-info-card {
-        background: #ffffff;
-        border: 1px solid #E2EEFF;
-        border-radius: 18px;
-        padding: 24px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-        position: relative;
-        overflow: hidden;
-        transition: border-color .25s, box-shadow .25s, transform .25s;
-        width: 100%;
-        max-width: 380px;
+          background: #ffffff;
+          border: 1px solid #E2EEFF;
+          border-radius: 18px;
+          padding: 24px 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+          position: relative;
+          overflow: hidden;
+          transition: border-color .25s, box-shadow .25s, transform .25s;
+          width: 100%;
+          max-width: 380px;
         }
         .ct-info-card:hover {
-        border-color: #93C5FD;
-        box-shadow: 0 12px 40px rgba(26,86,219,0.12);
-        transform: translateY(-6px);
+          border-color: #93C5FD;
+          box-shadow: 0 12px 40px rgba(26,86,219,0.12);
+          transform: translateY(-6px);
         }
 
         .ct-info-card-accent {
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 4px;
-        background: linear-gradient(180deg, #1A56DB 0%, #93C5FD 100%);
-        border-radius: 4px 0 0 4px;
-        opacity: 0;
-        transition: opacity .25s;
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 4px;
+          background: linear-gradient(180deg, #1A56DB 0%, #93C5FD 100%);
+          border-radius: 4px 0 0 4px;
+          opacity: 0;
+          transition: opacity .25s;
         }
         .ct-info-card:hover .ct-info-card-accent { opacity: 1; }
 
         .ct-info-icon-wrap {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: #EFF6FF;
-        border: 1px solid #BFDBFE;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 2px;
-        transition: background .25s;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 2px;
+          transition: background .25s;
         }
         .ct-info-card:hover .ct-info-icon-wrap { background: #DBEAFE; border-color: #93C5FD; }
 
         .ct-info-tag {
-        display: inline-flex;
-        align-items: center;
-        font-family: 'Inter', sans-serif;
-        font-size: 10px;
-        font-weight: 700;
-        border: 1px solid;
-        border-radius: 100px;
-        padding: 2px 9px;
-        align-self: flex-start;
+          display: inline-flex;
+          align-items: center;
+          font-family: 'Inter', sans-serif;
+          font-size: 10px;
+          font-weight: 700;
+          border: 1px solid;
+          border-radius: 100px;
+          padding: 2px 9px;
+          align-self: flex-start;
         }
 
         .ct-info-value {
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        font-weight: 800;
-        color: #1A56DB;
-        letter-spacing: -0.01em;
-        line-height: 1.2;
+          font-family: 'Inter', sans-serif;
+          font-size: 15px;
+          font-weight: 800;
+          color: #1A56DB;
+          letter-spacing: -0.01em;
+          line-height: 1.2;
         }
 
         .ct-info-sub {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 12px;
-        color: #94A3B8;
-        line-height: 1.5;
-        flex: 1;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          color: #94A3B8;
+          line-height: 1.5;
+          flex: 1;
         }
 
         .ct-info-cta {
-        display: inline-flex;
-        align-items: center;
-        font-family: 'Inter', sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        color: #1A56DB;
-        text-decoration: none;
-        margin-top: 4px;
+          display: inline-flex;
+          align-items: center;
+          font-family: 'Inter', sans-serif;
+          font-size: 12px;
+          font-weight: 700;
+          color: #1A56DB;
+          text-decoration: none;
+          margin-top: 4px;
         }
         .ct-info-cta:hover { text-decoration: underline; }
-
-        .ct-faq-teaser {
-          background: #F8FAFF;
-          border: 1px solid #E2EEFF;
-          border-radius: 18px;
-          padding: 24px 32px;
-          text-align: center;
-        }
 
         /* ── ANIMATIONS ─────────────────── */
         @keyframes ctFadeUp          { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
@@ -837,16 +844,114 @@ export default function ContactPage() {
         @keyframes ctRingSpinReverse { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(-360deg)} }
 
         /* ── RESPONSIVE ─────────────────── */
+
+        /* Tablet */
         @media (max-width: 1024px) {
-          .ct-cards-grid { grid-template-columns: repeat(2, 1fr); }
+          .ct-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .ct-info-card {
+            max-width: 100%;
+          }
         }
-        @media (max-width: 900px) {
-          .ct-hero-inner { grid-template-columns: 1fr; gap: 40px; }
-          .ct-hero { min-height: unset; padding: 100px 0 60px; }
+
+        /* Mobile landscape / tablet portrait */
+        @media (max-width: 768px) {
+          .ct-hero-grid {
+            grid-template-columns: 1fr;
+            padding: 5rem 1.5rem 3rem;
+            gap: 0;
+          }
+          .ct-hero-visual {
+            display: none;
+          }
+          .ct-hero {
+            min-height: unset;
+            padding-bottom: 0;
+          }
+          .ct-cards-grid {
+            grid-template-columns: 1fr;
+          }
+          .ct-info-card {
+            max-width: 100%;
+          }
+          .ct-info-section {
+            padding: 60px 0 80px;
+          }
+          .ct-container {
+            padding: 0 1.5rem;
+          }
+          .ct-info-header {
+            margin-bottom: 40px;
+          }
         }
-        @media (max-width: 640px) {
-          .ct-container { padding: 0 20px; }
-          .ct-cards-grid { grid-template-columns: 1fr; }
+
+        /* Small mobile */
+        @media (max-width: 480px) {
+          .ct-hero-grid {
+            padding: 4.5rem 1.25rem 2.5rem;
+          }
+          .ct-wa-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 13px 20px;
+            font-size: 14px;
+          }
+          .ct-info-section {
+            padding: 50px 0 60px;
+          }
+          .ct-section-title {
+            font-size: 22px !important;
+          }
+          .ct-section-sub {
+            font-size: 14px;
+          }
+          .ct-container {
+            padding: 0 1.25rem;
+          }
+          .ct-info-card {
+            padding: 20px 16px;
+          }
+        }
+
+        /* 360px target — extra compact */
+        @media (max-width: 390px) {
+          .ct-hero-grid {
+            padding: 4rem 1rem 2rem;
+          }
+          .ct-hero p {
+            font-size: 13.5px !important;
+            line-height: 1.65 !important;
+            margin-bottom: 28px !important;
+          }
+          .ct-wa-btn {
+            font-size: 13.5px;
+            padding: 12px 16px;
+            border-radius: 12px;
+          }
+          .ct-info-section {
+            padding: 40px 0 50px;
+          }
+          .ct-info-header {
+            margin-bottom: 32px;
+          }
+          .ct-section-title {
+            font-size: 20px !important;
+          }
+          .ct-section-sub {
+            font-size: 13.5px;
+          }
+          .ct-info-card {
+            padding: 18px 14px;
+            border-radius: 14px;
+          }
+          .ct-container {
+            padding: 0 1rem;
+          }
+          .ct-eyebrow {
+            font-size: 10px;
+            padding: 4px 12px;
+          }
         }
       `}</style>
     </>

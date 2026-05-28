@@ -107,7 +107,7 @@ export default function Navbar() {
         <div
           style={{
             width: "100%",
-            padding: "0 2rem",
+            padding: "0 clamp(1rem, 4vw, 2rem)",
             height: scrolled ? 58 : 66,
             display: "flex",
             alignItems: "center",

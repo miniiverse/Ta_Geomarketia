@@ -32,28 +32,12 @@ export default function ContactSection() {
             rel="noopener noreferrer"
             className="btn-whatsapp"
           >
-            <svg
-              className="btn-icon"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
+            <svg className="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.66-.5-5.22-1.44l-.37-.22-3.89.98.98-3.78-.25-.39A9.93 9.93 0 0 1 2 12C2 6.48 6.48 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 10-10 10zm5.44-7.48c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.14-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.46s1.06 2.85 1.21 3.05c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z" />
             </svg>
             Chat via WhatsApp
-            <svg
-              className="btn-arrow"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path
-                d="M4 10h12M11 5l5 5-5 5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="btn-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
         </div>
@@ -77,12 +61,7 @@ export default function ContactSection() {
 
               <div className="pin-wrap">
                 <div className="pin-body">
-                  <svg
-                    className="pin-icon"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    aria-hidden="true"
-                  >
+                  <svg className="pin-icon" viewBox="0 0 24 24" fill="white" aria-hidden="true">
                     <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.66-.5-5.22-1.44l-.37-.22-3.89.98.98-3.78-.25-.39A9.93 9.93 0 0 1 2 12C2 6.48 6.48 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 10-10 10zm5.44-7.48c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.14-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.46s1.06 2.85 1.21 3.05c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z" />
                   </svg>
                 </div>
@@ -91,13 +70,7 @@ export default function ContactSection() {
             </div>
 
             <div className="float-bubble float-bubble-1">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="#1A56DB"
-                aria-hidden="true"
-              >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1A56DB" aria-hidden="true">
                 <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52z" />
               </svg>
               <span>Online now</span>
@@ -126,7 +99,6 @@ export default function ContactSection() {
           justify-content: center;
         }
 
-        /* Background decorations */
         .bg-blob {
           position: absolute;
           border-radius: 50%;
@@ -158,7 +130,6 @@ export default function ContactSection() {
           pointer-events: none;
         }
 
-        /* Layout */
         .container {
           max-width: 960px;
           width: 100%;
@@ -170,7 +141,6 @@ export default function ContactSection() {
           z-index: 1;
         }
 
-        /* LEFT */
         .left {
           flex: 1;
           min-width: 0;
@@ -218,6 +188,7 @@ export default function ContactSection() {
           background: linear-gradient(90deg, #60A5FA, #34D399);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          position: relative;
         }
         .heading-accent::after {
           content: '';
@@ -230,11 +201,8 @@ export default function ContactSection() {
           border-radius: 2px;
           opacity: 0.3;
         }
-        .heading-accent {
-          position: relative;
-        }
         .heading-blue {
-        color: #1A56DB;
+          color: #1A56DB;
         }
 
         .desc {
@@ -266,25 +234,16 @@ export default function ContactSection() {
           transform: translateY(-2px);
           box-shadow: 0 8px 28px rgba(26,86,219,0.36);
         }
-        .btn-whatsapp:active {
-          transform: translateY(0);
-        }
-        .btn-icon {
-          width: 18px;
-          height: 18px;
-          flex-shrink: 0;
-        }
+        .btn-whatsapp:active { transform: translateY(0); }
+        .btn-icon { width: 18px; height: 18px; flex-shrink: 0; }
         .btn-arrow {
           width: 18px;
           height: 18px;
           flex-shrink: 0;
           transition: transform 0.2s;
         }
-        .btn-whatsapp:hover .btn-arrow {
-          transform: translateX(3px);
-        }
+        .btn-whatsapp:hover .btn-arrow { transform: translateX(3px); }
 
-        /* RIGHT — Illustration */
         .right {
           flex-shrink: 0;
           width: 340px;
@@ -302,17 +261,13 @@ export default function ContactSection() {
           justify-content: center;
         }
 
-        /* Rings */
         .ring {
           position: absolute;
           border-radius: 50%;
           border: 1.5px dashed rgba(26,86,219,0.18);
           animation: spin-slow 18s linear infinite;
         }
-        .ring-outer {
-          width: 260px;
-          height: 260px;
-        }
+        .ring-outer { width: 260px; height: 260px; }
         .ring-inner {
           width: 190px;
           height: 190px;
@@ -324,7 +279,6 @@ export default function ContactSection() {
           to { transform: rotate(360deg); }
         }
 
-        /* Phone card */
         .phone-card {
           position: relative;
           z-index: 2;
@@ -340,9 +294,7 @@ export default function ContactSection() {
           background: linear-gradient(145deg, #1A56DB, #3b82f6);
           border-radius: 24px;
           padding: 12px 10px 14px;
-          box-shadow:
-            0 20px 60px rgba(26,86,219,0.4),
-            0 4px 12px rgba(26,86,219,0.2);
+          box-shadow: 0 20px 60px rgba(26,86,219,0.4), 0 4px 12px rgba(26,86,219,0.2);
           position: relative;
         }
 
@@ -362,11 +314,7 @@ export default function ContactSection() {
           height: 100%;
         }
 
-        .map-cell {
-          border-radius: 4px;
-          background: #bfdbfe;
-          opacity: 0.6;
-        }
+        .map-cell { border-radius: 4px; background: #bfdbfe; opacity: 0.6; }
         .map-cell:nth-child(3n) { background: #93c5fd; opacity: 0.8; }
         .map-cell:nth-child(5n) { background: #60a5fa; opacity: 0.5; }
         .map-cell:nth-child(7) { background: #1A56DB; opacity: 0.4; }
@@ -379,7 +327,6 @@ export default function ContactSection() {
           margin: 10px auto 0;
         }
 
-        /* Pin */
         .pin-wrap {
           position: absolute;
           top: -36px;
@@ -402,11 +349,7 @@ export default function ContactSection() {
           box-shadow: 0 6px 20px rgba(26,86,219,0.45);
         }
 
-        .pin-icon {
-          transform: rotate(45deg);
-          width: 22px;
-          height: 22px;
-        }
+        .pin-icon { transform: rotate(45deg); width: 22px; height: 22px; }
 
         .pin-tail {
           width: 0;
@@ -417,7 +360,6 @@ export default function ContactSection() {
           margin-top: -2px;
         }
 
-        /* Floating bubbles */
         .float-bubble {
           position: absolute;
           display: flex;
@@ -440,7 +382,6 @@ export default function ContactSection() {
           right: -10px;
           animation: float-b1 3.5s ease-in-out infinite;
         }
-
         .float-bubble-2 {
           bottom: 28px;
           left: -14px;
@@ -465,20 +406,45 @@ export default function ContactSection() {
           box-shadow: 0 0 0 2px rgba(34,197,94,0.25);
         }
 
-        /* Responsive */
+        @media (max-width: 960px) {
+          .contact-section { padding: 100px 60px; }
+          .container { gap: 40px; }
+          .right { width: 280px; }
+          .illustration-wrap { width: 240px; height: 240px; }
+          .ring-outer { width: 220px; height: 220px; }
+          .ring-inner { width: 160px; height: 160px; }
+        }
+
         @media (max-width: 700px) {
-          .container {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 40px;
-          }
-          .right {
-            width: 100%;
-            justify-content: center;
-          }
-          .contact-section {
-            padding: 60px 24px;
-          }
+          .contact-section { padding: 60px 24px; }
+          .container { flex-direction: column; align-items: flex-start; gap: 40px; }
+          .right { width: 100%; justify-content: center; }
+          .desc { max-width: 100%; }
+        }
+
+        @media (max-width: 640px) {
+          .contact-section { padding: 48px 20px; }
+          .float-bubble-1 { right: 0; }
+          .float-bubble-2 { left: 0; }
+        }
+
+        @media (max-width: 400px) {
+          .contact-section { padding: 40px 16px; }
+          .btn-whatsapp { width: 100%; justify-content: center; font-size: 13.5px; padding: 13px 20px; }
+          .illustration-wrap { width: 200px; height: 200px; }
+          .ring-outer { width: 190px; height: 190px; }
+          .ring-inner { width: 135px; height: 135px; }
+          .phone-body { width: 120px; }
+          .phone-screen { height: 88px; }
+        }
+
+        @media (max-width: 360px) {
+          .contact-section { padding: 36px 14px; }
+          .btn-whatsapp { font-size: 13px; padding: 12px 16px; }
+          .illustration-wrap { width: 180px; height: 180px; }
+          .phone-body { width: 110px; }
+          .phone-screen { height: 80px; }
+          .float-bubble { font-size: 11px; padding: 6px 10px; }
         }
       `}</style>
     </section>

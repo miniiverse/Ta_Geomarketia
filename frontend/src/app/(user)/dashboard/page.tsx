@@ -9,7 +9,7 @@ export default function DashboardPage() {
       <div style={{
         maxWidth: 1200,
         margin: "0 auto",
-        padding: "0 40px 40px",
+        padding: "0 clamp(16px, 4vw, 40px) 40px",
       }}>
         <WelcomeCard />
         <StatsSection />

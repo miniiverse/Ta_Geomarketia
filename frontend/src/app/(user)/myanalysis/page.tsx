@@ -94,7 +94,6 @@ export default function MyAnalysisPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [hoveredCat, setHoveredCat] = useState<string | null>(null);
-  const [statCardHovered, setStatCardHovered] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -132,8 +131,6 @@ export default function MyAnalysisPage() {
   }
 
   const color = "#1A56DB";
-  const lightBg = "#EBF3FF";
-  const border = "#BFDBFE";
 
   return (
     <div
@@ -143,7 +140,13 @@ export default function MyAnalysisPage() {
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px 40px" }}>
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "0 clamp(16px, 4vw, 40px) 40px",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -182,7 +185,7 @@ export default function MyAnalysisPage() {
           <div>
             <h1
               style={{
-                fontSize: 32,
+                fontSize: "clamp(22px, 5vw, 32px)",
                 fontWeight: 800,
                 letterSpacing: "-0.025em",
                 margin: 0,
@@ -209,115 +212,6 @@ export default function MyAnalysisPage() {
             >
               Review your geospatial analysis results
             </p>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: 32 }}>
-          <div
-            onMouseEnter={() => setStatCardHovered(true)}
-            onMouseLeave={() => setStatCardHovered(false)}
-            style={{
-              display: "inline-flex",
-              flexDirection: "column",
-              background: statCardHovered ? lightBg : "#ffffff",
-              border: `1.5px solid ${statCardHovered ? border : "#E8EEF8"}`,
-              borderRadius: 16,
-              padding: "20px 22px",
-              position: "relative",
-              overflow: "hidden",
-              cursor: "default",
-              transition: "all 0.25s ease",
-              boxShadow: statCardHovered
-                ? `0 8px 32px ${color}18, 0 2px 8px rgba(0,0,0,0.06)`
-                : "0 2px 12px rgba(0,0,0,0.05)",
-              transform: statCardHovered ? "translateY(-3px)" : "translateY(0)",
-              minWidth: 240,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 3,
-                background: `linear-gradient(90deg, ${color}, ${color}55)`,
-                borderRadius: "16px 16px 0 0",
-                opacity: statCardHovered ? 1 : 0,
-                transition: "opacity 0.25s",
-              }}
-            />
-
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 11,
-                background: lightBg,
-                border: `1.5px solid ${border}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color,
-                marginBottom: 14,
-                transition: "transform 0.2s",
-                transform: statCardHovered ? "scale(1.08)" : "scale(1)",
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div
-              style={{
-                fontSize: 36,
-                fontWeight: 800,
-                color,
-                letterSpacing: "-0.04em",
-                lineHeight: 1,
-                marginBottom: 4,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {mockAnalyses.length}
-            </div>
-
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#0F172A",
-                marginBottom: 2,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Total Analysis
-            </div>
-
-            <div
-              style={{
-                marginTop: 8,
-                height: 5,
-                background: `${color}14`,
-                borderRadius: 999,
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background: `linear-gradient(90deg, ${color}88, ${color})`,
-                  borderRadius: 999,
-                }}
-              />
-            </div>
           </div>
         </div>
 
@@ -567,7 +461,8 @@ export default function MyAnalysisPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(min(440px, 100%), 1fr))",
               gap: 20,
             }}
           >

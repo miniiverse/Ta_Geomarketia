@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import ProfileCard, { type ProfileForm } from "./components/ProfileCard";
 import { useToast } from "../../components/admin/ToastAdmin";
-import { Toast } from "../../components/user/Toast";
 
 function MiniCalendar() {
   const now = new Date();
@@ -11,13 +10,13 @@ function MiniCalendar() {
   const month = now.getMonth();
   const today = now.getDate();
 
-  const monthName = now.toLocaleDateString("id-ID", {
+  const monthName = now.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -181,14 +180,14 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      showToast("Failed to save profile.");
+      showToast("Failed to save profile.", "error");
     }
   };
 
   const handleSavePhoto = async (file: File) => {
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      showToast("Maximum photo size is 10MB.");
+      showToast("Maximum photo size is 10MB.", "error");
       return;
     }
 
@@ -206,6 +205,7 @@ export default function AdminProfilePage() {
         return;
       }
       setPhotoUrl(data.photo_url);
+      showToast("Profile photo updated successfully.", "success");
 
       window.dispatchEvent(
         new CustomEvent("profile-photo-updated", {
@@ -213,7 +213,7 @@ export default function AdminProfilePage() {
         }),
       );
     } catch {
-      showToast("Failed to upload photo.");
+      showToast("Failed to upload photo.", "error");
     }
   };
 
@@ -231,13 +231,14 @@ export default function AdminProfilePage() {
           background: "#fff",
         }}
       >
-        Memuat data profil...
+        Loading profile data...
       </div>
     );
   }
 
   return (
     <>
+      <ToastContainer />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         * { box-sizing: border-box; }
@@ -250,11 +251,93 @@ export default function AdminProfilePage() {
         .btn-ghost:hover { background:#f8fafc;border-color:#cbd5e1;color:#374151; }
         .card { background:#fff;border-radius:16px;border:1px solid #e8edf5;padding:28px;box-shadow:0 1px 6px rgba(26,86,219,0.06); }
         .input-focus:focus { border-color:#1A56DB !important;background:#fff !important;box-shadow:0 0 0 3px rgba(26,86,219,0.08) !important; }
-        .profile-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
-        @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
+
+        /* ── Responsive Grid ── */
+        .profile-grid {
+          display: grid;
+          grid-template-columns: 340px 1fr;
+          gap: 20px;
+          align-items: start;
+        }
+
+        /* Large tablet & small laptop (768px – 1024px): side-by-side tapi kolom kiri lebih fleksibel */
+        @media (max-width: 1024px) {
+          .profile-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+          }
+        }
+
+        /* Tablet portrait & mobile (max 768px): stack vertikal */
+        @media (max-width: 768px) {
+          .profile-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          /* Hapus sticky di mobile agar tidak overlap konten */
+          .profile-card-sticky {
+            position: static !important;
+          }
+
+          .card {
+            padding: 20px 16px;
+            border-radius: 14px;
+          }
+
+          .btn-primary,
+          .btn-ghost {
+            padding: 9px 14px;
+            font-size: 13px;
+          }
+
+          .page-header h1 {
+            font-size: 22px !important;
+          }
+        }
+
+        /* Mobile kecil (max 480px) */
+        @media (max-width: 480px) {
+          .page-wrapper {
+            padding: 16px 14px 32px !important;
+          }
+
+          .page-header {
+            margin-bottom: 16px !important;
+          }
+
+          .page-header h1 {
+            font-size: 20px !important;
+          }
+
+          .card {
+            padding: 16px 14px;
+            border-radius: 12px;
+          }
+
+          .field-row {
+            gap: 10px;
+            padding: 11px 0;
+          }
+
+          .btn-primary,
+          .btn-ghost {
+            padding: 8px 12px;
+            font-size: 13px;
+            flex: 1;
+            justify-content: center;
+          }
+
+          /* Tombol action full-width di layar kecil */
+          .btn-actions {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+        }
       `}</style>
 
       <div
+        className="page-wrapper"
         style={{
           minHeight: "100vh",
           background: "#FFFFFF",
@@ -263,6 +346,7 @@ export default function AdminProfilePage() {
         }}
       >
         <div
+          className="page-header"
           style={{
             marginBottom: "24px",
             display: "flex",
@@ -298,7 +382,7 @@ export default function AdminProfilePage() {
               My Profile
             </h1>
             <p style={{ margin: 0, fontSize: "14px", color: "#64748b" }}>
-              Kelola informasi akun dan keamanan Anda.
+              Manage your account information and security.
             </p>
           </div>
         </div>
@@ -331,7 +415,6 @@ export default function AdminProfilePage() {
                 }}
               />
               <MiniCalendar />
-              <ToastContainer />
             </div>
           </div>
         </div>

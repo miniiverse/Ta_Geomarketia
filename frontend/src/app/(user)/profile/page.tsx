@@ -373,7 +373,7 @@ export default function ProfilePage() {
       }}
     >
       <div style={{ background: "#fff", borderBottom: "1px solid #E5E7EB" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 40px" }}>
+        <div className="page-header" style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h1
             style={{
               margin: 0,
@@ -402,7 +402,6 @@ export default function ProfilePage() {
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: "2rem 40px 40px",
           display: "grid",
           gridTemplateColumns: "300px 1fr",
           gap: "1.5rem",
@@ -751,6 +750,7 @@ export default function ProfilePage() {
             </div>
 
             <div
+              className="account-fields"
               style={{
                 padding: "1.75rem 2rem",
                 display: "flex",
@@ -786,6 +786,7 @@ export default function ProfilePage() {
 
               {isEditing && (
                 <div
+                  className="action-buttons"
                   style={{
                     paddingTop: "1.25rem",
                     borderTop: "1px solid #F3F4F6",
@@ -973,8 +974,57 @@ export default function ProfilePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .page-header {
+          padding: 40px 40px;
+        }
+
+        .profile-grid {
+          padding: 2rem 40px 40px;
+        }
+
+        @media (max-width: 1024px) {
+          .page-header {
+            padding: 28px 24px;
+          }
+          .profile-grid {
+            grid-template-columns: 260px 1fr !important;
+            padding: 1.5rem 24px 32px !important;
+            gap: 1.25rem !important;
+          }
+        }
+
         @media (max-width: 768px) {
-          .profile-grid { grid-template-columns: 1fr !important; padding: 1.5rem 1rem !important; }
+          .page-header {
+            padding: 20px 16px;
+          }
+          .page-header h1 {
+            font-size: 1.5rem !important;
+          }
+          .profile-grid {
+            grid-template-columns: 1fr !important;
+            padding: 1rem 16px 24px !important;
+            gap: 1rem !important;
+          }
+          .account-fields {
+            padding: 1.25rem 1rem !important;
+          }
+          .action-buttons {
+            flex-direction: column !important;
+          }
+          .action-buttons button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .page-header {
+            padding: 16px 12px;
+          }
+          .profile-grid {
+            padding: 0.75rem 12px 20px !important;
+          }
         }
       `}</style>
     </main>

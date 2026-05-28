@@ -71,7 +71,7 @@ export default function StatsSection() {
             background: hovered === i ? item.lightBg : "#ffffff",
             border: `1.5px solid ${hovered === i ? item.border : "#E8EEF8"}`,
             borderRadius: 16,
-            padding: "20px 22px",
+            padding: "clamp(14px, 3vw, 20px) clamp(14px, 3vw, 22px)",
             position: "relative",
             overflow: "hidden",
             cursor: "default",

@@ -15,12 +15,15 @@ const C = {
 export default function StepOTP({
   email,
   onNext,
+  setOtpCode,
 }: {
   email: string;
   onNext: () => void;
+  setOtpCode: (otp: string) => void;
 }) {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (i: number, val: string) => {
@@ -39,38 +42,106 @@ export default function StepOTP({
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     const next = Array(6).fill("");
-    pasted.split("").forEach((ch, i) => { next[i] = ch; });
+    pasted.split("").forEach((ch, i) => {
+      next[i] = ch;
+    });
     setOtp(next);
     inputs.current[Math.min(pasted.length, 5)]?.focus();
   };
 
-  const handleSubmit = () => {
-    if (otp.join("").length < 6) return;
+  const handleSubmit = async () => {
+    const otpCode = otp.join("");
+
+    if (otpCode.length < 6) return;
+
     setLoading(true);
-    setTimeout(() => { setLoading(false); onNext(); }, 1400);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          otp: otpCode,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "OTP verification failed.");
+        return;
+      }
+
+      setOtpCode(otpCode);
+      onNext();
+    } catch {
+      setError("Failed to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isFilled = otp.join("").length === 6;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18, animation: "lgFadeUp 0.4s ease both", opacity: 0 }}>
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 18,
+        animation: "lgFadeUp 0.4s ease both",
+        opacity: 0,
+      }}
+    >
       <div>
-        <label style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "'Inter',system-ui,sans-serif", fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 14, letterSpacing: "-0.01em" }}>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            fontFamily: "'Inter',system-ui,sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            color: C.text,
+            marginBottom: 14,
+            letterSpacing: "-0.01em",
+          }}
+        >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#1A56DB" strokeWidth="1.8"/>
-            <polyline points="22,6 12,13 2,6" stroke="#1A56DB" strokeWidth="1.8" strokeLinecap="round"/>
+            <path
+              d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              stroke="#1A56DB"
+              strokeWidth="1.8"
+            />
+            <polyline
+              points="22,6 12,13 2,6"
+              stroke="#1A56DB"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
           </svg>
           Verification Code
         </label>
 
-        <div style={{ display: "flex", gap: 10, justifyContent: "center" }} onPaste={handlePaste}>
+        <div
+          style={{ display: "flex", gap: 10, justifyContent: "center" }}
+          onPaste={handlePaste}
+        >
           {otp.map((digit, i) => (
             <input
               key={i}
-              ref={(el) => { inputs.current[i] = el; }}
+              ref={(el) => {
+                inputs.current[i] = el;
+              }}
               type="text"
               inputMode="numeric"
               maxLength={1}
@@ -78,10 +149,12 @@ export default function StepOTP({
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
               style={{
-                width: 48, height: 56,
+                width: 48,
+                height: 56,
                 textAlign: "center",
                 fontFamily: "'Inter',system-ui,sans-serif",
-                fontSize: 22, fontWeight: 700,
+                fontSize: 22,
+                fontWeight: 700,
                 color: C.text,
                 background: digit ? "#EFF6FF" : "#F8FAFF",
                 border: `2px solid ${digit ? C.blue : C.border}`,
@@ -93,7 +166,8 @@ export default function StepOTP({
               }}
               onFocus={(e) => {
                 (e.target as HTMLInputElement).style.borderColor = C.blue;
-                (e.target as HTMLInputElement).style.boxShadow = "0 0 0 3px rgba(26,86,219,0.12)";
+                (e.target as HTMLInputElement).style.boxShadow =
+                  "0 0 0 3px rgba(26,86,219,0.12)";
               }}
               onBlur={(e) => {
                 if (!digit) {
@@ -106,30 +180,98 @@ export default function StepOTP({
         </div>
       </div>
 
-      <div style={{ height: 1, background: `linear-gradient(90deg, transparent, ${C.border}, transparent)`, margin: "2px 0" }}/>
+      {error && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "#FEF2F2",
+            border: "1px solid #FECACA",
+            borderRadius: 8,
+            padding: "8px 12px",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Inter',system-ui,sans-serif",
+              fontSize: 12,
+              color: "#EF4444",
+              fontWeight: 500,
+            }}
+          >
+            {error}
+          </span>
+        </div>
+      )}
+
+      <div
+        style={{
+          height: 1,
+          background: `linear-gradient(90deg, transparent, ${C.border}, transparent)`,
+          margin: "2px 0",
+        }}
+      />
 
       <button
         onClick={handleSubmit}
         disabled={loading || !isFilled}
         style={{
-          width: "100%", height: 50, borderRadius: 12,
+          width: "100%",
+          height: 50,
+          borderRadius: 12,
           background: loading || !isFilled ? "#93C5FD" : C.blue,
-          border: "none", color: "#fff",
+          border: "none",
+          color: "#fff",
           fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em",
+          fontSize: 15,
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
           cursor: loading || !isFilled ? "not-allowed" : "pointer",
           transition: "all 0.2s ease",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          boxShadow: loading || !isFilled ? "none" : "0 4px 18px rgba(26,86,219,0.38)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          boxShadow:
+            loading || !isFilled ? "none" : "0 4px 18px rgba(26,86,219,0.38)",
         }}
-        onMouseEnter={(e) => { if (!loading && isFilled) { (e.currentTarget as HTMLElement).style.background = C.blueHover; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}}
-        onMouseLeave={(e) => { if (!loading && isFilled) { (e.currentTarget as HTMLElement).style.background = C.blue; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}}
+        onMouseEnter={(e) => {
+          if (!loading && isFilled) {
+            (e.currentTarget as HTMLElement).style.background = C.blueHover;
+            (e.currentTarget as HTMLElement).style.transform =
+              "translateY(-1px)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!loading && isFilled) {
+            (e.currentTarget as HTMLElement).style.background = C.blue;
+            (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+          }
+        }}
       >
         {loading ? (
           <>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ animation: "lgSpin 0.8s linear infinite" }}>
-              <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5"/>
-              <path d="M12 3a9 9 0 019 9" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              style={{ animation: "lgSpin 0.8s linear infinite" }}
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+                stroke="rgba(255,255,255,0.35)"
+                strokeWidth="2.5"
+              />
+              <path
+                d="M12 3a9 9 0 019 9"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
             </svg>
             Verifying…
           </>
@@ -138,9 +280,20 @@ export default function StepOTP({
         )}
       </button>
 
-      <p style={{ fontFamily: "'Inter',system-ui,sans-serif", fontSize: 13.5, color: C.muted, textAlign: "center", margin: 0 }}>
+      <p
+        style={{
+          fontFamily: "'Inter',system-ui,sans-serif",
+          fontSize: 13.5,
+          color: C.muted,
+          textAlign: "center",
+          margin: 0,
+        }}
+      >
         Back to{" "}
-        <Link href="/login" style={{ color: C.blue, fontWeight: 600, textDecoration: "none" }}>
+        <Link
+          href="/login"
+          style={{ color: C.blue, fontWeight: 600, textDecoration: "none" }}
+        >
           Login
         </Link>
       </p>

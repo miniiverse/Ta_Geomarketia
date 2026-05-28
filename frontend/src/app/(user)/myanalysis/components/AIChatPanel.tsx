@@ -52,8 +52,6 @@ const QUICK_SUGGESTIONS: Record<"map" | "cluster", string[]> = {
   ],
 };
 
-// ── SVG Icon Components ──────────────────────────────────────────────────────
-
 const IconMapPin = ({
   size = 16,
   color = "currentColor",
@@ -256,8 +254,6 @@ const IconBrain = ({
   </svg>
 );
 
-// ────────────────────────────────────────────────────────────────────────────
-
 function buildSystemPrompt(ctx: AnalysisContext): string {
   const base = `Kamu adalah konsultan geospasial dan analis bisnis senior yang ahli dalam pasar teknologi Batam, Indonesia. Kamu memiliki akses ke data real dari Google Maps — 267 toko komputer & elektronik di seluruh wilayah Batam.
 
@@ -377,12 +373,20 @@ export default function AIChatPanel({ context }: Props) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeTab, setActiveTab] = useState<"chat" | "insights">("chat");
+  const [isMobile, setIsMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const mode = context.mode;
   const suggestions = QUICK_SUGGESTIONS[mode];
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 600);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (isOpen && activeTab === "chat") {
@@ -504,6 +508,11 @@ export default function AIChatPanel({ context }: Props) {
   const accentLight = mode === "map" ? "#EFF6FF" : "#FFFBEB";
   const accentBorder = mode === "map" ? "#BFDBFE" : "#FDE68A";
 
+  const panelWidth = isMobile ? "calc(100vw - 24px)" : isMinimized ? 320 : 390;
+  const panelRight = isMobile ? 12 : 28;
+  const panelBottom = isMobile ? 80 : isMinimized ? 90 : 92;
+  const panelHeight = isMobile ? "70vh" : isMinimized ? "auto" : 560;
+
   const insightCards = [
     {
       icon: <IconBarChart size={20} color={accent} />,
@@ -541,12 +550,11 @@ export default function AIChatPanel({ context }: Props) {
 
   return (
     <>
-      {/* ── FAB Button ── */}
       <div
         style={{
           position: "fixed",
-          bottom: 28,
-          right: 28,
+          bottom: isMobile ? 16 : 28,
+          right: isMobile ? 16 : 28,
           zIndex: 1300,
           display: "flex",
           flexDirection: "column",
@@ -554,7 +562,6 @@ export default function AIChatPanel({ context }: Props) {
           gap: 8,
         }}
       >
-        {/* Tooltip */}
         {!isOpen && (
           <div
             style={{
@@ -619,7 +626,6 @@ export default function AIChatPanel({ context }: Props) {
             <IconChat size={20} color="white" />
           )}
 
-          {/* Unread badge */}
           {!isOpen && unreadCount > 0 && (
             <div
               style={{
@@ -644,7 +650,6 @@ export default function AIChatPanel({ context }: Props) {
             </div>
           )}
 
-          {/* Mode indicator */}
           <div
             style={{
               position: "absolute",
@@ -661,15 +666,14 @@ export default function AIChatPanel({ context }: Props) {
         </button>
       </div>
 
-      {/* ── Chat Panel ── */}
       {isOpen && (
         <div
           style={{
             position: "fixed",
-            bottom: isMinimized ? 90 : 92,
-            right: 28,
-            width: isMinimized ? 320 : 390,
-            height: isMinimized ? "auto" : 560,
+            bottom: panelBottom,
+            right: panelRight,
+            width: panelWidth,
+            height: panelHeight,
             background: panelBg,
             borderRadius: 20,
             boxShadow:
@@ -682,7 +686,6 @@ export default function AIChatPanel({ context }: Props) {
             animation: "slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }}
         >
-          {/* ── Panel Header ── */}
           <div
             style={{
               padding: isMinimized ? "12px 14px" : "14px 16px",
@@ -691,7 +694,6 @@ export default function AIChatPanel({ context }: Props) {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {/* Avatar */}
               <div
                 style={{
                   width: 36,
@@ -757,7 +759,6 @@ export default function AIChatPanel({ context }: Props) {
                 )}
               </div>
 
-              {/* Online indicator */}
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <div
                   style={{
@@ -777,9 +778,7 @@ export default function AIChatPanel({ context }: Props) {
                 )}
               </div>
 
-              {/* Controls */}
               <div style={{ display: "flex", gap: 4, marginLeft: 4 }}>
-                {/* Clear */}
                 {messages.length > 0 && !isMinimized && (
                   <button
                     onClick={clearChat}
@@ -820,58 +819,58 @@ export default function AIChatPanel({ context }: Props) {
                     </svg>
                   </button>
                 )}
-                {/* Minimize */}
-                <button
-                  onClick={() => setIsMinimized((v) => !v)}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: "rgba(255,255,255,0.15)",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "background 0.15s",
-                  }}
-                  title={isMinimized ? "Perluas" : "Perkecil"}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.25)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.15)";
-                  }}
-                >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {!isMobile && (
+                  <button
+                    onClick={() => setIsMinimized((v) => !v)}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,0.15)",
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background 0.15s",
+                    }}
+                    title={isMinimized ? "Perluas" : "Perkecil"}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "rgba(255,255,255,0.25)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "rgba(255,255,255,0.15)";
+                    }}
                   >
-                    {isMinimized ? (
-                      <>
-                        <polyline points="17 11 12 6 7 11" />
-                        <polyline points="17 18 12 13 7 18" />
-                      </>
-                    ) : (
-                      <>
-                        <polyline points="7 13 12 18 17 13" />
-                        <polyline points="7 6 12 11 17 6" />
-                      </>
-                    )}
-                  </svg>
-                </button>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      {isMinimized ? (
+                        <>
+                          <polyline points="17 11 12 6 7 11" />
+                          <polyline points="17 18 12 13 7 18" />
+                        </>
+                      ) : (
+                        <>
+                          <polyline points="7 13 12 18 17 13" />
+                          <polyline points="7 6 12 11 17 6" />
+                        </>
+                      )}
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Tab bar */}
             {!isMinimized && (
               <div
                 style={{
@@ -939,11 +938,9 @@ export default function AIChatPanel({ context }: Props) {
             )}
           </div>
 
-          {/* ── Body ── */}
           {!isMinimized && (
             <>
               {activeTab === "chat" ? (
-                /* Chat messages */
                 <div
                   style={{
                     flex: 1,
@@ -958,7 +955,6 @@ export default function AIChatPanel({ context }: Props) {
                   }}
                 >
                   {messages.length === 0 ? (
-                    /* Empty state */
                     <div style={{ textAlign: "center", padding: "16px 8px" }}>
                       <div
                         style={{
@@ -999,7 +995,6 @@ export default function AIChatPanel({ context }: Props) {
                       >
                         Analisis berbasis 267 bisnis real di Batam
                       </div>
-                      {/* Suggestion chips */}
                       <div
                         style={{
                           display: "flex",
@@ -1095,7 +1090,6 @@ export default function AIChatPanel({ context }: Props) {
                     ))
                   )}
 
-                  {/* Loading indicator */}
                   {loading && (
                     <div
                       style={{
@@ -1123,7 +1117,6 @@ export default function AIChatPanel({ context }: Props) {
                     </div>
                   )}
 
-                  {/* Follow-up suggestions */}
                   {messages.length > 0 &&
                     messages[messages.length - 1].role === "assistant" &&
                     !loading && (
@@ -1177,7 +1170,6 @@ export default function AIChatPanel({ context }: Props) {
                   <div ref={bottomRef} />
                 </div>
               ) : (
-                /* Insights tab */
                 <div
                   style={{
                     flex: 1,
@@ -1275,7 +1267,6 @@ export default function AIChatPanel({ context }: Props) {
                     </button>
                   ))}
 
-                  {/* Context summary card */}
                   <div
                     style={{
                       marginTop: 4,
@@ -1396,7 +1387,6 @@ export default function AIChatPanel({ context }: Props) {
                 </div>
               )}
 
-              {/* ── Input Area ── */}
               {activeTab === "chat" && (
                 <div
                   style={{

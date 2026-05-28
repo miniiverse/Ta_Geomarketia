@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-
+ 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const server = process.env.NEXT_PUBLIC_SERVER;
-
+  const server = process.env.LARAVEL_API_URL;
+ 
   try {
     const res = await fetch(`${server}/api/login`, {
       method: "POST",
@@ -13,31 +13,32 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(body),
     });
-
+ 
     const data = await res.json();
-
+ 
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
     }
-
+ 
     const response = NextResponse.json({
       success: true,
       user: data.user,
     });
-
+ 
+    // Set token sebagai HTTP Only Cookie — tidak bisa diakses JavaScript browser
     response.cookies.set("token", data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 30, 
+      maxAge: 60 * 30, // 30 menit
     });
-
-    return response;    
+ 
+    return response;
   } catch {
     return NextResponse.json(
-      { message: "Gagal menghubungi server." },
-      { status: 503 },
+      { message: "Failed to connect to the server." },
+      { status: 503 }
     );
   }
 }

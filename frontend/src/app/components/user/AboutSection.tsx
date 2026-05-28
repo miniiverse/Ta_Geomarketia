@@ -46,7 +46,6 @@ const IconArrow = () => (
   </svg>
 );
 
-
 const solutions: Solution[] = [
   {
     icon: <IconRetail />,
@@ -68,7 +67,6 @@ const solutions: Solution[] = [
   },
 ];
 
-
 function MapIllustration() {
   return (
     <div
@@ -84,31 +82,9 @@ function MapIllustration() {
         justifyContent: "center",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(circle at 50% 60%, rgba(255,255,255,0.12) 0%, transparent 65%)",
-          pointerEvents: "none",
-        }}
-      />
-      <svg
-        width="220"
-        height="240"
-        viewBox="0 0 220 240"
-        fill="none"
-        style={{ position: "relative", zIndex: 1, animation: "gmFadeUp 0.8s ease both" }}
-      >
+      <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)", backgroundSize:"24px 24px", pointerEvents:"none" }} />
+      <div style={{ position:"absolute", inset:0, background:"radial-gradient(circle at 50% 60%, rgba(255,255,255,0.12) 0%, transparent 65%)", pointerEvents:"none" }} />
+      <svg width="220" height="240" viewBox="0 0 220 240" fill="none" style={{ position:"relative", zIndex:1, animation:"gmFadeUp 0.8s ease both" }}>
         <path d="M28 112 L110 68 L192 112 L110 156Z" fill="#60a5fa" opacity="0.45" />
         <path d="M28 112 L110 156 L110 172 L28 128Z" fill="#1d4ed8" opacity="0.65" />
         <path d="M192 112 L110 156 L110 172 L192 128Z" fill="#2563eb" opacity="0.55" />
@@ -148,18 +124,14 @@ function MapIllustration() {
   );
 }
 
-
 function SolutionCard({ icon, title, desc, href }: Solution) {
   return (
     <Link
       href={href}
       style={{
-        display: "flex",
-        flexDirection: "column",
-        background: "#ffffff",
-        border: "1px solid #f0f2f5",
-        borderRadius: 16,
-        padding: "24px",
+        display: "flex", flexDirection: "column",
+        background: "#ffffff", border: "1px solid #f0f2f5",
+        borderRadius: 16, padding: "24px",
         textDecoration: "none",
         transition: "box-shadow 0.2s, border-color 0.2s, transform 0.2s",
         cursor: "pointer",
@@ -177,213 +149,89 @@ function SolutionCard({ icon, title, desc, href }: Solution) {
         el.style.transform = "translateY(0)";
       }}
     >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: "#eff6ff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 14,
-          flexShrink: 0,
-        }}
-      >
+      <div style={{ width:48, height:48, borderRadius:12, background:"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14, flexShrink:0 }}>
         {icon}
       </div>
-
-      <div
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: "1rem",
-          fontWeight: 700,
-          color: "#1A56DB",
-          letterSpacing: "-0.02em",
-          marginBottom: 8,
-        }}
-      >
+      <div style={{ fontFamily:"'Inter',system-ui,sans-serif", fontSize:"1rem", fontWeight:700, color:"#1A56DB", letterSpacing:"-0.02em", marginBottom:8 }}>
         {title}
       </div>
-
-      <p
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: "0.825rem",
-          lineHeight: 1.65,
-          color: "#6b7280",
-          marginBottom: 18,
-          flex: 1,
-        }}
-      >
+      <p style={{ fontFamily:"'Inter',system-ui,sans-serif", fontSize:"0.825rem", lineHeight:1.65, color:"#6b7280", marginBottom:18, flex:1 }}>
         {desc}
       </p>
-
       <button
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          background: "#eff6ff",
-          color: "#1A56DB",
-          border: "1px solid #bfdbfe",
-          borderRadius: 8,
-          padding: "8px 12px",
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 12.5,
-          fontWeight: 600,
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          width: "fit-content",
+          display:"inline-flex", alignItems:"center", gap:6,
+          background:"#eff6ff", color:"#1A56DB",
+          border:"1px solid #bfdbfe", borderRadius:8, padding:"8px 12px",
+          fontFamily:"'Inter',system-ui,sans-serif", fontSize:12.5, fontWeight:600,
+          cursor:"pointer", transition:"all 0.2s ease", width:"fit-content",
         }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLElement;
-          el.style.background = "#1A56DB";
-          el.style.color = "#ffffff";
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLElement;
-          el.style.background = "#eff6ff";
-          el.style.color = "#1A56DB";
-        }}
+        onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.background="#1A56DB"; el.style.color="#ffffff"; }}
+        onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.background="#eff6ff"; el.style.color="#1A56DB"; }}
       >
-        Learn more
-        <IconArrow />
+        Learn more <IconArrow />
       </button>
     </Link>
   );
 }
 
-
 function CtaCard() {
   return (
     <div
       style={{
-        background: "#eff6ff",
-        border: "1px solid #bfdbfe",
-        borderRadius: 16,
-        padding: "24px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        minHeight: 190,
-        transition: "background 0.2s",
-        cursor: "pointer",
+        background:"#eff6ff", border:"1px solid #bfdbfe", borderRadius:16,
+        padding:"24px", display:"flex", flexDirection:"column",
+        justifyContent:"space-between", minHeight:190,
+        transition:"background 0.2s", cursor:"pointer",
       }}
-      onMouseEnter={(e) =>
-        ((e.currentTarget as HTMLElement).style.background = "#dbeafe")
-      }
-      onMouseLeave={(e) =>
-        ((e.currentTarget as HTMLElement).style.background = "#eff6ff")
-      }
+      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#dbeafe")}
+      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#eff6ff")}
     >
-      <div
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 12,
-          background: "rgba(37,99,235,0.12)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div style={{ width:44, height:44, borderRadius:12, background:"rgba(37,99,235,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
         <IconSearch />
       </div>
-
       <Link
         href="/about/more"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          background: "#1A56DB",
-          color: "#fff",
-          borderRadius: 10,
-          padding: "13px 20px",
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 13.5,
-          fontWeight: 600,
-          textDecoration: "none",
-          letterSpacing: "-0.01em",
-          marginTop: "auto",
-          transition: "background 0.15s, transform 0.15s",
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+          background:"#1A56DB", color:"#fff", borderRadius:10, padding:"13px 20px",
+          fontFamily:"'Inter',system-ui,sans-serif", fontSize:13.5, fontWeight:600,
+          textDecoration:"none", letterSpacing:"-0.01em", marginTop:"auto",
+          transition:"background 0.15s, transform 0.15s",
         }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.background = "#1036A0";
-          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.background = "#1A56DB";
-          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background="#1036A0"; (e.currentTarget as HTMLElement).style.transform="translateY(-1px)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background="#1A56DB"; (e.currentTarget as HTMLElement).style.transform="translateY(0)"; }}
       >
-        See More Solutions
-        <IconArrow />
+        See More Solutions <IconArrow />
       </Link>
     </div>
   );
 }
 
-
 export default function AboutSection() {
   return (
     <section
       id="about"
-      style={{
-        width: "100%",
-        background: "#ffffff",
-        padding: "6rem 4rem",
-      }}
       className="gm-about-section"
+      style={{ width:"100%", background:"#ffffff", padding:"6rem 4rem" }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ marginBottom: "3rem" }}>
-          <h2
-            style={{
-              fontFamily: "'Inter', system-ui, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(1.6rem, 2.5vw, 2.2rem)",
-              color: "#1A56DB",
-              letterSpacing: "-0.03em",
-              marginBottom: 10,
-            }}
-          >
+      <div style={{ maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ marginBottom:"3rem" }}>
+          <h2 style={{ fontFamily:"'Inter',system-ui,sans-serif", fontWeight:700, fontSize:"clamp(1.6rem,2.5vw,2.2rem)", color:"#1A56DB", letterSpacing:"-0.03em", marginBottom:10 }}>
             Solutions for Market Analysis
           </h2>
-          <p
-            style={{
-              fontFamily: "'Inter', system-ui, sans-serif",
-              fontSize: "0.95rem",
-              color: "#6b7280",
-              lineHeight: 1.7,
-              maxWidth: 660,
-            }}
-          >
-            Explore how Geomarketia helps businesses analyze market potential
-            and identify strategic locations using geospatial intelligence.
+          <p style={{ fontFamily:"'Inter',system-ui,sans-serif", fontSize:"0.95rem", color:"#6b7280", lineHeight:1.7, maxWidth:660 }}>
+            Explore how Geomarketia helps businesses analyze market potential and identify strategic locations using geospatial intelligence.
           </p>
         </div>
 
         <div
           className="gm-about-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "300px 1fr",
-            gap: 20,
-            alignItems: "start",
-          }}
+          style={{ display:"grid", gridTemplateColumns:"300px 1fr", gap:20, alignItems:"start" }}
         >
           <MapIllustration />
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 14,
-            }}
-          >
+          <div className="gm-solution-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
             {solutions.map((sol) => (
               <SolutionCard key={sol.title} {...sol} />
             ))}
@@ -396,18 +244,51 @@ export default function AboutSection() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         @keyframes gmFadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { opacity:0; transform:translateY(20px); }
+          to   { opacity:1; transform:translateY(0); }
         }
 
+        /* ── Tablet: 960px ── */
         @media (max-width: 960px) {
-          .gm-about-section { padding: 4rem 1.5rem !important; }
-          .gm-about-grid    { grid-template-columns: 1fr !important; }
+          .gm-about-section {
+            padding: 4rem 2rem !important;
+          }
+          .gm-about-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
 
-        @media (max-width: 520px) {
-          .gm-about-grid > div:last-child {
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .gm-about-section {
+            padding: 3rem 1.25rem !important;
+          }
+          .gm-solution-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* ── Mobile XS: 520px (breakpoint asli) ── */
+        @media (max-width: 520px) {
+          .gm-solution-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .gm-about-section {
+            padding: 2.5rem 1rem !important;
+          }
+        }
+
+        /* ── Mobile 360px (Android mid-range) ── */
+        @media (max-width: 360px) {
+          .gm-about-section {
+            padding: 2rem 0.875rem !important;
+          }
+          .gm-solution-grid {
+            gap: 10px !important;
           }
         }
       `}</style>

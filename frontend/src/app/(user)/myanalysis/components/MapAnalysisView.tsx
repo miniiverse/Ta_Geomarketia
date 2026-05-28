@@ -23,6 +23,19 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function useWindowSize() {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    function update() {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return size;
+}
+
 export default function MapAnalysis({
   center,
   radiusKm,
@@ -31,38 +44,46 @@ export default function MapAnalysis({
   onBusinessCountChange,
 }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const instanceRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const layersRef = useRef<any[]>([]);
   const [mapReady, setMapReady] = useState(false);
   const [loadingMap, setLoadingMap] = useState(true);
+
+  const { width } = useWindowSize();
+  const isMobile = width > 0 && width < 640;
 
   useEffect(() => {
     if (!mapRef.current || instanceRef.current) return;
 
     import("leaflet").then((L) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconRetinaUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
       const map = L.map(mapRef.current!, {
         center: [center.lat, center.lng],
-        zoom: 14,
+        zoom: isMobile ? 13 : 14,
         zoomControl: true,
         attributionControl: false,
+        touchZoom: true,
+        bounceAtZoomLimits: false,
       });
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
       }).addTo(map);
 
-      // Custom attribution
-      L.control.attribution({ prefix: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OSM</a>' }).addTo(map);
+      L.control
+        .attribution({
+          prefix:
+            '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OSM</a>',
+        })
+        .addTo(map);
 
       instanceRef.current = { map, L };
       setMapReady(true);
@@ -76,7 +97,6 @@ export default function MapAnalysis({
         setMapReady(false);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -91,11 +111,12 @@ export default function MapAnalysis({
       const { map, L } = instanceRef.current;
 
       layersRef.current.forEach((l) => {
-        try { l.remove(); } catch { /* ignore */ }
+        try {
+          l.remove();
+        } catch {}
       });
       layersRef.current = [];
 
-      // ── Radius circle dengan animasi pulse ──
       const outerCircle = L.circle([center.lat, center.lng], {
         radius: radiusKm * 1000,
         color: "#2563EB",
@@ -103,11 +124,9 @@ export default function MapAnalysis({
         fillOpacity: 0.04,
         weight: 1.5,
         dashArray: "8 5",
-        className: "radius-circle-outer",
       }).addTo(map);
       layersRef.current.push(outerCircle);
 
-      // Inner pulse circle (lebih kecil, lebih terang)
       const innerCircle = L.circle([center.lat, center.lng], {
         radius: radiusKm * 1000 * 0.15,
         color: "#2563EB",
@@ -117,23 +136,25 @@ export default function MapAnalysis({
       }).addTo(map);
       layersRef.current.push(innerCircle);
 
-      // ── Center marker (pin analysis point) ──
+      const pinSize = isMobile ? 36 : 32;
+      const badgeSize = isMobile ? 20 : 18;
+
       const centerIcon = L.divIcon({
         className: "",
         html: `
           <div style="position:relative;filter:drop-shadow(0 4px 8px rgba(37,99,235,0.4));">
-            <svg viewBox="0 0 32 42" width="32" height="42" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 32 42" width="${pinSize}" height="${pinSize * 1.3125}" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 0C7.163 0 0 7.163 0 16c0 6.075 3.318 11.37 8.225 14.225L16 42l7.775-11.775C28.682 27.37 32 22.075 32 16 32 7.163 24.837 0 16 0z" fill="#1D4ED8"/>
               <path d="M16 1C7.716 1 1 7.716 1 16c0 5.73 3.12 10.74 7.77 13.46L16 41l7.23-11.54C27.88 26.74 31 21.73 31 16 31 7.716 24.284 1 16 1z" fill="#2563EB"/>
               <circle cx="16" cy="16" r="7" fill="white" opacity="0.95"/>
               <circle cx="16" cy="16" r="4" fill="#2563EB"/>
               <circle cx="16" cy="16" r="1.8" fill="white"/>
             </svg>
-            <div style="position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;border-radius:9px;background:#EF4444;border:2px solid white;font-size:9px;font-weight:800;color:white;display:flex;align-items:center;justify-content:center;padding:0 4px;font-family:sans-serif;letter-spacing:-0.3px;">Anda</div>
+            <div style="position:absolute;top:-8px;right:-8px;min-width:${badgeSize}px;height:${badgeSize}px;border-radius:${badgeSize / 2}px;background:#EF4444;border:2px solid white;font-size:${isMobile ? 10 : 9}px;font-weight:800;color:white;display:flex;align-items:center;justify-content:center;padding:0 4px;font-family:sans-serif;letter-spacing:-0.3px;">Anda</div>
           </div>`,
-        iconSize: [32, 42],
-        iconAnchor: [16, 42],
-        popupAnchor: [0, -44],
+        iconSize: [pinSize, pinSize * 1.3125],
+        iconAnchor: [pinSize / 2, pinSize * 1.3125],
+        popupAnchor: [0, -(pinSize * 1.3125 + 4)],
       });
 
       const centerMarker = L.marker([center.lat, center.lng], {
@@ -142,7 +163,7 @@ export default function MapAnalysis({
       })
         .addTo(map)
         .bindPopup(
-          `<div style="font-family:system-ui,sans-serif;min-width:180px;padding:8px 0">
+          `<div style="font-family:system-ui,sans-serif;min-width:${isMobile ? 200 : 180}px;padding:8px 0">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
               <div style="width:36px;height:36px;border-radius:10px;background:#EFF6FF;border:1px solid #BFDBFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -173,11 +194,10 @@ export default function MapAnalysis({
               <span style="font-size:12px;font-weight:600;color:#1D4ED8;">Radius aktif: ${radiusKm} km</span>
             </div>
           </div>`,
-          { maxWidth: 240, className: "custom-popup" }
+          { maxWidth: isMobile ? 260 : 240, className: "custom-popup" },
         );
       layersRef.current.push(centerMarker);
 
-      // ── Business markers ──
       let inRadiusCount = 0;
       businesses.forEach((biz) => {
         const dist = haversine(center.lat, center.lng, biz.lat, biz.lng);
@@ -188,24 +208,31 @@ export default function MapAnalysis({
         const opacity = isInRadius ? 1 : 0.22;
         const isHighRated = biz.rating >= 4.5 && biz.reviews >= 50;
 
-        // Ukuran berdasarkan reviews (prominence)
         const prominence = Math.min(1, (biz.reviews || 0) / 500);
+        const baseSize = isMobile ? 22 : 18;
         const size = isInRadius
-          ? Math.round(18 + prominence * 14)
-          : 10;
+          ? Math.round(baseSize + prominence * 14)
+          : isMobile
+            ? 12
+            : 10;
 
         const icon = L.divIcon({
           className: "",
           html: `
             <div style="opacity:${opacity};transition:opacity 0.25s ease;position:relative;">
-              ${isHighRated && isInRadius ? `
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:${size * 2.2}px;height:${size * 2.2}px;border-radius:50%;background:${color}22;animation:pulse-ring 2s ease-out infinite;"></div>
-              ` : ""}
-              <svg viewBox="0 0 ${size} ${size * 1.35}" width="${size}" height="${size * 1.35}" xmlns="http://www.w3.org/2000/svg" style="filter:${isInRadius ? `drop-shadow(0 2px 4px ${color}55)` : 'none'};">
-                <path d="M${size / 2} 0C${size * 0.224} 0 0 ${size * 0.224} 0 ${size / 2}c0 ${size * 0.188} ${size * 0.101} ${size * 0.356} ${size * 0.254} ${size * 0.447}L${size / 2} ${size * 1.35}l${size * 0.246} -${size * 0.353}C${size * 0.899} ${size * 0.606} ${size} ${size * 0.438} ${size} ${size / 2} ${size} ${size * 0.224} ${size * 0.776} 0 ${size / 2} 0z" fill="${isInRadius ? color : '#94A3B8'}"/>
-                ${isHighRated && isInRadius ? `<circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.3}" fill="white" opacity="0.92"/>
-                <path d="M${size / 2} ${size * 0.185}l${size * 0.082} ${size * 0.162}${size * 0.178} 0.026-${size * 0.129} ${size * 0.126}${size * 0.03} ${size * 0.18}-${size * 0.162} -0.085-${size * 0.162} 0.085${size * 0.03} -${size * 0.18}-${size * 0.129} -${size * 0.126}z" fill="${color}" transform="scale(0.55) translate(${size * 0.45}, ${size * 0.48})"/>` :
-                `<circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.26}" fill="white" opacity="0.9"/>`}
+              ${
+                isHighRated && isInRadius
+                  ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:${size * 2.2}px;height:${size * 2.2}px;border-radius:50%;background:${color}22;animation:pulse-ring 2s ease-out infinite;"></div>`
+                  : ""
+              }
+              <svg viewBox="0 0 ${size} ${size * 1.35}" width="${size}" height="${size * 1.35}" xmlns="http://www.w3.org/2000/svg" style="filter:${isInRadius ? `drop-shadow(0 2px 4px ${color}55)` : "none"};">
+                <path d="M${size / 2} 0C${size * 0.224} 0 0 ${size * 0.224} 0 ${size / 2}c0 ${size * 0.188} ${size * 0.101} ${size * 0.356} ${size * 0.254} ${size * 0.447}L${size / 2} ${size * 1.35}l${size * 0.246} -${size * 0.353}C${size * 0.899} ${size * 0.606} ${size} ${size * 0.438} ${size} ${size / 2} ${size} ${size * 0.224} ${size * 0.776} 0 ${size / 2} 0z" fill="${isInRadius ? color : "#94A3B8"}"/>
+                ${
+                  isHighRated && isInRadius
+                    ? `<circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.3}" fill="white" opacity="0.92"/>
+                <path d="M${size / 2} ${size * 0.185}l${size * 0.082} ${size * 0.162}${size * 0.178} 0.026-${size * 0.129} ${size * 0.126}${size * 0.03} ${size * 0.18}-${size * 0.162} -0.085-${size * 0.162} 0.085${size * 0.03} -${size * 0.18}-${size * 0.129} -${size * 0.126}z" fill="${color}" transform="scale(0.55) translate(${size * 0.45}, ${size * 0.48})"/>`
+                    : `<circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.26}" fill="white" opacity="0.9"/>`
+                }
               </svg>
             </div>`,
           iconSize: [size, size * 1.35],
@@ -213,15 +240,21 @@ export default function MapAnalysis({
           popupAnchor: [0, -(size * 1.35 + 4)],
         });
 
-        // Jam buka hari ini
-        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
         const todayName = days[new Date().getDay()];
         const todayHours = biz.open_hours.find((h) => h.day === todayName);
         const hoursText = todayHours?.hours ?? null;
         const isClosed = hoursText === "Closed";
         const isOpen24 = hoursText === "00:00 - 23:59";
 
-        // Stars HTML
         const starsHtml =
           biz.rating > 0
             ? Array.from({ length: 5 }, (_, i) => {
@@ -231,7 +264,6 @@ export default function MapAnalysis({
               }).join("")
             : "";
 
-        // Category color badge
         const catEmoji: Record<string, string> = {
           "Computer store": "💻",
           "Electronics store": "📱",
@@ -242,14 +274,15 @@ export default function MapAnalysis({
         };
         const emoji = catEmoji[biz.category] || "🏪";
 
+        const popupWidth = isMobile ? 260 : 230;
+
         const marker = L.marker([biz.lat, biz.lng], {
           icon,
           zIndexOffset: isInRadius ? Math.round(biz.reviews) : -100,
         })
           .addTo(map)
           .bindPopup(
-            `<div style="font-family:system-ui,sans-serif;min-width:230px;max-width:270px;padding:8px 0;">
-              <!-- Header -->
+            `<div style="font-family:system-ui,sans-serif;min-width:${popupWidth}px;max-width:${popupWidth + 40}px;padding:8px 0;">
               <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:${color}18;border:1.5px solid ${color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">${emoji}</div>
                 <div style="flex:1;min-width:0;">
@@ -261,48 +294,54 @@ export default function MapAnalysis({
                 </div>
               </div>
 
-              <!-- Rating & Reviews -->
-              ${biz.rating > 0 ? `
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:6px 10px;background:#FFFBF0;border-radius:8px;border:1px solid #FDE68A40;">
+              ${
+                biz.rating > 0
+                  ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:6px 10px;background:#FFFBF0;border-radius:8px;border:1px solid #FDE68A40;">
                 <span>${starsHtml}</span>
                 <span style="font-size:13px;font-weight:700;color:#92400E;">${biz.rating.toFixed(1)}</span>
                 <span style="font-size:11px;color:#78716C;">${biz.reviews.toLocaleString()} ulasan</span>
                 ${isHighRated ? `<div style="margin-left:auto;padding:2px 7px;background:#FEF3C7;border-radius:4px;"><span style="font-size:10px;font-weight:700;color:#92400E;">★ TOP</span></div>` : ""}
-              </div>` : `
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:6px 10px;background:#F8FAFC;border-radius:8px;">
+              </div>`
+                  : `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:6px 10px;background:#F8FAFC;border-radius:8px;">
                 <span style="font-size:11px;color:#94A3B8;">Belum ada ulasan</span>
-              </div>`}
+              </div>`
+              }
 
-              <!-- Address -->
-              ${biz.address ? `
-              <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;">
+              ${
+                biz.address
+                  ? `<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;">
                 <svg style="flex-shrink:0;margin-top:1px;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
                 </svg>
                 <span style="font-size:11px;color:#475569;line-height:1.45;">${biz.address.split(",").slice(0, 3).join(",").replace(", Indonesia", "")}</span>
-              </div>` : ""}
+              </div>`
+                  : ""
+              }
 
-              <!-- Phone -->
-              ${biz.phone ? `
-              <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              ${
+                biz.phone
+                  ? `<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
                 <svg style="flex-shrink:0;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>
                 </svg>
                 <a href="tel:${biz.phone}" style="font-size:11px;color:#2563EB;text-decoration:none;">${biz.phone}</a>
-              </div>` : ""}
+              </div>`
+                  : ""
+              }
 
-              <!-- Jam Buka -->
-              ${hoursText ? `
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+              ${
+                hoursText
+                  ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                 <svg style="flex-shrink:0;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
                 <span style="font-size:11px;font-weight:600;color:${isClosed ? "#DC2626" : isOpen24 ? "#7C3AED" : "#16A34A"};">
                   ${isClosed ? "Tutup hari ini" : isOpen24 ? "Buka 24 jam" : `Buka ${hoursText}`}
                 </span>
-              </div>` : ""}
+              </div>`
+                  : ""
+              }
 
-              <!-- Footer: Area + Jarak -->
               <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid #F1F5F9;">
                 <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></div>
                 <span style="font-size:11px;color:#64748B;font-weight:500;">${biz.area}</span>
@@ -313,27 +352,28 @@ export default function MapAnalysis({
                   <span style="font-size:11px;font-weight:600;color:${isInRadius ? "#1D4ED8" : "#94A3B8"};">${dist.toFixed(1)} km</span>
                 </div>
               </div>
-              ${biz.website ? `
-              <div style="margin-top:8px;">
-                <a href="https://${biz.website}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;border:1px solid #E2E8F0;border-radius:8px;text-decoration:none;color:#374151;font-size:12px;font-weight:500;background:#F8FAFC;transition:background 0.15s;">
+
+              ${
+                biz.website
+                  ? `<div style="margin-top:8px;">
+                <a href="https://${biz.website}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;border:1px solid #E2E8F0;border-radius:8px;text-decoration:none;color:#374151;font-size:12px;font-weight:500;background:#F8FAFC;">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
                   </svg>
                   Kunjungi Website
                 </a>
-              </div>` : ""}
+              </div>`
+                  : ""
+              }
             </div>`,
-            { maxWidth: 280, className: "custom-popup" }
+            { maxWidth: isMobile ? 300 : 280, className: "custom-popup" },
           );
         layersRef.current.push(marker);
       });
 
       onBusinessCountChange?.(inRadiusCount);
-
-      // Pan ke center
       map.setView([center.lat, center.lng], map.getZoom());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, center.lat, center.lng, radiusKm]);
 
   return (
@@ -366,6 +406,9 @@ export default function MapAnalysis({
           60% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
           100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
         }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
         .leaflet-control-attribution {
           font-size: 10px !important;
           background: rgba(255,255,255,0.85) !important;
@@ -373,18 +416,49 @@ export default function MapAnalysis({
           border-radius: 6px 0 0 0 !important;
           padding: 3px 6px !important;
         }
+        @media (max-width: 640px) {
+          .leaflet-control-zoom a {
+            width: 36px !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            font-size: 18px !important;
+          }
+          .leaflet-popup-content-wrapper {
+            max-width: 88vw !important;
+          }
+          .custom-popup .leaflet-popup-content {
+            margin: 10px 12px !important;
+          }
+        }
       `}</style>
 
-      {/* Loading overlay */}
       {loadingMap && (
-        <div style={{
-          position: "absolute", inset: 0, background: "white",
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          zIndex: 999, gap: 12,
-        }}>
-          <div style={{ width: 40, height: 40, border: "3px solid #EFF6FF", borderTopColor: "#2563EB", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-          <span style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>Memuat peta…</span>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "white",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              border: "3px solid #EFF6FF",
+              borderTopColor: "#2563EB",
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+            }}
+          />
+          <span style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>
+            Loading map...
+          </span>
         </div>
       )}
 

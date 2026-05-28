@@ -44,20 +44,55 @@ export default function TransactionPage() {
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      <div
-        style={{
-          background: "#fff",
-          borderBottom: "1px solid #f1f5f9",
-          padding: "0 32px",
-          height: "64px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-        }}
-      >
+      <style>{`
+        /* ── Breadcrumb Bar ── */
+        .trx-topbar {
+          background: #fff;
+          border-bottom: 1px solid #f1f5f9;
+          padding: 0 32px;
+          height: 64px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        /* ── Page Body ── */
+        .trx-body { padding: 32px; }
+
+        /* ── Stats Grid: 4 kolom default ── */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        /* Large tablet (≤1024px): 2×2 */
+        @media (max-width: 1024px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        /* Mobile (≤640px): 1 kolom, padding lebih kecil */
+        @media (max-width: 640px) {
+          .trx-topbar  { padding: 0 16px; }
+          .trx-body    { padding: 16px; }
+          .stats-grid  { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+          .stat-card   { padding: 14px !important; }
+          .stat-value  { font-size: 18px !important; }
+          .trx-title   { font-size: 22px !important; }
+        }
+
+        @media (max-width: 380px) {
+          .stats-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
+      <div className="trx-topbar">
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link
             href="/admin/dashboard-admin"
@@ -77,9 +112,10 @@ export default function TransactionPage() {
         </div>
       </div>
 
-      <div style={{ padding: "32px" }}>
+      <div className="trx-body">
         <div style={{ marginBottom: "28px" }}>
           <h1
+            className="trx-title"
             style={{
               margin: "0 0 4px",
               fontSize: "28px",
@@ -95,17 +131,11 @@ export default function TransactionPage() {
           </p>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "16px",
-            marginBottom: "28px",
-          }}
-        >
+        <div className="stats-grid">
           {stats.map((s) => (
             <div
               key={s.label}
+              className="stat-card"
               style={{
                 background: "#fff",
                 borderRadius: "16px",
@@ -121,6 +151,7 @@ export default function TransactionPage() {
                 style={{
                   width: "42px",
                   height: "42px",
+                  minWidth: "42px",
                   borderRadius: "12px",
                   background: s.bg,
                   display: "flex",
@@ -153,6 +184,7 @@ export default function TransactionPage() {
                   {s.label}
                 </div>
                 <div
+                  className="stat-value"
                   style={{
                     fontSize: "22px",
                     fontWeight: 700,
@@ -162,14 +194,6 @@ export default function TransactionPage() {
                   }}
                 >
                   {s.value}
-                </div>
-                <div
-                  style={{
-                    fontSize: "11.5px",
-                    color: "#64748b",
-                    marginTop: "4px",
-                  }}
-                >
                 </div>
               </div>
             </div>

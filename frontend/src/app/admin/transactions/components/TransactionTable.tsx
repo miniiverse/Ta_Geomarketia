@@ -184,6 +184,97 @@ export default function TransactionTable() {
 
   return (
     <>
+      <style>{`
+        /* ── Toolbar: filter + search + export ── */
+        .trx-toolbar {
+          padding: 18px 22px;
+          border-bottom: 1px solid #f1f5f9;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .trx-filters {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .trx-search {
+          width: 220px;
+        }
+        .trx-toolbar-right {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .trx-showing {
+          font-size: 12.5px;
+          color: #94a3b8;
+          font-family: 'Inter', sans-serif;
+          white-space: nowrap;
+        }
+
+        /* Mobile (≤640px) */
+        @media (max-width: 640px) {
+          .trx-toolbar       { padding: 12px 14px; flex-direction: column; align-items: stretch; }
+          .trx-filters       { flex-direction: column; align-items: stretch; }
+          .trx-filters > div { width: 100%; }
+          .trx-filters select { width: 100%; box-sizing: border-box; }
+          .trx-search        { width: 100% !important; }
+          .trx-search input  { width: 100% !important; box-sizing: border-box; }
+          .trx-toolbar-right { justify-content: space-between; }
+          .trx-export-btn    { flex: 1; justify-content: center; }
+        }
+
+        /* ── Card view on very small screens ── */
+        .trx-table-wrap { overflow-x: auto; }
+
+        @media (max-width: 768px) {
+          /* Hide full table, show card list instead */
+          .trx-desktop-table { display: none !important; }
+          .trx-card-list     { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+          .trx-desktop-table { display: table !important; }
+          .trx-card-list     { display: none !important; }
+        }
+
+        /* ── Mobile cards ── */
+        .trx-card-list {
+          flex-direction: column;
+          gap: 0;
+          display: none;
+        }
+        .trx-mobile-card {
+          padding: 14px 16px;
+          border-bottom: 1px solid #f1f5f9;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .trx-mobile-card:last-child { border-bottom: none; }
+        .trx-mobile-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
+        /* Pagination */
+        .trx-pagination {
+          padding: 16px 22px;
+          border-top: 1px solid #f1f5f9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+      `}</style>
+
       {selectedTransaction && (
         <TransactionDetail
           transaction={selectedTransaction}
@@ -200,25 +291,8 @@ export default function TransactionTable() {
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            padding: "18px 22px",
-            borderBottom: "1px solid #f1f5f9",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              flexWrap: "wrap",
-            }}
-          >
+        <div className="trx-toolbar">
+          <div className="trx-filters">
             <div style={{ position: "relative" }}>
               <select
                 value={filterCategory}
@@ -290,7 +364,7 @@ export default function TransactionTable() {
               </svg>
             </div>
 
-            <div style={{ position: "relative" }}>
+            <div className="trx-search" style={{ position: "relative" }}>
               <input
                 type="text"
                 placeholder="Search transactions..."
@@ -308,7 +382,8 @@ export default function TransactionTable() {
                   fontFamily: "'Inter', sans-serif",
                   color: "#0f172a",
                   outline: "none",
-                  width: "220px",
+                  width: "100%",
+                  boxSizing: "border-box",
                 }}
               />
               <svg
@@ -333,18 +408,12 @@ export default function TransactionTable() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <span
-              style={{
-                fontSize: "12.5px",
-                color: "#94a3b8",
-                fontFamily: "'Inter', sans-serif",
-              }}
-            >
+          <div className="trx-toolbar-right">
+            <span className="trx-showing">
               Showing {paginated.length} of {filtered.length} transactions
             </span>
-
             <button
+              className="trx-export-btn"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -380,8 +449,11 @@ export default function TransactionTable() {
           </div>
         </div>
 
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="trx-table-wrap">
+          <table
+            className="trx-desktop-table"
+            style={{ width: "100%", borderCollapse: "collapse" }}
+          >
             <thead>
               <tr style={{ background: "#F8FAFF" }}>
                 {[
@@ -446,7 +518,6 @@ export default function TransactionTable() {
                     >
                       {trx.invoiceId}
                     </td>
-
                     <td
                       style={{
                         padding: "14px 18px",
@@ -463,7 +534,6 @@ export default function TransactionTable() {
                         {trx.projectName}
                       </span>
                     </td>
-
                     <td
                       style={{
                         padding: "14px 18px",
@@ -494,7 +564,6 @@ export default function TransactionTable() {
                         {trx.category}
                       </span>
                     </td>
-
                     <td
                       style={{
                         padding: "14px 18px",
@@ -520,7 +589,6 @@ export default function TransactionTable() {
                         {trx.payment}
                       </span>
                     </td>
-
                     <td
                       style={{
                         padding: "14px 18px",
@@ -533,7 +601,6 @@ export default function TransactionTable() {
                     >
                       {trx.amount}
                     </td>
-
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <span
                         style={{
@@ -561,7 +628,6 @@ export default function TransactionTable() {
                         {trx.status}
                       </span>
                     </td>
-
                     <td
                       style={{
                         padding: "14px 18px",
@@ -573,7 +639,6 @@ export default function TransactionTable() {
                     >
                       {trx.date}
                     </td>
-
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setSelectedTransaction(trx)}
@@ -610,6 +675,157 @@ export default function TransactionTable() {
             </tbody>
           </table>
 
+          <div className="trx-card-list">
+            {paginated.map((trx) => {
+              const statusStyle = getStatusStyle(trx.status);
+              return (
+                <div key={trx.id} className="trx-mobile-card">
+                  <div className="trx-mobile-row">
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        color: "#1A56DB",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {trx.invoiceId}
+                    </span>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        background: statusStyle.bg,
+                        color: statusStyle.color,
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                        padding: "3px 9px",
+                        borderRadius: "20px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "5px",
+                          height: "5px",
+                          borderRadius: "50%",
+                          background: statusStyle.dot,
+                          display: "inline-block",
+                        }}
+                      />
+                      {trx.status}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: "13.5px",
+                      fontWeight: 600,
+                      color: "#0f172a",
+                      fontFamily: "'Inter', sans-serif",
+                      cursor: "pointer",
+                      lineHeight: 1.4,
+                    }}
+                    onClick={() => setSelectedTransaction(trx)}
+                  >
+                    <span style={{ borderBottom: "1px dashed #BFDBFE" }}>
+                      {trx.projectName}
+                    </span>
+                  </div>
+
+                  <div className="trx-mobile-row">
+                    <span
+                      style={{
+                        padding: "3px 9px",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "11px",
+                        fontFamily: "'Inter', sans-serif",
+                        background:
+                          trx.category === "Retail"
+                            ? "#EBF3FF"
+                            : trx.category === "Food & Beverage"
+                              ? "#FFF7ED"
+                              : "#ECFDF5",
+                        color:
+                          trx.category === "Retail"
+                            ? "#1A56DB"
+                            : trx.category === "Food & Beverage"
+                              ? "#C2410C"
+                              : "#059669",
+                      }}
+                    >
+                      {trx.category}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        color: "#0f172a",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {trx.amount}
+                    </span>
+                  </div>
+
+                  <div className="trx-mobile-row">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          background: "#F8FAFF",
+                          border: "1px solid #EBF3FF",
+                          borderRadius: "6px",
+                          padding: "2px 9px",
+                          fontSize: "11px",
+                          fontWeight: 500,
+                          fontFamily: "'Inter', sans-serif",
+                          color: "#475569",
+                        }}
+                      >
+                        {trx.payment}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          color: "#94a3b8",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        {trx.date}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedTransaction(trx)}
+                      style={{
+                        background: "#EBF3FF",
+                        color: "#1A56DB",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "5px 12px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Detail
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           {filtered.length === 0 && (
             <div
               style={{
@@ -627,16 +843,7 @@ export default function TransactionTable() {
         </div>
 
         {totalPages > 1 && (
-          <div
-            style={{
-              padding: "16px 22px",
-              borderTop: "1px solid #f1f5f9",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "6px",
-            }}
-          >
+          <div className="trx-pagination">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
@@ -644,7 +851,6 @@ export default function TransactionTable() {
             >
               ‹
             </button>
-
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
@@ -665,7 +871,6 @@ export default function TransactionTable() {
                 {n}
               </button>
             ))}
-
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}

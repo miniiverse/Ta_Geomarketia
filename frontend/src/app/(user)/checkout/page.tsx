@@ -35,18 +35,17 @@ export default function PaymentPage() {
 
   return (
     <main style={{
-      minHeight: "calc(100vh - 66px)",
+      minHeight: "100vh",
       background: "#F3F4F6",
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       <PaymentHeader />
-      
       <div style={{
         background: "#fff",
         borderBottom: "1px solid #E5E7EB",
-        padding: "12px 32px",
+        padding: "12px 16px",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         gap: "16px",
         flexWrap: "wrap",
       }}>
@@ -62,16 +61,19 @@ export default function PaymentPage() {
           </div>
           <div>
             <p style={{ margin: 0, fontSize: "14px", color: "#94a3b8", fontWeight: 500 }}>Product purchased</p>
-            <p style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#0f172a" }}>{title}</p>
+            <p style={{ margin: 0, fontSize: "clamp(15px, 2vw, 18px)", fontWeight: 700, color: "#0f172a" }}>{title}</p>
             {description && (
-              <p style={{ margin: "2px 0 0", fontSize: "14px", color: "#64748b", fontWeight: 400, maxWidth: 420 }}>
+              <p style={{ margin: "2px 0 0", fontSize: "14px", color: "#64748b", fontWeight: 400, maxWidth: "100%" }}>
                 {description}
               </p>
             )}
           </div>
         </div>
 
-        <div style={{ height: "32px", width: "1px", background: "#E5E7EB" }} />
+        <div
+          className="payment-divider"
+          style={{ height: "32px", width: "1px", background: "#E5E7EB" }}
+        />
 
         <span style={{
           fontSize: "12px", fontWeight: 700, color: "#1A56DB",
@@ -90,7 +92,10 @@ export default function PaymentPage() {
           <span style={{ fontSize: "14px", color: "#64748b", fontWeight: 500 }}>{region}</span>
         </div>
 
-        <div style={{ marginLeft: "auto" }}>
+        <div
+          className="payment-total"
+          style={{ marginLeft: "auto", width: "100%" }}
+        >
           <span style={{ fontSize: "14px", color: "#94a3b8" }}>Total Payment: </span>
           <span style={{ fontSize: "15px", fontWeight: 800, color: "#1A56DB" }}>{formatRp(total)}</span>
         </div>
@@ -99,8 +104,8 @@ export default function PaymentPage() {
       <div
         className="payment-grid"
         style={{
-          width: "100%", padding: "1.5rem 2rem", boxSizing: "border-box",
-          display: "grid", gridTemplateColumns: "1fr 300px",
+          width: "100%", padding: "1.25rem 2rem", boxSizing: "border-box",
+          display: "grid", gridTemplateColumns: "minmax(0,1fr) 300px",
           gap: "1.25rem", alignItems: "start",
         }}
       >
@@ -131,9 +136,46 @@ export default function PaymentPage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* ── Tablet: 768px ── */
         @media (max-width: 768px) {
-          .payment-grid { grid-template-columns: 1fr !important; padding: 1rem !important; }
-          .tab-label { display: none; }
+          .payment-grid {
+            grid-template-columns: 1fr !important;
+            padding: 1rem !important;
+          }
+          .tab-label {
+            display: none;
+          }
+          .payment-divider {
+            display: none;
+          }
+          .payment-total {
+            margin-left: 0 !important;
+          }
+        }
+
+        /* ── Mobile: 640px ── */
+        @media (max-width: 640px) {
+          .payment-grid {
+            padding: 0.75rem !important;
+            gap: 0.75rem !important;
+          }
+        }
+
+        /* ── Mobile XS: 400px ── */
+        @media (max-width: 400px) {
+          .payment-grid {
+            padding: 0.5rem !important;
+            gap: 0.5rem !important;
+          }
+        }
+
+        /* ── Mobile 360px (Android mid-range) ── */
+        @media (max-width: 360px) {
+          .payment-grid {
+            padding: 0.4rem !important;
+            gap: 0.4rem !important;
+          }
         }
       `}</style>
     </main>

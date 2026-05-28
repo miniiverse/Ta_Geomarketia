@@ -130,6 +130,26 @@ export default function CtaSection() {
           box-shadow: 0 16px 48px rgba(0,0,0,0.35);
           background: #EFF6FF;
         }
+
+        @media (max-width: 640px) {
+          .cta-section { padding: 48px 0 56px; }
+          .cta-inner { padding: 0 24px; gap: 16px; }
+          .cta-sub { font-size: 14.5px; }
+          .cta-btn { width: 100%; justify-content: center; font-size: 14px; padding: 13px 24px; }
+        }
+
+        @media (max-width: 400px) {
+          .cta-section { padding: 40px 0 48px; }
+          .cta-inner { padding: 0 16px; }
+          .cta-sub { font-size: 14px; }
+        }
+
+        @media (max-width: 360px) {
+          .cta-section { padding: 36px 0 44px; }
+          .cta-inner { padding: 0 14px; gap: 14px; }
+          .cta-sub { font-size: 13.5px; }
+          .cta-btn { font-size: 13px; padding: 12px 20px; }
+        }
       `}</style>
 
       <section className="cta-section">
