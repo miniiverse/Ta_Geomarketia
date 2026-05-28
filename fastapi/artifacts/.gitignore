@@ -1,0 +1,11 @@
+# Artifact store — gitignored at the top level (fastapi/.gitignore).
+# This nested .gitignore allows committing lightweight artifacts
+# (CSV, JSON, PNG) while keeping large binary files out of git.
+
+# Exclude large binary model files — distribute separately
+*.joblib
+
+# Exclude raw SQLite copies (db_with_cluster/)
+*.db
+
+# Keep everything else (CSV, JSON, PNG)

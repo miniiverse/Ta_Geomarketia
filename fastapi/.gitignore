@@ -25,3 +25,12 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# ML artifacts (per-run feature stores, joblib models, reports). Synced
+# from the training repo via scripts/sync_artifacts.py.
+# The artifacts/ directory itself is tracked (with a nested .gitignore
+# that excludes *.joblib and *.db). This allows committing lightweight
+# artifacts (CSV, JSON, PNG) for team sharing while keeping large
+# binary files out of git.
+artifacts/**/*.joblib
+artifacts/**/*.db

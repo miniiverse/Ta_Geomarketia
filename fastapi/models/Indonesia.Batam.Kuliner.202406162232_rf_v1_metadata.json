@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "db_name": "Indonesia.Batam.Kuliner.202406162232",
+  "timestamp": "2026-05-22T14:00:27.068599",
+  "model_path": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\models\\Indonesia.Batam.Kuliner.202406162232_rf_v1.joblib",
+  "features": [
+    "rating",
+    "review_log",
+    "hotspot_score",
+    "competitor_density_500m",
+    "same_category_density_500m",
+    "nearest_neighbor_dist_m",
+    "dist_to_cluster_centroid_m",
+    "cluster_id"
+  ],
+  "parameters": {
+    "n_estimators": 300,
+    "class_weight": "balanced"
+  },
+  "metrics": {
+    "f1_macro": 0.9769,
+    "report": {
+      "High": {
+        "precision": 0.9863387978142076,
+        "recall": 0.978319783197832,
+        "f1-score": 0.9823129251700681,
+        "support": 369.0
+      },
+      "Low": {
+        "precision": 0.9838709677419355,
+        "recall": 0.9884259259259259,
+        "f1-score": 0.9861431870669746,
+        "support": 432.0
+      },
+      "Medium": {
+        "precision": 0.9607250755287009,
+        "recall": 0.9636363636363636,
+        "f1-score": 0.962178517397882,
+        "support": 330.0
+      },
+      "accuracy": 0.97789566755084,
+      "macro avg": {
+        "precision": 0.9769782803616147,
+        "recall": 0.9767940242533738,
+        "f1-score": 0.9768782098783082,
+        "support": 1131.0
+      },
+      "weighted avg": {
+        "precision": 0.977922678499054,
+        "recall": 0.97789566755084,
+        "f1-score": 0.9779011820884078,
+        "support": 1131.0
+      }
+    }
+  }
+}

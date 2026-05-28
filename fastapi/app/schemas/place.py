@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict
 
 
 class PlaceOut(BaseModel):
-    """Response schema for a single place."""
+    """Response schema for a single place.
+
+    Field names use the legacy API shape (snake_case, matching the original
+    SQLite column names) so the frontend doesn't need to change its types.
+    The ORM model uses `from_attributes=True` to map from the Postgres
+    column names.
+    """
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -23,15 +29,24 @@ class PlaceOut(BaseModel):
     open_hours: str | None = None
     phone: str | None = None
     url: str | None = None
-    cluster: str | None = None
+    cluster_id: int | None = None
 
-    # latitude / longitude are stored as TEXT in the DB — cast to float
-    @field_validator("latitude", "longitude", mode="before")
     @classmethod
-    def cast_coord_to_float(cls, v: str | float | None) -> float | None:
-        if v is None or v == "":
-            return None
-        try:
-            return float(v)
-        except (ValueError, TypeError):
-            return None
+    def from_orm_place(cls, place) -> "PlaceOut":
+        """Map from the Postgres ORM model to the API response shape."""
+        return cls(
+            id=place.id,
+            name=place.place_name,
+            latitude=place.latitude,
+            longitude=place.longitude,
+            category=place.category,
+            rating=place.rating,
+            review=place.review_count,
+            price_level=place.price_level,
+            services=place.services,
+            address=place.address,
+            open_hours=place.open_hours,
+            phone=place.phone,
+            url=place.url,
+            cluster_id=place.cluster_id,
+        )
