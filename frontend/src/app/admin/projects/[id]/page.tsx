@@ -292,9 +292,16 @@ export default function ProjectDetailPage() {
     fetch(`/api/places?api_url=${encodeURIComponent(apiBase)}`)
       .then((r) => r.json())
       .then((d) => {
-        const valid = (d.data ?? []).filter(
-          (p: PlaceData) => p.latitude && p.longitude,
-        );
+        const valid = (d.data ?? [])
+          .filter((p: any) => p.latitude && p.longitude)
+          .map((p: any) => ({
+            ...p,
+            cluster: p.cluster_id ?? p.cluster ?? null,
+            services: p.services ?? null,
+            open_hours: p.open_hours ?? null,
+            phone: p.phone ?? null,
+            url: p.url ?? null,
+          }));
         setPlaces(valid);
       })
       .catch((err) => setMapError(err.message))

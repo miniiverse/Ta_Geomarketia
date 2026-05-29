@@ -9,7 +9,7 @@ type FastApiProject = {
   db_id: string;
   date: string;
   province: string;
-  regency: string;
+  city: string;
   category: string;
   total_data: number;
 };
@@ -20,14 +20,45 @@ const CATEGORY_MAP: Record<string, number> = {
   Healthcare: 3,
 };
 
-const CITY_MAP: Record<string, number> = {
-  Batam: 1,
-  Tanjungpinang: 2,
-};
+function resolveCityId(city: string): number | null {
+  const c = (city ?? "").toLowerCase().trim();
+  if (c.includes("batam")) return 1;
+  if (c.includes("tanjungpinang") || c.includes("tanjung pinang")) return 2;
+  return null;
+}
 
 function parseDate(str: string): string {
+  if (!str) return "";
+
+  const MONTHS: Record<string, string> = {
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    May: "05",
+    Jun: "06",
+    Jul: "07",
+    Aug: "08",
+    Sep: "09",
+    Oct: "10",
+    Nov: "11",
+    Dec: "12",
+  };
+
+  const match = str.match(/^(\d{1,2})\s([A-Za-z]{3})\s(\d{4})$/);
+  if (match) {
+    const day = match[1].padStart(2, "0");
+    const month = MONTHS[match[2]] ?? "01";
+    const year = match[3];
+    return `${year}-${month}-${day}`;
+  }
+
   const d = new Date(str);
-  return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+  if (isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 export default function ProjectsPage() {
@@ -114,7 +145,7 @@ export default function ProjectsPage() {
               const match = p.api_url.match(/\/api\/v1\/([^/]+)\/places/);
               return match ? match[1] : null;
             })
-            .filter(Boolean) as string[]
+            .filter(Boolean) as string[],
         );
         setUsedDbIds(ids);
       })
@@ -159,12 +190,14 @@ export default function ProjectsPage() {
     }
 
     if (usedDbIds.has(autoFilled.db_id)) {
-      alert(`Dataset "${autoFilled.project_name}" sudah digunakan sebagai project.`);
+      alert(
+        `Dataset "${autoFilled.project_name}" sudah digunakan sebagai project.`,
+      );
       return;
     }
 
     const resolvedCategoryId = CATEGORY_MAP[autoFilled.category] ?? null;
-    const resolvedCityId = CITY_MAP[autoFilled.regency] ?? null;
+    const resolvedCityId = resolveCityId(autoFilled.city);
 
     // ── Generate project name dari db_id ──
     // Format db_id: "Indonesia.Batam.Kuliner.202410290644"
@@ -173,7 +206,7 @@ export default function ProjectsPage() {
     const generatedTitle =
       dbParts.length >= 3
         ? `${dbParts[2]} ${dbParts[1]}, ${dbParts[0]}`
-        : autoFilled.project_name; 
+        : autoFilled.project_name;
 
     setIsSaving(true);
     try {
@@ -211,7 +244,7 @@ export default function ProjectsPage() {
   }
 
   const availableCount = fastapiProjects.filter(
-    (p) => !usedDbIds.has(p.db_id)
+    (p) => !usedDbIds.has(p.db_id),
   ).length;
 
   return (
@@ -538,7 +571,8 @@ export default function ProjectsPage() {
                         fontWeight: 600,
                         fontFamily: "'Inter', sans-serif",
                         color: availableCount === 0 ? "#ef4444" : "#059669",
-                        background: availableCount === 0 ? "#fff5f5" : "#f0fdf4",
+                        background:
+                          availableCount === 0 ? "#fff5f5" : "#f0fdf4",
                         border: `1px solid ${availableCount === 0 ? "#fecaca" : "#bbf7d0"}`,
                         padding: "2px 8px",
                         borderRadius: "20px",
@@ -599,7 +633,8 @@ export default function ProjectsPage() {
                         fontWeight: 500,
                       }}
                     >
-                      All available datasets have already been added as projects.
+                      All available datasets have already been added as
+                      projects.
                     </span>
                   </div>
                 ) : (
@@ -621,7 +656,7 @@ export default function ProjectsPage() {
                           }}
                         >
                           {isUsed ? "✓ " : ""}
-                          {p.project_name} · {p.regency} (
+                          {p.project_name} · {p.city} ({p.category}) (
                           {p.total_data.toLocaleString()} data)
                           {isUsed ? " — Already added" : ""}
                         </option>
@@ -658,14 +693,7 @@ export default function ProjectsPage() {
                     <label style={labelStyle}>Project Name</label>
                     <input
                       readOnly
-                      value={
-                        (() => {
-                          const parts = autoFilled.db_id.split(".");
-                          return parts.length >= 3
-                            ? `${parts[2]} ${parts[1]}, ${parts[0]}`
-                            : autoFilled.project_name;
-                        })()
-                      }
+                      value={autoFilled.city}
                       style={readonlyStyle}
                     />
                   </div>
@@ -680,15 +708,27 @@ export default function ProjectsPage() {
                   >
                     <div>
                       <label style={labelStyle}>Category</label>
-                      <input readOnly value={autoFilled.category} style={readonlyStyle} />
+                      <input
+                        readOnly
+                        value={autoFilled.category}
+                        style={readonlyStyle}
+                      />
                     </div>
                     <div>
                       <label style={labelStyle}>City</label>
-                      <input readOnly value={autoFilled.regency} style={readonlyStyle} />
+                      <input
+                        readOnly
+                        value={autoFilled.city}
+                        style={readonlyStyle}
+                      />
                     </div>
                     <div>
                       <label style={labelStyle}>Total Data</label>
-                      <input readOnly value={autoFilled.total_data.toLocaleString()} style={readonlyStyle} />
+                      <input
+                        readOnly
+                        value={autoFilled.total_data.toLocaleString()}
+                        style={readonlyStyle}
+                      />
                     </div>
                   </div>
 
@@ -701,11 +741,19 @@ export default function ProjectsPage() {
                   >
                     <div>
                       <label style={labelStyle}>Province</label>
-                      <input readOnly value={autoFilled.province} style={readonlyStyle} />
+                      <input
+                        readOnly
+                        value={autoFilled.province}
+                        style={readonlyStyle}
+                      />
                     </div>
                     <div>
                       <label style={labelStyle}>Project Date</label>
-                      <input readOnly value={autoFilled.date} style={readonlyStyle} />
+                      <input
+                        readOnly
+                        value={autoFilled.date}
+                        style={readonlyStyle}
+                      />
                     </div>
                   </div>
 

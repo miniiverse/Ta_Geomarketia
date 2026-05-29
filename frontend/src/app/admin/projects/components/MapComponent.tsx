@@ -24,6 +24,10 @@ type PlaceData = {
   rating: number;
   review: number;
   cluster?: number | string | null;
+  services?: string | null;
+  open_hours?: string | null;
+  phone?: string | null;
+  url?: string | null;
 };
 
 type ClickedPoint = {
@@ -80,57 +84,6 @@ function haversineMeters(
       Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function runDBSCAN(
-  places: PlaceData[],
-  indices: number[],
-  epsilonMeters: number,
-  minPts: number,
-): Map<number, number> {
-  const result = new Map<number, number>();
-  const n = indices.length;
-  const labels = new Array(n).fill(-2);
-  let clusterId = 0;
-
-  const neighbors = (i: number): number[] => {
-    const out: number[] = [];
-    for (let j = 0; j < n; j++) {
-      if (i === j) continue;
-      const pi = places[indices[i]];
-      const pj = places[indices[j]];
-      if (
-        haversineMeters(pi.latitude, pi.longitude, pj.latitude, pj.longitude) <=
-        epsilonMeters
-      ) {
-        out.push(j);
-      }
-    }
-    return out;
-  };
-
-  for (let i = 0; i < n; i++) {
-    if (labels[i] !== -2) continue;
-    const nb = neighbors(i);
-    if (nb.length < minPts) {
-      labels[i] = -1;
-      continue;
-    }
-    labels[i] = clusterId;
-    const queue = [...nb];
-    while (queue.length > 0) {
-      const q = queue.shift()!;
-      if (labels[q] === -1) labels[q] = clusterId;
-      if (labels[q] !== -2) continue;
-      labels[q] = clusterId;
-      const qnb = neighbors(q);
-      if (qnb.length >= minPts) queue.push(...qnb);
-    }
-    clusterId++;
-  }
-
-  for (let i = 0; i < n; i++) result.set(indices[i], labels[i]);
-  return result;
 }
 
 function renderStars(rating: number) {
@@ -234,24 +187,17 @@ function ZoomToCluster({
   geoClusterMap: Map<number, number>;
 }) {
   const map = useMap();
-
   useEffect(() => {
     if (targetCluster === null) return;
-
     let targetPlaces: PlaceData[];
-
     if (targetCluster === -999) {
       targetPlaces = places;
     } else {
-      targetPlaces = places.filter((p, idx) => {
-        const apiCluster = parseCluster(p.cluster);
-        const gc = apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
-        return gc === targetCluster;
-      });
+      targetPlaces = places.filter(
+        (p) => parseCluster(p.cluster) === targetCluster,
+      );
     }
-
     if (targetPlaces.length === 0) return;
-
     const bounds = L.latLngBounds(
       targetPlaces.map((p) => [p.latitude, p.longitude] as [number, number]),
     );
@@ -259,8 +205,26 @@ function ZoomToCluster({
       map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
     }
   }, [targetCluster, places, geoClusterMap, map]);
-
   return null;
+}
+
+function ClockIcon() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0 }}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
 }
 
 export default function MapWithNearby({
@@ -279,30 +243,20 @@ export default function MapWithNearby({
     places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
 
   const geoClusterMap = useMemo(() => {
-    if (places.length === 0) return new Map<number, number>();
-    const nonNoiseIndices = places
-      .map((p, i) => ({ i, cluster: parseCluster(p.cluster) }))
-      .filter((x) => x.cluster >= 0)
-      .map((x) => x.i);
-    const n = nonNoiseIndices.length;
-    const minPts = n <= 10 ? 2 : n <= 100 ? 3 : n <= 500 ? 4 : 5;
-    return runDBSCAN(places, nonNoiseIndices, 500, minPts);
+    const map = new Map<number, number>();
+    places.forEach((p, i) => {
+      map.set(i, parseCluster(p.cluster));
+    });
+    return map;
   }, [places]);
 
   const uniqueGeoClusters = useMemo(() => {
-    const all = places.map((p, i) => {
-      const apiCluster = parseCluster(p.cluster);
-      if (apiCluster < 0) return -1;
-      return geoClusterMap.get(i) ?? -1;
-    });
+    const all = places.map((p) => parseCluster(p.cluster));
     return Array.from(new Set(all)).sort((a, b) => a - b);
-  }, [places, geoClusterMap]);
+  }, [places]);
 
   function getColorForPlaceIdx(placeIdx: number): string {
-    const apiCluster = parseCluster(places[placeIdx]?.cluster);
-    const geoCluster =
-      apiCluster < 0 ? -1 : (geoClusterMap.get(placeIdx) ?? -1);
-    return getClusterColor(geoCluster);
+    return getClusterColor(parseCluster(places[placeIdx]?.cluster));
   }
 
   function handleMarkerClick(place: PlaceData) {
@@ -361,13 +315,63 @@ export default function MapWithNearby({
               geoClusterMap={geoClusterMap}
             />
 
-            {places.map((place, idx) => {
-              const apiCluster = parseCluster(place.cluster);
-              const geoCluster =
-                apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
+            {places.map((place) => {
+              const geoCluster = parseCluster(place.cluster);
               const color = getClusterColor(geoCluster);
               const isSelected = selectedId === place.id;
               const isNearby = nearbyList.some((n) => n.id === place.id);
+
+              const noHoursEl = (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    alignItems: "center",
+                    color: "#cbd5e1",
+                  }}
+                >
+                  <ClockIcon />
+                  No hours available
+                </div>
+              );
+
+              const renderHours = () => {
+                if (!place.open_hours || place.open_hours === "[]")
+                  return noHoursEl;
+                try {
+                  const hours = JSON.parse(place.open_hours) as {
+                    day: string;
+                    hours: string;
+                  }[];
+                  if (hours.length === 0) return noHoursEl;
+                  const today = [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                  ][new Date().getDay()];
+                  const todayHours = hours.find((h) => h.day === today);
+                  return (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "5px",
+                        alignItems: "center",
+                        color: "#374151",
+                      }}
+                    >
+                      <ClockIcon />
+                      <span style={{ fontWeight: 600 }}>Today: </span>
+                      <span>{todayHours ? todayHours.hours : "Closed"}</span>
+                    </div>
+                  );
+                } catch {
+                  return noHoursEl;
+                }
+              };
 
               return (
                 <CircleMarker
@@ -390,8 +394,13 @@ export default function MapWithNearby({
                   }}
                   eventHandlers={{ click: () => handleMarkerClick(place) }}
                 >
-                  <Popup minWidth={200}>
-                    <div style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <Popup minWidth={240} maxWidth={280}>
+                    <div
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "12px",
+                      }}
+                    >
                       <div
                         style={{
                           fontWeight: 700,
@@ -403,6 +412,7 @@ export default function MapWithNearby({
                       >
                         {place.name}
                       </div>
+
                       <div
                         style={{
                           display: "flex",
@@ -438,35 +448,178 @@ export default function MapWithNearby({
                           {clusterLabel(geoCluster)}
                         </span>
                       </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "1px" }}>
+                          {renderStars(place.rating)}
+                        </div>
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: "#0f172a",
+                            fontSize: "11.5px",
+                          }}
+                        >
+                          {place.rating}
+                        </span>
+                        <span style={{ color: "#64748b", fontSize: "11px" }}>
+                          ({place.review.toLocaleString()} reviews)
+                        </span>
+                      </div>
+
                       {place.address && (
                         <div
                           style={{
-                            fontSize: "11.5px",
+                            display: "flex",
+                            gap: "5px",
+                            fontSize: "11px",
                             color: "#64748b",
-                            marginBottom: "5px",
+                            marginBottom: "6px",
                             lineHeight: 1.5,
                           }}
                         >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ flexShrink: 0, marginTop: "2px" }}
+                          >
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
                           {place.address}
                         </div>
                       )}
-                      {place.rating > 0 && (
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "5px",
+                          alignItems: "center",
+                          fontSize: "11px",
+                          color: place.phone ? "#0f172a" : "#cbd5e1",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ flexShrink: 0 }}
+                        >
+                          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.64A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+                        </svg>
+                        {place.phone || "No phone available"}
+                      </div>
+
+                      <div style={{ fontSize: "11px", marginBottom: "6px" }}>
+                        {renderHours()}
+                      </div>
+                      {place.services && (
                         <div
                           style={{
                             display: "flex",
+                            gap: "5px",
                             alignItems: "center",
-                            gap: "4px",
-                            fontSize: "11.5px",
-                            color: "#64748b",
+                            fontSize: "11px",
+                            color: place.services ? "#64748b" : "#cbd5e1",
+                            marginBottom: "6px",
                           }}
                         >
-                          <span style={{ fontWeight: 600, color: "#0f172a" }}>
-                            {place.rating}
-                          </span>
-                          <div style={{ display: "flex", gap: "1px" }}>
-                            {renderStars(place.rating)}
-                          </div>
-                          <span>({place.review} reviews)</span>
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ flexShrink: 0 }}
+                          >
+                            <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+                          </svg>
+                          {!place.services
+                            ? "No services available"
+                            : (() => {
+                                try {
+                                  const parsed = JSON.parse(place.services);
+                                  if (
+                                    Array.isArray(parsed) &&
+                                    parsed.length > 0
+                                  )
+                                    return parsed.join(", ");
+                                  return "No services available";
+                                } catch {
+                                  const cleaned = place.services
+                                    .replace(/[\[\]'"`]/g, "")
+                                    .split(",")
+                                    .map((s) => s.trim())
+                                    .filter(Boolean)
+                                    .join(", ");
+                                  return cleaned || "No services available";
+                                }
+                              })()}
+                        </div>
+                      )}
+
+                      {place.url ? (
+                        <a
+                          href={place.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "11px",
+                            color: "#1A56DB",
+                            fontWeight: 600,
+                            textDecoration: "none",
+                            marginTop: "4px",
+                          }}
+                        >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                          >
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                          View on Google Maps
+                        </a>
+                      ) : (
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: "#cbd5e1",
+                            marginTop: "4px",
+                          }}
+                        >
+                          No Google Maps link
                         </div>
                       )}
                     </div>
@@ -476,7 +629,6 @@ export default function MapWithNearby({
             })}
           </MapContainer>
 
-          {/* Legend */}
           {uniqueGeoClusters.length > 0 && (
             <div
               style={{

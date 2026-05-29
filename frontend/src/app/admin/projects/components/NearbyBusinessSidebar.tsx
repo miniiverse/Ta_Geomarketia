@@ -636,15 +636,20 @@ export default function NearbyBusinessSidebar({
                     </span>
                   </div>
 
-                  {/* Rating & Distance */}
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: "flex-end",
                       justifyContent: "space-between",
                     }}
                   >
-                    {place.rating > 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                      }}
+                    >
                       <div
                         style={{
                           display: "flex",
@@ -652,9 +657,6 @@ export default function NearbyBusinessSidebar({
                           gap: "3px",
                         }}
                       >
-                        <span style={{ fontSize: "10.5px", color: "#94a3b8" }}>
-                          Rating:
-                        </span>
                         <div style={{ display: "flex", gap: "1px" }}>
                           {renderStars(place.rating)}
                         </div>
@@ -667,16 +669,11 @@ export default function NearbyBusinessSidebar({
                         >
                           {place.rating}
                         </span>
-                        <span style={{ fontSize: "10.5px", color: "#94a3b8" }}>
-                          ({place.review})
-                        </span>
                       </div>
-                    ) : (
-                      <span style={{ fontSize: "11px", color: "#cbd5e1" }}>
-                        No rating available
+                      <span style={{ fontSize: "10.5px", color: "#94a3b8" }}>
+                        {place.review.toLocaleString()} reviews
                       </span>
-                    )}
-                    {/* Distance badge */}
+                    </div>
                     <span
                       style={{
                         fontSize: "10.5px",

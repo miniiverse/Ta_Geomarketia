@@ -32,11 +32,14 @@ function getClusterColor(geoCluster: number): string {
   if (geoCluster < 0) return NOISE_COLOR;
   return CLUSTER_COLORS[geoCluster % CLUSTER_COLORS.length];
 }
-
 function extractKecamatan(address?: string): string {
   if (!address) return "";
-  const kecMatch = address.match(/Kec\.\s*([^,]+)/i);
-  if (kecMatch) return kecMatch[1].trim();
+
+  const kecMatch = address.match(/Kec(?:amatan)?\.?\s+([^,]+)/i);
+  if (kecMatch) {
+    return kecMatch[1].trim();
+  }
+
   const parts = address
     .split(",")
     .map((s) => s.trim())
@@ -77,8 +80,7 @@ export default function ClusterSummaryCard({
   >();
 
   places.forEach((place, idx) => {
-    const apiCluster = parseCluster(place.cluster);
-    const geoCluster = apiCluster < 0 ? -1 : (geoClusterMap.get(idx) ?? -1);
+    const geoCluster = parseCluster(place.cluster);
 
     if (!clusterData.has(geoCluster)) {
       clusterData.set(geoCluster, { count: 0, kecCount: new Map() });
@@ -114,16 +116,10 @@ export default function ClusterSummaryCard({
   });
 
   const cards: CardEntry[] = rawCards.map(
-    ({ geoCluster, color, count, isNoise, kec1, kec2 }) => {
+    ({ geoCluster, color, count, isNoise, kec1 }) => {
       let label = "Noise / Outlier";
       if (!isNoise) {
-        if (!kec1) {
-          label = `Cluster ${geoCluster}`;
-        } else if (count < SMALL_CLUSTER_THRESHOLD) {
-          label = kec2 || kec1;
-        } else {
-          label = kec1;
-        }
+        label = kec1 || `Cluster ${geoCluster}`;
       }
       return { geoCluster, color, label, count, isNoise };
     },
