@@ -5,6 +5,7 @@ import {
   MapContainer,
   TileLayer,
   CircleMarker,
+  Circle,
   Popup,
   useMap,
 } from "react-leaflet";
@@ -48,7 +49,8 @@ const CLUSTER_COLORS = [
   "#14b8a6",
 ];
 const NOISE_COLOR = "#94a3b8";
-const NEARBY_RADIUS_M = 1500;
+
+const RADIUS_OPTIONS = [1.5, 2, 3, 5, 7, 10];
 
 function parseCluster(cluster?: number | string | null): number {
   if (cluster === undefined || cluster === null) return -1;
@@ -189,14 +191,10 @@ function ZoomToCluster({
   const map = useMap();
   useEffect(() => {
     if (targetCluster === null) return;
-    let targetPlaces: PlaceData[];
-    if (targetCluster === -999) {
-      targetPlaces = places;
-    } else {
-      targetPlaces = places.filter(
-        (p) => parseCluster(p.cluster) === targetCluster,
-      );
-    }
+    const targetPlaces =
+      targetCluster === -999
+        ? places
+        : places.filter((p) => parseCluster(p.cluster) === targetCluster);
     if (targetPlaces.length === 0) return;
     const bounds = L.latLngBounds(
       targetPlaces.map((p) => [p.latitude, p.longitude] as [number, number]),
@@ -227,17 +225,206 @@ function ClockIcon() {
   );
 }
 
+function RadiusSelector({
+  activeRadius,
+  onRadiusChange,
+  isLoading,
+}: {
+  activeRadius: number;
+  onRadiusChange: (r: number) => void;
+  isLoading: boolean;
+}) {
+  const MIN = 1.5;
+  const MAX = 10;
+  const pct = ((activeRadius - MIN) / (MAX - MIN)) * 100;
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onRadiusChange(parseFloat(parseFloat(e.target.value).toFixed(1)));
+  };
+
+  const formatRadius = (r: number) => {
+    return Number.isInteger(r) ? `${r}` : r.toFixed(1);
+  };
+
+  return (
+    <div
+      style={{
+        background: "#fff",
+        border: "1px solid #e2e8f0",
+        borderRadius: "10px",
+        padding: "10px 14px",
+        marginBottom: "12px",
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      <style>{`
+        .radius-slider {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 100%;
+          height: 4px;
+          border-radius: 4px;
+          outline: none;
+          cursor: pointer;
+          background: linear-gradient(to right, #1A56DB ${pct}%, #e2e8f0 ${pct}%);
+          transition: background 0s;
+        }
+        .radius-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #1A56DB;
+          border: 2.5px solid #fff;
+          box-shadow: 0 0 0 2px #1A56DB, 0 1px 4px rgba(26,86,219,0.3);
+          cursor: grab;
+          transition: box-shadow 0.15s ease, transform 0.1s ease;
+        }
+        .radius-slider:active::-webkit-slider-thumb {
+          cursor: grabbing;
+          transform: scale(1.2);
+          box-shadow: 0 0 0 5px rgba(26,86,219,0.15), 0 1px 4px rgba(26,86,219,0.3);
+        }
+        .radius-slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #1A56DB;
+          border: 2.5px solid #fff;
+          box-shadow: 0 0 0 2px #1A56DB;
+          cursor: grab;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "8px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          <div
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "7px",
+              background: "#EBF3FF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1A56DB"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="12" r="4" />
+              <line x1="12" y1="2" x2="12" y2="4" />
+              <line x1="12" y1="20" x2="12" y2="22" />
+              <line x1="2" y1="12" x2="4" y2="12" />
+              <line x1="20" y1="12" x2="22" y2="12" />
+            </svg>
+          </div>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0f172a" }}>
+            Radius Analysis
+          </span>
+          <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+            drag to set (1.5 – 10 km)
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {isLoading && (
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1A56DB"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              style={{ animation: "spin 1s linear infinite" }}
+            >
+              <path d="M21 12a9 9 0 11-6.219-8.56" />
+            </svg>
+          )}
+          <div
+            style={{
+              background: "#1A56DB",
+              color: "#fff",
+              fontSize: "12px",
+              fontWeight: 700,
+              padding: "3px 10px",
+              borderRadius: "20px",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {formatRadius(activeRadius)} km
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "2px 0 2px" }}>
+        <input
+          type="range"
+          min={1.5}
+          max={10}
+          step={0.1}
+          value={activeRadius}
+          onChange={handleSliderChange}
+          className="radius-slider"
+        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "4px",
+          }}
+        >
+          <span style={{ fontSize: "10px", color: "#cbd5e1" }}>1.5 km</span>
+          {[2.5, 4, 5.5, 7, 8.5].map((tick) => (
+            <span
+              key={tick}
+              style={{ fontSize: "9px", color: "#e2e8f0", userSelect: "none" }}
+            >
+              |
+            </span>
+          ))}
+          <span style={{ fontSize: "10px", color: "#cbd5e1" }}>10 km</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MapWithNearby({
   places = [],
+  dbName,
 }: {
   places: PlaceData[];
+  dbName?: string;
 }) {
   const [clickedPoint, setClickedPoint] = useState<ClickedPoint | null>(null);
+  const [clickedPlace, setClickedPlace] = useState<PlaceData | null>(null);
   const [nearbyList, setNearbyList] = useState<
     (PlaceData & { distance: number })[]
   >([]);
+  const [nearbyFromApi, setNearbyFromApi] = useState<PlaceData[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [zoomTarget, setZoomTarget] = useState<number | null>(null);
+  const [activeRadius, setActiveRadius] = useState<number>(1.5);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
 
   const center: [number, number] =
     places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
@@ -255,6 +442,49 @@ export default function MapWithNearby({
     return Array.from(new Set(all)).sort((a, b) => a - b);
   }, [places]);
 
+  const circleColor = useMemo(() => {
+    if (!clickedPlace) return "#1A56DB";
+    const gc = parseCluster(clickedPlace.cluster);
+    if (gc < 0) return "#1A56DB";
+    return getClusterColor(gc);
+  }, [clickedPlace]);
+
+  const fetchNearby = useCallback(
+    async (lat: number, lng: number, radius: number) => {
+      if (!dbName) return;
+      setNearbyLoading(true);
+      try {
+        const res = await fetch(
+          `/api/nearby?db_name=${encodeURIComponent(dbName)}&lat=${lat}&lng=${lng}&radius_km=${radius}`,
+        );
+        if (!res.ok) throw new Error("API error");
+        const json = await res.json();
+        const data: PlaceData[] = (json.data ?? json ?? []).map((p: any) => ({
+          ...p,
+          cluster: p.cluster_id ?? p.cluster ?? null,
+        }));
+        setNearbyFromApi(data);
+      } catch {
+        const fallback = places
+          .map((p) => ({
+            ...p,
+            distance: haversineMeters(lat, lng, p.latitude, p.longitude),
+          }))
+          .filter((p) => p.distance <= radius * 1000)
+          .sort((a, b) => a.distance - b.distance);
+        setNearbyFromApi(fallback);
+      } finally {
+        setNearbyLoading(false);
+      }
+    },
+    [dbName, places],
+  );
+
+  useEffect(() => {
+    if (!clickedPoint) return;
+    fetchNearby(clickedPoint.lat, clickedPoint.lng, activeRadius);
+  }, [activeRadius, clickedPoint, fetchNearby]);
+
   function getColorForPlaceIdx(placeIdx: number): string {
     return getClusterColor(parseCluster(places[placeIdx]?.cluster));
   }
@@ -264,29 +494,77 @@ export default function MapWithNearby({
     if (selectedId === place.id) {
       setSelectedId(null);
       setClickedPoint(null);
+      setClickedPlace(null);
       setNearbyList([]);
+      setNearbyFromApi([]);
       return;
     }
     setSelectedId(place.id);
+    setClickedPlace(place);
     setClickedPoint({ lat, lng });
+
     const nearby = places
       .map((p) => ({
         ...p,
         distance: haversineMeters(lat, lng, p.latitude, p.longitude),
       }))
-      .filter((p) => p.distance <= NEARBY_RADIUS_M)
+      .filter((p) => p.distance <= activeRadius * 1000)
       .sort((a, b) => a.distance - b.distance);
     setNearbyList(nearby);
+
+    fetchNearby(lat, lng, activeRadius);
   }
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleRadiusChange = useCallback(
+    (r: number) => {
+      setActiveRadius(r);
+      if (clickedPoint) {
+        const nearby = places
+          .map((p) => ({
+            ...p,
+            distance: haversineMeters(
+              clickedPoint.lat,
+              clickedPoint.lng,
+              p.latitude,
+              p.longitude,
+            ),
+          }))
+          .filter((p) => p.distance <= r * 1000)
+          .sort((a, b) => a.distance - b.distance);
+        setNearbyList(nearby);
+      }
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        if (clickedPoint) fetchNearby(clickedPoint.lat, clickedPoint.lng, r);
+      }, 400);
+    },
+    [clickedPoint, places, fetchNearby],
+  );
 
   const handleZoomToCluster = useCallback((geoCluster: number) => {
     setZoomTarget(null);
     setTimeout(() => setZoomTarget(geoCluster), 0);
   }, []);
 
+  const activeNearby = nearbyFromApi.length > 0 ? nearbyFromApi : nearbyList;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-      <MapStatsCard places={places} />
+      <MapStatsCard
+        places={places}
+        nearbyPlaces={activeNearby}
+        activeRadius={activeRadius}
+        clickedPoint={clickedPoint}
+      />
+
+      <RadiusSelector
+        activeRadius={activeRadius}
+        onRadiusChange={handleRadiusChange}
+        isLoading={nearbyLoading}
+      />
+
       <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
         <div
           style={{
@@ -314,6 +592,20 @@ export default function MapWithNearby({
               places={places}
               geoClusterMap={geoClusterMap}
             />
+
+            {clickedPoint && (
+              <Circle
+                center={[clickedPoint.lat, clickedPoint.lng]}
+                radius={activeRadius * 1000}
+                pathOptions={{
+                  color: circleColor,
+                  fillColor: circleColor,
+                  fillOpacity: 0.08,
+                  weight: 2,
+                  dashArray: "6 4",
+                }}
+              />
+            )}
 
             {places.map((place) => {
               const geoCluster = parseCluster(place.cluster);
@@ -412,7 +704,6 @@ export default function MapWithNearby({
                       >
                         {place.name}
                       </div>
-
                       <div
                         style={{
                           display: "flex",
@@ -448,7 +739,6 @@ export default function MapWithNearby({
                           {clusterLabel(geoCluster)}
                         </span>
                       </div>
-
                       <div
                         style={{
                           display: "flex",
@@ -473,7 +763,6 @@ export default function MapWithNearby({
                           ({place.review.toLocaleString()} reviews)
                         </span>
                       </div>
-
                       {place.address && (
                         <div
                           style={{
@@ -502,7 +791,6 @@ export default function MapWithNearby({
                           {place.address}
                         </div>
                       )}
-
                       <div
                         style={{
                           display: "flex",
@@ -528,7 +816,6 @@ export default function MapWithNearby({
                         </svg>
                         {place.phone || "No phone available"}
                       </div>
-
                       <div style={{ fontSize: "11px", marginBottom: "6px" }}>
                         {renderHours()}
                       </div>
@@ -539,7 +826,7 @@ export default function MapWithNearby({
                             gap: "5px",
                             alignItems: "center",
                             fontSize: "11px",
-                            color: place.services ? "#64748b" : "#cbd5e1",
+                            color: "#64748b",
                             marginBottom: "6px",
                           }}
                         >
@@ -579,7 +866,6 @@ export default function MapWithNearby({
                               })()}
                         </div>
                       )}
-
                       {place.url ? (
                         <a
                           href={place.url}
@@ -708,7 +994,6 @@ export default function MapWithNearby({
               Click a location marker to see nearby businesses
             </div>
           )}
-
           {clickedPoint && (
             <div
               style={{
@@ -743,7 +1028,9 @@ export default function MapWithNearby({
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              {nearbyList.length} businesses within a 1.5 km radius
+              {nearbyLoading
+                ? "Loading nearby data..."
+                : `${activeNearby.length} businesses within ${activeRadius} km`}
             </div>
           )}
         </div>
@@ -756,7 +1043,9 @@ export default function MapWithNearby({
             if (id === null) {
               setSelectedId(null);
               setClickedPoint(null);
+              setClickedPlace(null);
               setNearbyList([]);
+              setNearbyFromApi([]);
             } else {
               const place = places.find((p) => p.id === id);
               if (place) handleMarkerClick(place);

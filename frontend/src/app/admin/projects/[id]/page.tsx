@@ -156,27 +156,6 @@ const IconMapEmpty = () => (
     <line x1="16" y1="6" x2="16" y2="22" />
   </svg>
 );
-const IconMicroscope = () => (
-  <svg
-    width="48"
-    height="48"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#cbd5e1"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M6 18h8" />
-    <path d="M3 22h18" />
-    <path d="M14 22a7 7 0 10 0-14h-1" />
-    <path d="M9 14h2" />
-    <path d="M9 12a2 2 0 010-4h3.5" />
-    <path d="M9 10V6" />
-    <path d="M12 10V6" />
-    <path d="M11 6V3" />
-  </svg>
-);
 const IconLoading = () => (
   <svg
     width="32"
@@ -235,6 +214,32 @@ const MapComponent = dynamic<{ places: PlaceData[] }>(
   },
 );
 
+const ClusterMapComponent = dynamic(
+  () => import("../components/ClusterMapComponent"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "clamp(400px, 65vh, 700px)",
+          background: "#f0f7ff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "12px",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <IconLoading />
+          <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "8px" }}>
+            Loading cluster map...
+          </div>
+        </div>
+      </div>
+    ),
+  },
+);
+
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -279,6 +284,7 @@ export default function ProjectDetailPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
+  // ── UPDATED: fetch data juga saat tab "cluster" dibuka ──
   useEffect(() => {
     if (!project || tab !== "sp-map" || hasFetchedMap.current) return;
     const apiBase = project.api_url
@@ -416,6 +422,7 @@ export default function ProjectDetailPage() {
     >
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
+      {/* ── Topbar ── */}
       <div
         style={{
           background: "#fff",
@@ -495,6 +502,7 @@ export default function ProjectDetailPage() {
           padding: isMobile ? "16px" : "32px",
         }}
       >
+        {/* ── Header Card ── */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -586,6 +594,7 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
+          {/* ── Tabs ── */}
           <div
             style={{
               display: "flex",
@@ -634,6 +643,7 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
+        {/* ── Tab Content ── */}
         <div
           style={{
             background: "#fff",
@@ -643,6 +653,7 @@ export default function ProjectDetailPage() {
             boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           }}
         >
+          {/* ── Overview ── */}
           {tab === "overview" && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "16px" }}
@@ -816,6 +827,7 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
+          {/* ── Map Analysis ── */}
           {tab === "sp-map" && (
             <div>
               <div
@@ -997,56 +1009,77 @@ export default function ProjectDetailPage() {
           )}
 
           {tab === "cluster" && (
-            <div
-              style={{
-                minHeight: "400px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div style={{ textAlign: "center", color: "#94a3b8" }}>
-                <IconMicroscope />
-                <div
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: "#64748b",
-                    marginTop: "16px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Cluster Area
-                </div>
-                <div
-                  style={{
-                    fontSize: "13.5px",
-                    lineHeight: 1.6,
-                    maxWidth: "280px",
-                    margin: "0 auto",
-                  }}
-                >
-                  This feature is coming soon! We are working hard to bring you
-                  insights on data clusters and patterns.
-                </div>
-                <div
-                  style={{
-                    marginTop: "20px",
-                    background: "#f8fafc",
-                    borderRadius: "12px",
-                    padding: "12px 20px",
-                    border: "1px solid #e2e8f0",
-                    display: "inline-block",
-                  }}
-                >
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>
-                    Total data:{" "}
-                    <strong style={{ color: "#0f172a" }}>
-                      {project.totalData.toLocaleString()} points
-                    </strong>
-                  </span>
-                </div>
+            <div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+                  gap: "12px",
+                  marginBottom: "16px",
+                }}
+              >
+                {[
+                  {
+                    label: "Total Titik",
+                    value: mapLoading ? "..." : places.length.toLocaleString(),
+                    icon: <IconPin />,
+                  },
+                  {
+                    label: "Kategori",
+                    value: project.category || "-",
+                    icon: <IconTag />,
+                  },
+                  {
+                    label: "Kota",
+                    value: project.city || "-",
+                    icon: <IconMapIcon />,
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    style={{
+                      background: "#F8FAFF",
+                      borderRadius: "12px",
+                      padding: "14px 16px",
+                      border: "1px solid #EBF3FF",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "10px",
+                        background: "#EBF3FF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "11px", color: "#64748b" }}>
+                        {item.label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "16px",
+                          fontWeight: 700,
+                          color: "#0f172a",
+                        }}
+                      >
+                        {item.value}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              <ClusterMapComponent places={places} />
             </div>
           )}
         </div>
