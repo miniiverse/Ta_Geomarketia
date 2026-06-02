@@ -221,18 +221,27 @@ const ClusterMapComponent = dynamic(
     loading: () => (
       <div
         style={{
-          height: "clamp(400px, 65vh, 700px)",
           background: "#f0f7ff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "12px",
+          borderRadius: "14px",
+          border: "1px solid #e2e8f0",
+          overflow: "hidden",
         }}
       >
-        <div style={{ textAlign: "center", color: "#1A56DB" }}>
-          <IconLoading />
-          <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "8px" }}>
-            Loading cluster map...
+        <div
+          style={{
+            height: "clamp(400px, 65vh, 700px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ textAlign: "center", color: "#1A56DB" }}>
+            <IconLoading />
+            <div
+              style={{ fontSize: "13px", fontWeight: 600, marginTop: "8px" }}
+            >
+              Loading cluster map...
+            </div>
           </div>
         </div>
       </div>
@@ -284,9 +293,8 @@ export default function ProjectDetailPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
-  // ── UPDATED: fetch data juga saat tab "cluster" dibuka ──
   useEffect(() => {
-    if (!project || tab !== "sp-map" || hasFetchedMap.current) return;
+    if (!project || hasFetchedMap.current) return;
     const apiBase = project.api_url
       ? project.api_url.replace("/places", "")
       : null;
@@ -312,7 +320,7 @@ export default function ProjectDetailPage() {
       })
       .catch((err) => setMapError(err.message))
       .finally(() => setMapLoading(false));
-  }, [tab, project]);
+  }, [project]);
 
   const labelStyle: React.CSSProperties = {
     display: "block",
@@ -422,7 +430,6 @@ export default function ProjectDetailPage() {
     >
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
-      {/* ── Topbar ── */}
       <div
         style={{
           background: "#fff",
@@ -502,7 +509,6 @@ export default function ProjectDetailPage() {
           padding: isMobile ? "16px" : "32px",
         }}
       >
-        {/* ── Header Card ── */}
         <div
           style={{
             background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
@@ -594,7 +600,6 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* ── Tabs ── */}
           <div
             style={{
               display: "flex",
@@ -643,7 +648,6 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* ── Tab Content ── */}
         <div
           style={{
             background: "#fff",
@@ -653,7 +657,6 @@ export default function ProjectDetailPage() {
             boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           }}
         >
-          {/* ── Overview ── */}
           {tab === "overview" && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "16px" }}
@@ -827,7 +830,6 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* ── Map Analysis ── */}
           {tab === "sp-map" && (
             <div>
               <div
@@ -840,17 +842,17 @@ export default function ProjectDetailPage() {
               >
                 {[
                   {
-                    label: "Total Titik",
+                    label: "Total Points",
                     value: mapLoading ? "..." : places.length.toLocaleString(),
                     icon: <IconPin />,
                   },
                   {
-                    label: "Kategori",
+                    label: "Category",
                     value: project.category || "-",
                     icon: <IconTag />,
                   },
                   {
-                    label: "Kota",
+                    label: "City",
                     value: project.city || "-",
                     icon: <IconMapIcon />,
                   },
@@ -1020,17 +1022,17 @@ export default function ProjectDetailPage() {
               >
                 {[
                   {
-                    label: "Total Titik",
+                    label: "Total Points",
                     value: mapLoading ? "..." : places.length.toLocaleString(),
                     icon: <IconPin />,
                   },
                   {
-                    label: "Kategori",
+                    label: "Category",
                     value: project.category || "-",
                     icon: <IconTag />,
                   },
                   {
-                    label: "Kota",
+                    label: "City",
                     value: project.city || "-",
                     icon: <IconMapIcon />,
                   },
