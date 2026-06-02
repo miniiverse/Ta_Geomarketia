@@ -13,6 +13,7 @@ import {
 import L from "leaflet";
 import ClusterSidebarPanel from "./ClusterSidebarPanel";
 import "leaflet/dist/leaflet.css";
+import ClusterAreaSummaryCard from "./ClusterAreaSummaryCard";
 
 type PlaceData = {
   id: number;
@@ -600,7 +601,7 @@ function DensityPanel({ groups }: { groups: ClusterGroup[] }) {
     <div
       style={{
         position: "absolute",
-        bottom: "52px",
+        bottom: "12px",
         left: "12px",
         zIndex: 1000,
         width: "220px",
@@ -1457,6 +1458,20 @@ export default function ClusterAreaMap({
           />
         )}
       </div>
+
+      <ClusterAreaSummaryCard
+        places={places}
+        geoClusterMap={
+          new Map(groups.map((g) => [g.geoCluster, g.places.length]))
+        }
+        onZoomToCluster={(geoCluster) => {
+          if (geoCluster === -999) {
+            handleSelectCluster(null);
+          } else {
+            handleSelectCluster(geoCluster);
+          }
+        }}
+      />
     </div>
   );
 }
