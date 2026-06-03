@@ -1,346 +1,797 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
-import ProjectDetailSection from "./components/ProjectDetailSection";
-import PreviewMapSection from "./components/PreviewMapSection";
-import PreviewClusterSection from "./components/PreviewClusterSection";
+import ProjectStatsCard from "./components/ProjectStatsCard";
 
-const projects: Record<string, ProjectData> = {
-  "retail-site-selection": {
-    id: "retail-site-selection",
-    title: "Retail Site Selection",
-    description: "Identify the best retail locations in Batam Kota using population density and accessibility data.",
-    region: "Batam Kota",
-    category: "Retail",
-    price: "Rp 850.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80&fit=crop",
-    totalData: 100,
-    lastUpdate: "Apr 2, 2025",
-  },
-  "fnb-hotspot-analysis": {
-    id: "fnb-hotspot-analysis",
-    title: "F&B Hotspot Analysis",
-    description: "Analyze high foot traffic areas in Nagoya for food & beverage business opportunities.",
-    region: "Nagoya",
-    category: "Food & Beverage",
-    price: "Rp 650.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80&fit=crop",
-    totalData: 250,
-    lastUpdate: "Mar 28, 2025",
-  },
-  "healthcare-access-gap": {
-    id: "healthcare-access-gap",
-    title: "Healthcare Access Gap",
-    description: "Map underserved healthcare zones in Batu Aji based on population distribution.",
-    region: "Batu Aji",
-    category: "Healthcare",
-    price: "Rp 1.200.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80&fit=crop",
-    totalData: 150,
-    lastUpdate: "Jan 15, 2025",
-  },
-  "retail-expansion-analysis": {
-    id: "retail-expansion-analysis",
-    title: "Retail Expansion Analysis",
-    description: "Evaluate retail expansion opportunities in Bengkong using economic activity data.",
-    region: "Bengkong",
-    category: "Retail",
-    price: "Rp 750.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80&fit=crop",
-    totalData: 320,
-    lastUpdate: "Feb 10, 2025",
-  },
-  "fnb-market-mapping": {
-    id: "fnb-market-mapping",
-    title: "F&B Market Mapping",
-    description: "Discover potential F&B business zones in Nongsa based on tourism and traffic patterns.",
-    region: "Nongsa",
-    category: "Food & Beverage",
-    price: "Rp 700.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80&fit=crop",
-    totalData: 80,
-    lastUpdate: "Apr 1, 2025",
-  },
-  "healthcare-facility-planning": {
-    id: "healthcare-facility-planning",
-    title: "Healthcare Facility Planning",
-    description: "Plan optimal healthcare facility locations in Sekupang using demographic insights.",
-    region: "Sekupang",
-    category: "Healthcare",
-    price: "Rp 1.150.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80&fit=crop",
-    totalData: 200,
-    lastUpdate: "Dec 20, 2024",
-  },
-  "retail-demand-heatmap": {
-    id: "retail-demand-heatmap",
-    title: "Retail Demand Heatmap",
-    description: "Visualize retail demand concentration in Lubuk Baja using consumer spending patterns.",
-    region: "Lubuk Baja",
-    category: "Retail",
-    price: "Rp 900.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80&fit=crop",
-    totalData: 450,
-    lastUpdate: "Mar 31, 2025",
-  },
-  "fnb-competitor-density": {
-    id: "fnb-competitor-density",
-    title: "F&B Competitor Density",
-    description: "Analyze restaurant competition density and identify saturation zones in Batam Center.",
-    region: "Batam Center",
-    category: "Food & Beverage",
-    price: "Rp 720.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80&fit=crop",
-    totalData: 600,
-    lastUpdate: "Jan 5, 2025",
-  },
-  "healthcare-coverage-optimization": {
-    id: "healthcare-coverage-optimization",
-    title: "Healthcare Coverage Optimization",
-    description: "Optimize clinic placement in Tiban based on accessibility and emergency response time.",
-    region: "Tiban",
-    category: "Healthcare",
-    price: "Rp 1.300.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80&fit=crop",
-    totalData: 90,
-    lastUpdate: "Apr 3, 2025",
-  },
-  "retail-foot-traffic-analysis": {
-    id: "retail-foot-traffic-analysis",
-    title: "Retail Foot Traffic Analysis",
-    description: "Measure pedestrian flow trends to identify high-performing retail zones in Nagoya.",
-    region: "Nagoya",
-    category: "Retail",
-    price: "Rp 880.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80&fit=crop",
-    totalData: 400,
-    lastUpdate: "Feb 22, 2025",
-  },
-  "fnb-revenue-potential-map": {
-    id: "fnb-revenue-potential-map",
-    title: "F&B Revenue Potential Map",
-    description: "Estimate revenue potential for new cafes based on income levels and visitor patterns.",
-    region: "Nongsa",
-    category: "Food & Beverage",
-    price: "Rp 780.000",
-    status: "New",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80&fit=crop",
-    totalData: 120,
-    lastUpdate: "Mar 19, 2025",
-  },
-  "healthcare-service-demand": {
-    id: "healthcare-service-demand",
-    title: "Healthcare Service Demand",
-    description: "Identify areas with high healthcare demand but limited facilities in Sei Beduk.",
-    region: "Sei Beduk",
-    category: "Healthcare",
-    price: "Rp 1.250.000",
-    status: "Oldest",
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80&fit=crop",
-    totalData: 180,
-    lastUpdate: "Nov 30, 2024",
-  },
-};
-
-export type ProjectData = {
-  id: string;
-  title: string;
-  description: string;
-  region: string;
+type Project = {
+  id: number;
+  name: string;
   category: string;
-  price: string;
-  status: "New" | "Oldest";
-  image: string;
   totalData: number;
-  lastUpdate: string;
+  price: string;
+  projectDate: string;
+  description?: string;
+  api_url?: string;
+  city?: string;
+  province?: string;
+  thumbnail?: string;
 };
 
-const TABS = [
+type PlaceData = {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  category: string;
+  address: string;
+  rating: number;
+  review: number;
+  cluster?: number | null;
+  services?: string | null;
+  open_hours?: string | null;
+  phone?: string | null;
+  url?: string | null;
+};
+
+type TabId = "map" | "cluster";
+
+function formatPrice(price: string | number | null): string {
+  if (!price) return "Rp0";
+  const num = typeof price === "string" ? parseFloat(price) : price;
+  return "Rp" + num.toLocaleString("id-ID");
+}
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function SpinIcon() {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#1A56DB"
+      strokeWidth="2"
+      strokeLinecap="round"
+      style={{ animation: "spin 1s linear infinite" }}
+    >
+      <path d="M21 12a9 9 0 11-6.219-8.56" />
+    </svg>
+  );
+}
+
+const UserMapComponent = dynamic<{ places: PlaceData[] }>(
+  () => import("./components/UserMapComponent"),
   {
-    key: "detail",
-    label: "Project Detail",
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <path d="M8 12h8M8 8h5M8 16h6" />
-      </svg>
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "clamp(420px, 65vh, 720px)",
+          background: "#f0f7ff",
+          borderRadius: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <SpinIcon />
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              marginTop: "10px",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            Loading map...
+          </div>
+        </div>
+      </div>
     ),
   },
+);
+
+const UserClusterMapComponent = dynamic(
+  () => import("./components/UserClusterMapComponent"),
   {
-    key: "map",
-    label: "Preview Map",
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-        <line x1="9" y1="3" x2="9" y2="18" />
-        <line x1="15" y1="6" x2="15" y2="21" />
-      </svg>
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "clamp(420px, 65vh, 720px)",
+          background: "#f0f7ff",
+          borderRadius: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <SpinIcon />
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              marginTop: "10px",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            Loading cluster map...
+          </div>
+        </div>
+      </div>
     ),
   },
+);
+
+const TABS: { id: TabId; label: string; icon: string }[] = [
   {
-    key: "cluster",
-    label: "Preview Cluster",
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="5" r="2" />
-        <circle cx="5" cy="19" r="2" />
-        <circle cx="19" cy="19" r="2" />
-        <path d="M12 7v4M8.5 17.5l3-4M15.5 17.5l-3-4" />
-      </svg>
-    ),
+    id: "map",
+    label: "Map Analysis",
+    icon: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
+  },
+  {
+    id: "cluster",
+    label: "Cluster Area",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
   },
 ];
 
-export default function ProjectDetailPage() {
+export default function UserProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
 
-  const [activeTab, setActiveTab] = useState<"detail" | "map" | "cluster">("detail");
+  const [activeTab, setActiveTab] = useState<TabId>("map");
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const project: ProjectData =
-    projects[id] ??
-    ({
-      id,
-      title: "Project Title",
-      description: "Project description not available.",
-      region: "Unknown",
-      category: "General",
-      price: "Rp 0",
-      status: "New",
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80&fit=crop",
-      totalData: 0,
-      lastUpdate: "-",
-    } as ProjectData);
+  const [places, setPlaces] = useState<PlaceData[]>([]);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const hasFetchedMap = useRef(false);
+
+  useEffect(() => {
+    if (!id) return;
+    setIsLoading(true);
+    fetch(`/api/projects-user/${id}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (!json.success) throw new Error(json.message || "Project not found");
+        const p = json.data;
+        setProject({
+          id: p.project_id,
+          name: p.title,
+          category: p.category?.name || "-",
+          totalData: p.total_data ?? 0,
+          price: formatPrice(p.price),
+          projectDate: formatDate(p.project_date),
+          description: p.description,
+          api_url: p.api_url,
+          city: p.city?.name,
+          province: p.city?.province?.name,
+          thumbnail: p.thumbnail,
+        });
+      })
+      .catch((err) => setFetchError(err.message))
+      .finally(() => setIsLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    if (!project || hasFetchedMap.current) return;
+    const apiBase = project.api_url
+      ? project.api_url.replace("/places", "")
+      : null;
+    if (!apiBase) return;
+    hasFetchedMap.current = true;
+    setMapLoading(true);
+    setMapError(null);
+
+    fetch(`/api/places?api_url=${encodeURIComponent(apiBase)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        const valid = (d.data ?? [])
+          .filter((p: any) => p.latitude && p.longitude)
+          .map((p: any) => ({
+            ...p,
+            cluster: p.cluster_id ?? p.cluster ?? null,
+            services: p.services ?? null,
+            open_hours: p.open_hours ?? null,
+            phone: p.phone ?? null,
+            url: p.url ?? null,
+          }));
+        setPlaces(valid);
+      })
+      .catch((err) => setMapError(err.message))
+      .finally(() => setMapLoading(false));
+  }, [project]);
+
+  const SERVER = process.env.NEXT_PUBLIC_SERVER;
+  const thumbnailUrl = project?.thumbnail
+    ? `${SERVER}/storage/${project.thumbnail}`
+    : null;
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#F6F9FF",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <SpinIcon />
+          <div style={{ marginTop: "14px", fontSize: "15px", fontWeight: 600 }}>
+            Loading project...
+          </div>
+        </div>
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (fetchError || !project) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#F6F9FF",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "15px", fontWeight: 600, color: "#ef4444" }}>
+            {fetchError || "Project not found."}
+          </div>
+          <button
+            onClick={() => router.back()}
+            style={{
+              marginTop: "16px",
+              padding: "10px 22px",
+              borderRadius: "10px",
+              border: "none",
+              background: "#1A56DB",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8FAFF",
-        fontFamily: "'Inter', system-ui, sans-serif",
+        background: "#F6F9FF",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
-      <div
-        style={{
-          background: "#ffffff",
-          borderBottom: "1.5px solid #E0ECFF",
-          padding: "14px 32px",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        <button
-          onClick={() => router.back()}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "7px 14px",
-            borderRadius: 9,
-            border: "1.5px solid #E0ECFF",
-            background: "#ffffff",
-            color: "#475569",
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all 0.18s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "#ffffff";
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-          Back
-        </button>
-
-        <div style={{ height: 18, width: 1, background: "#E2E8F0" }} />
-
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: "#1A56DB",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
-        >
-          {project.category}
-        </span>
-        <span style={{ fontSize: 12, color: "#94A3B8" }}>•</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>
-          {project.title}
-        </span>
-      </div>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn:hover { opacity: 0.85; }
+        .back-btn:hover { background: #F1F5F9 !important; }
+      `}</style>
 
       <div
-        style={{
-          background: "#ffffff",
-          borderBottom: "1.5px solid #E0ECFF",
-          padding: "0 32px",
-          display: "flex",
-          gap: 0,
-        }}
+        style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px" }}
       >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as typeof activeTab)}
+        <div style={{ marginBottom: "20px" }}>
+          <button
+            onClick={() => router.back()}
+            className="back-btn"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "8px 16px",
+              borderRadius: "10px",
+              border: "1.5px solid #E0ECFF",
+              background: "#fff",
+              color: "#475569",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "'Inter', sans-serif",
+              transition: "all 0.15s",
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back
+          </button>
+        </div>
+
+        <div style={{ animation: "fadeUp 0.4s ease both" }}>
+          <div
+            style={{
+              borderRadius: "22px",
+              overflow: "hidden",
+              marginBottom: "28px",
+              position: "relative",
+              background:
+                "linear-gradient(135deg, #0F2C6B 0%, #1A56DB 60%, #2D7BE8 100%)",
+              boxShadow: "0 8px 40px rgba(26,86,219,0.22)",
+            }}
+          >
+            <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-                padding: "14px 20px",
-                border: "none",
-                borderBottom: isActive ? "2.5px solid #1A56DB" : "2.5px solid transparent",
-                background: "transparent",
-                color: isActive ? "#1A56DB" : "#64748B",
-                fontSize: 13,
-                fontWeight: isActive ? 700 : 500,
-                cursor: "pointer",
-                transition: "all 0.18s",
-                marginBottom: -1.5,
-                fontFamily: "'Inter', system-ui, sans-serif",
+                position: "absolute",
+                inset: 0,
+                backgroundImage:
+                  "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+                pointerEvents: "none",
+              }}
+            />
+
+            {thumbnailUrl && (
+              <div
+                style={{ position: "absolute", inset: 0, overflow: "hidden" }}
+              >
+                <img
+                  src={thumbnailUrl}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    opacity: 0.12,
+                    filter: "saturate(0.6)",
+                  }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display =
+                      "none";
+                  }}
+                />
+              </div>
+            )}
+
+            <div style={{ position: "relative", padding: "36px 40px 0" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "14px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span
+                  style={{
+                    background: "rgba(255,255,255,0.18)",
+                    color: "#fff",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    padding: "4px 12px",
+                    borderRadius: "20px",
+                    backdropFilter: "blur(6px)",
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
+                  {project.category}
+                </span>
+                {project.city && (
+                  <span
+                    style={{
+                      background: "rgba(255,255,255,0.12)",
+                      color: "rgba(255,255,255,0.85)",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      padding: "4px 12px",
+                      borderRadius: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      fontFamily: "'Inter', sans-serif",
+                    }}
+                  >
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    >
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    {project.city}
+                  </span>
+                )}
+              </div>
+
+              <h1
+                style={{
+                  margin: "0 0 6px",
+                  fontSize: "clamp(20px, 3vw, 30px)",
+                  fontWeight: 800,
+                  color: "#fff",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.2,
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                {project.name}
+              </h1>
+
+              {project.description && (
+                <p
+                  style={{
+                    margin: "0 0 24px",
+                    fontSize: "14px",
+                    color: "rgba(255,255,255,0.65)",
+                    lineHeight: 1.7,
+                    maxWidth: "640px",
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
+                  {project.description}
+                </p>
+              )}
+
+              <div style={{ marginBottom: "28px" }}>
+                <ProjectStatsCard
+                  projectDate={project.projectDate}
+                  totalData={project.totalData}
+                  price={project.price}
+                  city={project.city}
+                  province={project.province}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "4px",
+                  borderTop: "1px solid rgba(255,255,255,0.12)",
+                }}
+              >
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      className="tab-btn"
+                      onClick={() => setActiveTab(tab.id)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "7px",
+                        padding: "12px 18px",
+                        background: isActive
+                          ? "rgba(255,255,255,0.15)"
+                          : "transparent",
+                        border: "none",
+                        borderBottom: isActive
+                          ? "2px solid #fff"
+                          : "2px solid transparent",
+                        color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
+                        fontSize: "13px",
+                        fontWeight: isActive ? 700 : 500,
+                        cursor: "pointer",
+                        fontFamily: "'Inter', sans-serif",
+                        borderRadius: "0",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d={tab.icon} />
+                      </svg>
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ animation: "fadeUp 0.5s 0.1s ease both" }}>
+          {activeTab === "map" && (
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: "20px",
+                border: "1.5px solid #E0ECFF",
+                padding: "24px",
+                boxShadow: "0 2px 20px rgba(26,86,219,0.06)",
               }}
             >
-              {tab.icon}
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+              {mapLoading && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#F0F7FF",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px solid #BFDBFE",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                    <SpinIcon />
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        marginTop: "12px",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      Loading {project.totalData.toLocaleString()} data
+                      points...
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "11.5px",
+                        color: "#64748B",
+                        marginTop: "4px",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      This may take a few seconds.
+                    </div>
+                  </div>
+                </div>
+              )}
 
-      <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
-        {activeTab === "detail" && <ProjectDetailSection project={project} />}
-        {activeTab === "map" && <PreviewMapSection project={project} />}
-        {activeTab === "cluster" && <PreviewClusterSection project={project} />}
-      </div>
+              {mapError && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#FFF5F5",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px solid #FECACA",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        color: "#EF4444",
+                        marginBottom: "6px",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      Failed to load map data
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#64748B",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {mapError}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-      `}</style>
+              {!mapLoading && !mapError && places.length === 0 && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#F8FAFC",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px dashed #CBD5E1",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#94A3B8" }}>
+                    <svg
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#CBD5E1"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                      <line x1="8" y1="2" x2="8" y2="18" />
+                      <line x1="16" y1="6" x2="16" y2="22" />
+                    </svg>
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        marginTop: "12px",
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      No location data available
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!mapLoading && !mapError && places.length > 0 && (
+                <UserMapComponent places={places} />
+              )}
+            </div>
+          )}
+
+          {activeTab === "cluster" && (
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: "20px",
+                border: "1.5px solid #E0ECFF",
+                padding: "24px",
+                boxShadow: "0 2px 20px rgba(26,86,219,0.06)",
+              }}
+            >
+              {mapLoading && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#F0F7FF",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px solid #BFDBFE",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                    <SpinIcon />
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        marginTop: "12px",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      Loading cluster data...
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {mapError && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#FFF5F5",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px solid #FECACA",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        color: "#EF4444",
+                        marginBottom: "6px",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      Failed to load cluster data
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#64748B",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {mapError}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!mapLoading && !mapError && places.length === 0 && (
+                <div
+                  style={{
+                    height: "clamp(420px, 65vh, 720px)",
+                    background: "#F8FAFC",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1.5px dashed #CBD5E1",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#94A3B8" }}>
+                    <svg
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#CBD5E1"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        marginTop: "12px",
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      No cluster data available
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!mapLoading && !mapError && places.length > 0 && (
+                <UserClusterMapComponent places={places} />
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

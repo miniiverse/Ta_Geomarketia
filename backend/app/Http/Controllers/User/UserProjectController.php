@@ -107,4 +107,37 @@ class UserProjectController extends Controller
             'project_date_years' => $projectDateYears,
         ]);
     }
+
+    public function show($id)
+    {
+        $p = Project::with(['category', 'city.province'])
+            ->findOrFail($id);
+
+        $appUrl = rtrim((string) config('app.url'), '/');
+        $thumbnailUrl = null;
+        if ($p->thumbnail && trim($p->thumbnail) !== '') {
+            $thumbnailUrl = $appUrl . '/storage/' . ltrim($p->thumbnail, '/');
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'project_id'   => $p->project_id,
+                'title'        => $p->title,
+                'description'  => $p->description ?? '',
+                'price'        => $p->price ?? 0,
+                'total_data'   => $p->total_data ?? 0,
+                'project_date' => $p->project_date
+                    ? Carbon::parse($p->project_date)->format('Y-m-d')
+                    : null,
+                'category'     => ['name' => $p->category?->name ?? '-'],
+                'city'         => [
+                    'name'     => $p->city?->name ?? '-',
+                    'province' => ['name' => $p->city?->province?->name ?? '-'],
+                ],
+                'thumbnail'    => $p->thumbnail,
+                'api_url'      => $p->api_url ?? '',
+            ],
+        ]);
+    }
 }

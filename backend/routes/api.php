@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 // ── Public routes (tidak perlu token) ───────────────────────
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
- 
+
 // Password Reset — OTP Flow
 Route::prefix('password')->group(function () {
     Route::post('/forgot',         [PasswordResetController::class, 'sendOtp']);       // Step 1: kirim OTP
@@ -24,6 +24,8 @@ Route::get('/user/projects',   [UserProjectController::class, 'index']);
 Route::get('/user/categories', [FilterController::class, 'categories']);
 Route::get('/user/provinces',  [FilterController::class, 'provinces']);
 Route::get('/user/cities',     [FilterController::class, 'cities']);
+Route::get('/user/projects',      [UserProjectController::class, 'index']);
+Route::get('/user/projects/{id}', [UserProjectController::class, 'show']); // ← tambah ini
 
 // Protected - semua user yang login
 Route::middleware('auth:sanctum')->group(function () {
@@ -37,11 +39,11 @@ Route::middleware('auth:sanctum')->group(function () {
 // Protected - admin only
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('/projects',         [ProjectController::class, 'index']);
-    Route::get('/projects/{id}',    [ProjectController::class, 'show']); 
+    Route::get('/projects/{id}',    [ProjectController::class, 'show']);
     Route::post('/projects',        [ProjectController::class, 'store']);
     Route::post('/projects/{id}',   [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/categories',       [ProjectController::class, 'categories']);
     Route::get('/cities',           [ProjectController::class, 'cities']);
-    Route::get('/users',            [UserController::class, 'index']); 
+    Route::get('/users',            [UserController::class, 'index']);
 });
