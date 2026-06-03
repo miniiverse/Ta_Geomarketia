@@ -92,6 +92,9 @@ function renderStars(rating: number) {
   const stars = [];
   const full = Math.floor(rating);
   const half = rating % 1 >= 0.5;
+  const uid = `star-${Math.random().toString(36).slice(2, 7)}`;
+  const gradId = `half-${uid}`;
+
   for (let i = 0; i < 5; i++) {
     if (i < full) {
       stars.push(
@@ -119,14 +122,14 @@ function renderStars(rating: number) {
           strokeWidth="1"
         >
           <defs>
-            <linearGradient id="half">
+            <linearGradient id={gradId}>
               <stop offset="50%" stopColor="#f59e0b" />
               <stop offset="50%" stopColor="#e2e8f0" />
             </linearGradient>
           </defs>
           <polygon
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-            fill="url(#half)"
+            fill={`url(#${gradId})`}
             stroke="#f59e0b"
           />
         </svg>,
@@ -204,6 +207,42 @@ function ZoomToCluster({
     }
   }, [targetCluster, places, geoClusterMap, map]);
   return null;
+}
+
+function RadiusCircle({
+  center,
+  radius,
+  color,
+}: {
+  center: [number, number];
+  radius: number;
+  color: string;
+}) {
+  const circleRef = useRef<L.Circle | null>(null);
+
+  useEffect(() => {
+    if (circleRef.current) {
+      const el = (circleRef.current as any)._path;
+      if (el) {
+        el.style.pointerEvents = "none";
+      }
+    }
+  }, []);
+
+  return (
+    <Circle
+      ref={circleRef}
+      center={center}
+      radius={radius}
+      pathOptions={{
+        color,
+        fillColor: color,
+        fillOpacity: 0.08,
+        weight: 2,
+        dashArray: "6 4",
+      }}
+    />
+  );
 }
 
 function ClockIcon() {
@@ -594,16 +633,10 @@ export default function MapWithNearby({
             />
 
             {clickedPoint && (
-              <Circle
+              <RadiusCircle
                 center={[clickedPoint.lat, clickedPoint.lng]}
                 radius={activeRadius * 1000}
-                pathOptions={{
-                  color: circleColor,
-                  fillColor: circleColor,
-                  fillOpacity: 0.08,
-                  weight: 2,
-                  dashArray: "6 4",
-                }}
+                color={circleColor}
               />
             )}
 
@@ -682,7 +715,11 @@ export default function MapWithNearby({
                       : isNearby && clickedPoint
                         ? "#fff"
                         : "#fff",
-                    weight: isSelected ? 3 : isNearby && clickedPoint ? 2 : 1.2,
+                    weight: isSelected
+                      ? 3
+                      : isNearby && clickedPoint
+                        ? 2
+                        : 1.2,
                   }}
                   eventHandlers={{ click: () => handleMarkerClick(place) }}
                 >

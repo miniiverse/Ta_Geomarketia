@@ -223,7 +223,6 @@ const ClusterMapComponent = dynamic(
         style={{
           background: "#f0f7ff",
           borderRadius: "14px",
-          border: "1px solid #e2e8f0",
           overflow: "hidden",
         }}
       >
@@ -652,7 +651,6 @@ export default function ProjectDetailPage() {
           style={{
             background: "#fff",
             borderRadius: "20px",
-            border: "1px solid #f1f5f9",
             padding: isMobile ? "20px" : "28px",
             boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           }}
@@ -980,7 +978,6 @@ export default function ProjectDetailPage() {
                   style={{
                     borderRadius: "14px",
                     overflow: "hidden",
-                    border: "1px solid #e2e8f0",
                   }}
                 >
                   <MapComponent places={places} />

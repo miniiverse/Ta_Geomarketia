@@ -199,15 +199,186 @@ function RatingBar({
   );
 }
 
+function EmptyState() {
+  return (
+    <div
+      style={{
+        width: "300px",
+        flexShrink: 0,
+        background: "#fff",
+        borderRadius: "14px",
+        border: "1px solid #e2e8f0",
+        boxShadow: "0 1px 8px rgba(26,86,219,0.07)",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "'Inter', sans-serif",
+        height: "clamp(400px, 65vh, 700px)",
+      }}
+    >
+      <div
+        style={{
+          background: "linear-gradient(135deg, #1A56DB 0%, #1036A0 100%)",
+          padding: "14px 16px",
+          display: "flex",
+          alignItems: "center",
+          borderRadius: "14px 14px 0 0",
+          gap: "10px",
+        }}
+      >
+        <div
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "10px",
+            background: "rgba(255,255,255,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </div>
+        <div>
+          <div
+            style={{
+              fontSize: "14px",
+              fontWeight: 800,
+              color: "#fff",
+              lineHeight: 1.2,
+            }}
+          >
+            Cluster Details
+          </div>
+          <div
+            style={{
+              fontSize: "11px",
+              color: "rgba(255,255,255,0.7)",
+              marginTop: "2px",
+            }}
+          >
+            Select a cluster to view info
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "32px 20px",
+          gap: "14px",
+        }}
+      >
+        <div
+          style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "18px",
+            background: "#f1f5f9",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#cbd5e1"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+            <line x1="8" y1="2" x2="8" y2="18" />
+            <line x1="16" y1="6" x2="16" y2="22" />
+          </svg>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 700,
+              color: "#475569",
+              marginBottom: "6px",
+            }}
+          >
+            No Cluster Selected
+          </div>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#94a3b8",
+              lineHeight: 1.6,
+              maxWidth: "200px",
+            }}
+          >
+            Click on a cluster area or label on the map to view detailed
+            information here.
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: "10px",
+            padding: "8px 12px",
+            marginTop: "4px",
+          }}
+        >
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1A56DB"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>
+            Click a cluster area or label
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ClusterSidebarPanel({
   group,
   allGroups,
   onClose,
 }: {
-  group: ClusterGroup;
+  group: ClusterGroup | null;
   allGroups: ClusterGroup[];
   onClose: () => void;
 }) {
+  if (!group) {
+    return <EmptyState />;
+  }
+
   const realGroups = allGroups.filter((g) => g.geoCluster >= 0);
   const counts = realGroups.map((g) => g.places.length);
   const max = Math.max(...counts);
@@ -309,12 +480,14 @@ export default function ClusterSidebarPanel({
         width: "300px",
         flexShrink: 0,
         background: "#fff",
-        borderLeft: "1px solid #f1f5f9",
+        borderRadius: "14px",
+        border: "1px solid #e2e8f0",
+        boxShadow: "0 1px 8px rgba(26,86,219,0.07)",
         display: "flex",
         flexDirection: "column",
         fontFamily: "'Inter', sans-serif",
         overflowY: "auto",
-        maxHeight: "clamp(400px, 65vh, 700px)",
+        height: "clamp(400px, 65vh, 700px)",
       }}
     >
       <div
@@ -325,6 +498,7 @@ export default function ClusterSidebarPanel({
           alignItems: "flex-start",
           justifyContent: "space-between",
           flexShrink: 0,
+          borderRadius: "14px 14px 0 0",
         }}
       >
         <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
