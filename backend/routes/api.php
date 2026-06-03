@@ -24,8 +24,7 @@ Route::get('/user/projects',   [UserProjectController::class, 'index']);
 Route::get('/user/categories', [FilterController::class, 'categories']);
 Route::get('/user/provinces',  [FilterController::class, 'provinces']);
 Route::get('/user/cities',     [FilterController::class, 'cities']);
-Route::get('/user/projects',      [UserProjectController::class, 'index']);
-Route::get('/user/projects/{id}', [UserProjectController::class, 'show']); // ← tambah ini
+Route::get('/user/projects/{id}', [UserProjectController::class, 'show']);
 
 // Protected - semua user yang login
 Route::middleware('auth:sanctum')->group(function () {

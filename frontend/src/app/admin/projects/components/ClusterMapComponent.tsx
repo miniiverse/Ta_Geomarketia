@@ -1044,12 +1044,12 @@ export default function ClusterAreaMap({
                 <CircleMarker
                   key={place.id}
                   center={[place.latitude, place.longitude]}
-                  radius={isNoise ? 4 : isHov ? 7 : 5}
+                  radius={isNoise ? 5 : isHov ? 8 : 6}
                   pathOptions={{
-                    fillColor: color,
-                    fillOpacity: isNoise ? 0.85 : isHov ? 1 : 0.85,
-                    color: isNoise ? "#64748b" : "#fff",
-                    weight: isNoise ? 2 : 1.2,
+                    fillColor: isNoise ? "#6b7280" : color,
+                    fillOpacity: isNoise ? 0.50 : isHov ? 1 : 0.9,
+                    color: "#fff",
+                    weight: isNoise ? 1.2 : 1.5,
                   }}
                   eventHandlers={
                     isNoise

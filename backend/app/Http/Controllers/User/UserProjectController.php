@@ -108,7 +108,7 @@ class UserProjectController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $p = Project::with(['category', 'city.province'])
             ->findOrFail($id);
@@ -118,6 +118,8 @@ class UserProjectController extends Controller
         if ($p->thumbnail && trim($p->thumbnail) !== '') {
             $thumbnailUrl = $appUrl . '/storage/' . ltrim($p->thumbnail, '/');
         }
+
+        $isAuthenticated = auth('sanctum')->check();
 
         return response()->json([
             'success' => true,
@@ -135,8 +137,8 @@ class UserProjectController extends Controller
                     'name'     => $p->city?->name ?? '-',
                     'province' => ['name' => $p->city?->province?->name ?? '-'],
                 ],
-                'thumbnail'    => $p->thumbnail,
-                'api_url'      => $p->api_url ?? '',
+                'thumbnail'    => $thumbnailUrl,
+                'api_url'      => $isAuthenticated ? ($p->api_url ?? '') : null,
             ],
         ]);
     }

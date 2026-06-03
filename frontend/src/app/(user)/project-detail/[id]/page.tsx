@@ -70,6 +70,150 @@ function SpinIcon() {
   );
 }
 
+function LockIcon({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0110 0v4" />
+    </svg>
+  );
+}
+
+function LockedState({ onLogin }: { onLogin: () => void }) {
+  return (
+    <div
+      style={{
+        height: "clamp(420px, 65vh, 720px)",
+        background: "linear-gradient(135deg, #F8FAFF 0%, #EEF3FF 100%)",
+        borderRadius: "14px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1.5px dashed #BFDBFE",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(rgba(26,86,219,0.04) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          textAlign: "center",
+          padding: "0 24px",
+          maxWidth: "420px",
+        }}
+      >
+        <div
+          style={{
+            width: "80px",
+            height: "80px",
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #EEF3FF 0%, #DBEAFE 100%)",
+            border: "2px solid #BFDBFE",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+            color: "#1A56DB",
+          }}
+        >
+          <LockIcon size={36} />
+        </div>
+
+        <h3
+          style={{
+            margin: "0 0 10px",
+            fontSize: "17px",
+            fontWeight: 700,
+            color: "#1E3A6E",
+            fontFamily: "'Inter', sans-serif",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Login Required
+        </h3>
+
+        <p
+          style={{
+            margin: "0 0 24px",
+            fontSize: "13.5px",
+            color: "#64748B",
+            lineHeight: 1.65,
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          You cannot view this feature in detail because you are not logged in.
+        </p>
+
+        <button
+          onClick={onLogin}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "10px 24px",
+            borderRadius: "10px",
+            border: "none",
+            background: "linear-gradient(135deg, #1A56DB 0%, #2D7BE8 100%)",
+            color: "#fff",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "'Inter', sans-serif",
+            boxShadow: "0 4px 14px rgba(26,86,219,0.30)",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.opacity = "0.88";
+            (e.currentTarget as HTMLButtonElement).style.transform =
+              "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+            (e.currentTarget as HTMLButtonElement).style.transform =
+              "translateY(0)";
+          }}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+          Login to Access
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const UserMapComponent = dynamic<{ places: PlaceData[] }>(
   () => import("./components/UserMapComponent"),
   {
@@ -159,10 +303,22 @@ export default function UserProjectDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
   const [places, setPlaces] = useState<PlaceData[]>([]);
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const hasFetchedMap = useRef(false);
+
+  useEffect(() => {
+    fetch("/api/me", { headers: { Accept: "application/json" } })
+      .then((r) => {
+        setIsAuthenticated(r.ok);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -192,10 +348,13 @@ export default function UserProjectDetailPage() {
 
   useEffect(() => {
     if (!project || hasFetchedMap.current) return;
+    if (isAuthenticated === null || isAuthenticated === false) return;
+
     const apiBase = project.api_url
       ? project.api_url.replace("/places", "")
       : null;
     if (!apiBase) return;
+
     hasFetchedMap.current = true;
     setMapLoading(true);
     setMapError(null);
@@ -217,14 +376,18 @@ export default function UserProjectDetailPage() {
       })
       .catch((err) => setMapError(err.message))
       .finally(() => setMapLoading(false));
-  }, [project]);
+  }, [project, isAuthenticated]);
 
   const SERVER = process.env.NEXT_PUBLIC_SERVER;
   const thumbnailUrl = project?.thumbnail
     ? `${SERVER}/storage/${project.thumbnail}`
     : null;
 
-  if (isLoading) {
+  const handleLoginRedirect = () => {
+    router.push("/login");
+  };
+
+  if (isLoading || isAuthenticated === null) {
     return (
       <div
         style={{
@@ -529,6 +692,29 @@ export default function UserProjectDetailPage() {
                         <path d={tab.icon} />
                       </svg>
                       {tab.label}
+                      {!isAuthenticated && (
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ opacity: 0.7 }}
+                        >
+                          <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                          />
+                          <path d="M7 11V7a5 5 0 0110 0v4" />
+                        </svg>
+                      )}
                     </button>
                   );
                 })}
@@ -548,125 +734,131 @@ export default function UserProjectDetailPage() {
                 boxShadow: "0 2px 20px rgba(26,86,219,0.06)",
               }}
             >
-              {mapLoading && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#F0F7FF",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px solid #BFDBFE",
-                  }}
-                >
-                  <div style={{ textAlign: "center", color: "#1A56DB" }}>
-                    <SpinIcon />
+              {!isAuthenticated ? (
+                <LockedState onLogin={handleLoginRedirect} />
+              ) : (
+                <>
+                  {mapLoading && (
                     <div
                       style={{
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        marginTop: "12px",
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#F0F7FF",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px solid #BFDBFE",
                       }}
                     >
-                      Loading {project.totalData.toLocaleString()} data
-                      points...
+                      <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                        <SpinIcon />
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            marginTop: "12px",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          Loading {project.totalData.toLocaleString()} data
+                          points...
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "11.5px",
+                            color: "#64748B",
+                            marginTop: "4px",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          This may take a few seconds.
+                        </div>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "11.5px",
-                        color: "#64748B",
-                        marginTop: "4px",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      This may take a few seconds.
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {mapError && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#FFF5F5",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px solid #FECACA",
-                  }}
-                >
-                  <div style={{ textAlign: "center" }}>
+                  {mapError && (
                     <div
                       style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: "#EF4444",
-                        marginBottom: "6px",
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#FFF5F5",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px solid #FECACA",
                       }}
                     >
-                      Failed to load map data
+                      <div style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            color: "#EF4444",
+                            marginBottom: "6px",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          Failed to load map data
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#64748B",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          {mapError}
+                        </div>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "#64748B",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {mapError}
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {!mapLoading && !mapError && places.length === 0 && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#F8FAFC",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px dashed #CBD5E1",
-                  }}
-                >
-                  <div style={{ textAlign: "center", color: "#94A3B8" }}>
-                    <svg
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#CBD5E1"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
-                      <line x1="8" y1="2" x2="8" y2="18" />
-                      <line x1="16" y1="6" x2="16" y2="22" />
-                    </svg>
+                  {!mapLoading && !mapError && places.length === 0 && (
                     <div
                       style={{
-                        fontSize: "13px",
-                        marginTop: "12px",
-                        fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#F8FAFC",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px dashed #CBD5E1",
                       }}
                     >
-                      No location data available
+                      <div style={{ textAlign: "center", color: "#94A3B8" }}>
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#CBD5E1"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                          <line x1="8" y1="2" x2="8" y2="18" />
+                          <line x1="16" y1="6" x2="16" y2="22" />
+                        </svg>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            marginTop: "12px",
+                            fontWeight: 600,
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          No location data available
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {!mapLoading && !mapError && places.length > 0 && (
-                <UserMapComponent places={places} />
+                  {!mapLoading && !mapError && places.length > 0 && (
+                    <UserMapComponent places={places} />
+                  )}
+                </>
               )}
             </div>
           )}
@@ -681,112 +873,118 @@ export default function UserProjectDetailPage() {
                 boxShadow: "0 2px 20px rgba(26,86,219,0.06)",
               }}
             >
-              {mapLoading && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#F0F7FF",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px solid #BFDBFE",
-                  }}
-                >
-                  <div style={{ textAlign: "center", color: "#1A56DB" }}>
-                    <SpinIcon />
+              {!isAuthenticated ? (
+                <LockedState onLogin={handleLoginRedirect} />
+              ) : (
+                <>
+                  {mapLoading && (
                     <div
                       style={{
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        marginTop: "12px",
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#F0F7FF",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px solid #BFDBFE",
                       }}
                     >
-                      Loading cluster data...
+                      <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                        <SpinIcon />
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            marginTop: "12px",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          Loading cluster data...
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {mapError && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#FFF5F5",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px solid #FECACA",
-                  }}
-                >
-                  <div style={{ textAlign: "center" }}>
+                  {mapError && (
                     <div
                       style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: "#EF4444",
-                        marginBottom: "6px",
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#FFF5F5",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px solid #FECACA",
                       }}
                     >
-                      Failed to load cluster data
+                      <div style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            color: "#EF4444",
+                            marginBottom: "6px",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          Failed to load cluster data
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#64748B",
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          {mapError}
+                        </div>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "#64748B",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {mapError}
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {!mapLoading && !mapError && places.length === 0 && (
-                <div
-                  style={{
-                    height: "clamp(420px, 65vh, 720px)",
-                    background: "#F8FAFC",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1.5px dashed #CBD5E1",
-                  }}
-                >
-                  <div style={{ textAlign: "center", color: "#94A3B8" }}>
-                    <svg
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#CBD5E1"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                  {!mapLoading && !mapError && places.length === 0 && (
                     <div
                       style={{
-                        fontSize: "13px",
-                        marginTop: "12px",
-                        fontWeight: 600,
-                        fontFamily: "'Inter', sans-serif",
+                        height: "clamp(420px, 65vh, 720px)",
+                        background: "#F8FAFC",
+                        borderRadius: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1.5px dashed #CBD5E1",
                       }}
                     >
-                      No cluster data available
+                      <div style={{ textAlign: "center", color: "#94A3B8" }}>
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#CBD5E1"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            marginTop: "12px",
+                            fontWeight: 600,
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          No cluster data available
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {!mapLoading && !mapError && places.length > 0 && (
-                <UserClusterMapComponent places={places} />
+                  {!mapLoading && !mapError && places.length > 0 && (
+                    <UserClusterMapComponent places={places} />
+                  )}
+                </>
               )}
             </div>
           )}

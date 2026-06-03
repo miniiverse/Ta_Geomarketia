@@ -7,10 +7,14 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
+  const token = req.cookies.get("token")?.value;
 
   try {
     const res = await fetch(`${LARAVEL_URL}/api/user/projects/${id}`, {
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
       cache: "no-store",
     });
 
@@ -24,7 +28,7 @@ export async function GET(
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Cannot reach Laravel API" },
       { status: 503 }
