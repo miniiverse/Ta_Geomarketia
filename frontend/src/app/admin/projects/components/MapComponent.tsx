@@ -50,8 +50,6 @@ const CLUSTER_COLORS = [
 ];
 const NOISE_COLOR = "#94a3b8";
 
-const RADIUS_OPTIONS = [1.5, 2, 3, 5, 7, 10];
-
 function parseCluster(cluster?: number | string | null): number {
   if (cluster === undefined || cluster === null) return -1;
   const val = parseFloat(String(cluster));
@@ -464,6 +462,9 @@ export default function MapWithNearby({
   const [zoomTarget, setZoomTarget] = useState<number | null>(null);
   const [activeRadius, setActiveRadius] = useState<number>(1.5);
   const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [activeCardCluster, setActiveCardCluster] = useState<number | null>(
+    null,
+  );
 
   const center: [number, number] =
     places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
@@ -536,11 +537,15 @@ export default function MapWithNearby({
       setClickedPlace(null);
       setNearbyList([]);
       setNearbyFromApi([]);
+      setActiveCardCluster(null);
       return;
     }
     setSelectedId(place.id);
     setClickedPlace(place);
     setClickedPoint({ lat, lng });
+
+    const gc = parseCluster(place.cluster);
+    setActiveCardCluster(gc);
 
     const nearby = places
       .map((p) => ({
@@ -585,6 +590,11 @@ export default function MapWithNearby({
   const handleZoomToCluster = useCallback((geoCluster: number) => {
     setZoomTarget(null);
     setTimeout(() => setZoomTarget(geoCluster), 0);
+    if (geoCluster !== -999) {
+      setActiveCardCluster(geoCluster);
+    } else {
+      setActiveCardCluster(null);
+    }
   }, []);
 
   const activeNearby = nearbyFromApi.length > 0 ? nearbyFromApi : nearbyList;
@@ -715,11 +725,7 @@ export default function MapWithNearby({
                       : isNearby && clickedPoint
                         ? "#fff"
                         : "#fff",
-                    weight: isSelected
-                      ? 3
-                      : isNearby && clickedPoint
-                        ? 2
-                        : 1.2,
+                    weight: isSelected ? 3 : isNearby && clickedPoint ? 2 : 1.2,
                   }}
                   eventHandlers={{ click: () => handleMarkerClick(place) }}
                 >
@@ -1083,6 +1089,7 @@ export default function MapWithNearby({
               setClickedPlace(null);
               setNearbyList([]);
               setNearbyFromApi([]);
+              setActiveCardCluster(null);
             } else {
               const place = places.find((p) => p.id === id);
               if (place) handleMarkerClick(place);
@@ -1097,6 +1104,7 @@ export default function MapWithNearby({
         places={places}
         geoClusterMap={geoClusterMap}
         onZoomToCluster={handleZoomToCluster}
+        activeClusterOverride={activeCardCluster}
       />
     </div>
   );

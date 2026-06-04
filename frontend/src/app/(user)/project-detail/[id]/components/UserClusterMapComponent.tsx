@@ -653,7 +653,12 @@ function ClusterStatsCards({
         </div>
       </div>
 
-      <div style={cardBase}>
+      <div
+        style={{
+          ...cardBase,
+          background: largestCluster ? largestCluster.color + "11" : "#F8FAFF",
+        }}
+      >
         <div
           style={{
             ...iconWrap,
@@ -704,7 +709,12 @@ function ClusterStatsCards({
         </div>
       </div>
 
-      <div style={cardBase}>
+      <div
+        style={{
+          ...cardBase,
+          background: selectedGroup ? selectedGroup.color + "11" : "#F8FAFF",
+        }}
+      >
         <div
           style={{
             ...iconWrap,
@@ -994,7 +1004,7 @@ export default function UserClusterMapComponent({
                   radius={isNoise ? 5 : isHov ? 8 : 6}
                   pathOptions={{
                     fillColor: isNoise ? "#6b7280" : color,
-                    fillOpacity: isNoise ? 0.50 : isHov ? 1 : 0.9,
+                    fillOpacity: isNoise ? 0.5 : isHov ? 1 : 0.9,
                     color: "#fff",
                     weight: isNoise ? 1.2 : 1.5,
                   }}
@@ -1162,6 +1172,8 @@ export default function UserClusterMapComponent({
             handleSelectCluster(geoCluster);
           }
         }}
+        activeCluster={selectedCluster}
+        onActiveClusterChange={(gc) => handleSelectCluster(gc)}
       />
     </div>
   );

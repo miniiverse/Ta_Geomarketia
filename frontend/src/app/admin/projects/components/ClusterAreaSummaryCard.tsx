@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type PlaceData = {
   id: number;
@@ -39,7 +39,10 @@ function extractKecamatan(address?: string): string {
   if (!address) return "";
   const kecMatch = address.match(/Kec(?:amatan)?\.?\s+([^,]+)/i);
   if (kecMatch) return kecMatch[1].trim();
-  const parts = address.split(",").map((s) => s.trim()).filter(Boolean);
+  const parts = address
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (parts.length >= 4) return parts[parts.length - 4];
   if (parts.length >= 2) return parts[parts.length - 2];
   return "";
@@ -49,6 +52,7 @@ type ClusterAreaSummaryCardProps = {
   places: PlaceData[];
   geoClusterMap: Map<number, number>;
   onZoomToCluster: (geoCluster: number) => void;
+  activeClusterOverride?: number | null;
 };
 
 type CardEntry = {
@@ -65,8 +69,15 @@ export default function ClusterAreaSummaryCard({
   places,
   geoClusterMap,
   onZoomToCluster,
+  activeClusterOverride,
 }: ClusterAreaSummaryCardProps) {
   const [activeCluster, setActiveCluster] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeClusterOverride !== undefined) {
+      setActiveCluster(activeClusterOverride);
+    }
+  }, [activeClusterOverride]);
 
   if (places.length === 0) return null;
 
@@ -121,13 +132,27 @@ export default function ClusterAreaSummaryCard({
     .map(([geoCluster, data]) => {
       const isNoise = geoCluster < 0;
       const color = getClusterColor(geoCluster);
-      const sortedKec = Array.from(data.kecCount.entries()).sort((a, b) => b[1] - a[1]);
+      const sortedKec = Array.from(data.kecCount.entries()).sort(
+        (a, b) => b[1] - a[1],
+      );
       const kec1 = sortedKec[0]?.[0] ?? "";
-      const label = isNoise ? "Noise / Outlier" : kec1 || `Cluster ${geoCluster}`;
-      const avgRating = data.ratingCount > 0 ? data.totalRating / data.ratingCount : 0;
-      const avgReview = data.reviewCount > 0 ? data.totalReview / data.reviewCount : 0;
+      const label = isNoise
+        ? "Noise / Outlier"
+        : kec1 || `Cluster ${geoCluster}`;
+      const avgRating =
+        data.ratingCount > 0 ? data.totalRating / data.ratingCount : 0;
+      const avgReview =
+        data.reviewCount > 0 ? data.totalReview / data.reviewCount : 0;
 
-      return { geoCluster, color, label, count: data.count, avgRating, avgReview, isNoise };
+      return {
+        geoCluster,
+        color,
+        label,
+        count: data.count,
+        avgRating,
+        avgReview,
+        isNoise,
+      };
     })
     .sort((a, b) => {
       if (a.isNoise && !b.isNoise) return 1;
@@ -197,10 +222,14 @@ export default function ClusterAreaSummaryCard({
             </svg>
           </div>
           <div>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a" }}>
+            <div
+              style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a" }}
+            >
               Cluster Area Summary
             </div>
-            <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "1px" }}>
+            <div
+              style={{ fontSize: "11.5px", color: "#64748b", marginTop: "1px" }}
+            >
               Click a card to zoom the map to that cluster
             </div>
           </div>
@@ -228,196 +257,256 @@ export default function ClusterAreaSummaryCard({
           gap: "10px",
         }}
       >
-        {cards.map(({ geoCluster, color, label, count, avgRating, avgReview, isNoise }) => {
-          const pct = ((count / totalBusiness) * 100).toFixed(1);
-          const isActive = activeCluster === geoCluster;
+        {cards.map(
+          ({
+            geoCluster,
+            color,
+            label,
+            count,
+            avgRating,
+            avgReview,
+            isNoise,
+          }) => {
+            const pct = ((count / totalBusiness) * 100).toFixed(1);
+            const isActive = activeCluster === geoCluster;
 
-          return (
-            <div
-              key={geoCluster}
-              onClick={() => handleCardClick(geoCluster)}
-              style={{
-                background: isActive
-                  ? isNoise ? "#f1f5f9" : "#EBF3FF"
-                  : isNoise ? "#f8fafc" : "#fafbff",
-                borderRadius: "12px",
-                border: isActive
-                  ? `2px solid ${color}`
-                  : `1px solid ${isNoise ? "#e2e8f0" : "#EBF3FF"}`,
-                padding: isActive ? "11px 13px" : "12px 14px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                boxShadow: isActive ? `0 0 0 3px ${color}22` : "none",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            return (
+              <div
+                key={geoCluster}
+                onClick={() => handleCardClick(geoCluster)}
+                style={{
+                  background: isActive
+                    ? isNoise
+                      ? "#f1f5f9"
+                      : "#EBF3FF"
+                    : isNoise
+                      ? "#f8fafc"
+                      : "#fafbff",
+                  borderRadius: "12px",
+                  border: isActive
+                    ? `2px solid ${color}`
+                    : `1px solid ${isNoise ? "#e2e8f0" : "#EBF3FF"}`,
+                  padding: isActive ? "11px 13px" : "12px 14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  boxShadow: isActive ? `0 0 0 3px ${color}22` : "none",
+                }}
+              >
                 <div
-                  style={{
-                    width: "12px",
-                    height: "12px",
-                    borderRadius: "50%",
-                    background: color,
-                    flexShrink: 0,
-                    border: "2px solid #fff",
-                    boxShadow: `0 0 0 1.5px ${color}66`,
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    color: isNoise ? "#94a3b8" : "#1e293b",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    flex: 1,
-                  }}
-                >
-                  {label}
-                </span>
-                {isActive && (
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ flexShrink: 0 }}
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                )}
-              </div>
-
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    justifyContent: "space-between",
-                    marginBottom: "5px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: 800,
-                      color: "#0f172a",
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
-                    {count.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8" }}>
-                    {pct}%
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    height: "4px",
-                    borderRadius: "99px",
-                    background: "#f1f5f9",
-                    overflow: "hidden",
-                  }}
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <div
                     style={{
-                      height: "100%",
-                      width: `${pct}%`,
-                      borderRadius: "99px",
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
                       background: color,
-                      transition: "width 0.6s ease",
+                      flexShrink: 0,
+                      border: "2px solid #fff",
+                      boxShadow: `0 0 0 1.5px ${color}66`,
                     }}
                   />
-                </div>
-              </div>
-
-              {!isNoise && (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "6px",
-                    marginTop: "2px",
-                  }}
-                >
-                  <div
+                  <span
                     style={{
-                      background: "#fffbeb",
-                      borderRadius: "8px",
-                      padding: "6px 8px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "2px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: isNoise ? "#94a3b8" : "#1e293b",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      flex: 1,
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="#f59e0b"
-                        stroke="#f59e0b"
-                        strokeWidth="1"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                      <span style={{ fontSize: "9.5px", color: "#92400e", fontWeight: 600 }}>
-                        Avg Rating
-                      </span>
-                    </div>
-                    <span style={{ fontSize: "13px", fontWeight: 800, color: "#0f172a" }}>
-                      {avgRating > 0 ? avgRating.toFixed(1) : "N/A"}
+                    {label}
+                  </span>
+                  {isActive && (
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={color}
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ flexShrink: 0 }}
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  )}
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      justifyContent: "space-between",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "20px",
+                        fontWeight: 800,
+                        color: "#0f172a",
+                        letterSpacing: "-0.03em",
+                      }}
+                    >
+                      {count.toLocaleString()}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        color: "#94a3b8",
+                      }}
+                    >
+                      {pct}%
                     </span>
                   </div>
 
                   <div
                     style={{
-                      background: "#eff6ff",
-                      borderRadius: "8px",
-                      padding: "6px 8px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "2px",
+                      height: "4px",
+                      borderRadius: "99px",
+                      background: "#f1f5f9",
+                      overflow: "hidden",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#3b82f6"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      >
-                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-                      </svg>
-                      <span style={{ fontSize: "9.5px", color: "#1e40af", fontWeight: 600 }}>
-                        Avg Reviews
-                      </span>
-                    </div>
-                    <span style={{ fontSize: "13px", fontWeight: 800, color: "#0f172a" }}>
-                      {avgReview > 0 ? Math.round(avgReview).toLocaleString() : "N/A"}
-                    </span>
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${pct}%`,
+                        borderRadius: "99px",
+                        background: color,
+                        transition: "width 0.6s ease",
+                      }}
+                    />
                   </div>
                 </div>
-              )}
 
-              <div style={{ fontSize: "11px", color: "#94a3b8" }}>
-                {isNoise ? "unclustered points" : "businesses detected"}
+                {!isNoise && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "6px",
+                      marginTop: "2px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        background: "#fffbeb",
+                        borderRadius: "8px",
+                        padding: "6px 8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "3px",
+                        }}
+                      >
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="#f59e0b"
+                          stroke="#f59e0b"
+                          strokeWidth="1"
+                        >
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                        <span
+                          style={{
+                            fontSize: "9.5px",
+                            color: "#92400e",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Avg Rating
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: 800,
+                          color: "#0f172a",
+                        }}
+                      >
+                        {avgRating > 0 ? avgRating.toFixed(1) : "N/A"}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        background: "#eff6ff",
+                        borderRadius: "8px",
+                        padding: "6px 8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "3px",
+                        }}
+                      >
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#3b82f6"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        >
+                          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                        </svg>
+                        <span
+                          style={{
+                            fontSize: "9.5px",
+                            color: "#1e40af",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Avg Reviews
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: 800,
+                          color: "#0f172a",
+                        }}
+                      >
+                        {avgReview > 0
+                          ? Math.round(avgReview).toLocaleString()
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                  {isNoise ? "unclustered points" : "businesses detected"}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          },
+        )}
       </div>
     </div>
   );

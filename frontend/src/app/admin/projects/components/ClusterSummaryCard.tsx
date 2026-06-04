@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type PlaceData = {
   id: number;
@@ -32,14 +32,11 @@ function getClusterColor(geoCluster: number): string {
   if (geoCluster < 0) return NOISE_COLOR;
   return CLUSTER_COLORS[geoCluster % CLUSTER_COLORS.length];
 }
+
 function extractKecamatan(address?: string): string {
   if (!address) return "";
-
   const kecMatch = address.match(/Kec(?:amatan)?\.?\s+([^,]+)/i);
-  if (kecMatch) {
-    return kecMatch[1].trim();
-  }
-
+  if (kecMatch) return kecMatch[1].trim();
   const parts = address
     .split(",")
     .map((s) => s.trim())
@@ -53,6 +50,7 @@ type ClusterSummaryCardProps = {
   places: PlaceData[];
   geoClusterMap: Map<number, number>;
   onZoomToCluster: (geoCluster: number) => void;
+  activeClusterOverride?: number | null;
 };
 
 type CardEntry = {
@@ -63,14 +61,19 @@ type CardEntry = {
   isNoise: boolean;
 };
 
-const SMALL_CLUSTER_THRESHOLD = 20;
-
 export default function ClusterSummaryCard({
   places,
   geoClusterMap,
   onZoomToCluster,
+  activeClusterOverride,
 }: ClusterSummaryCardProps) {
   const [activeCluster, setActiveCluster] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeClusterOverride !== undefined) {
+      setActiveCluster(activeClusterOverride);
+    }
+  }, [activeClusterOverride]);
 
   if (places.length === 0) return null;
 
@@ -79,15 +82,13 @@ export default function ClusterSummaryCard({
     { count: number; kecCount: Map<string, number> }
   >();
 
-  places.forEach((place, idx) => {
+  places.forEach((place) => {
     const geoCluster = parseCluster(place.cluster);
-
     if (!clusterData.has(geoCluster)) {
       clusterData.set(geoCluster, { count: 0, kecCount: new Map() });
     }
     const entry = clusterData.get(geoCluster)!;
     entry.count += 1;
-
     if (geoCluster >= 0) {
       const kec = extractKecamatan(place.address);
       if (kec) {
@@ -106,13 +107,7 @@ export default function ClusterSummaryCard({
       (a, b) => b[1] - a[1],
     );
     const kec1 = sortedKec[0]?.[0] ?? "";
-    const kec2 = sortedKec[1]?.[0] ?? "";
-    return { geoCluster, color, count, isNoise, kec1, kec2 };
-  });
-
-  const kec1Count = new Map<string, number>();
-  rawCards.forEach(({ kec1, isNoise }) => {
-    if (!isNoise && kec1) kec1Count.set(kec1, (kec1Count.get(kec1) ?? 0) + 1);
+    return { geoCluster, color, count, isNoise, kec1 };
   });
 
   const cards: CardEntry[] = rawCards.map(

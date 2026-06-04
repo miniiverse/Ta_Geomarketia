@@ -419,6 +419,9 @@ export default function UserMapComponent({
   const [zoomTarget, setZoomTarget] = useState<number | null>(null);
   const [activeRadius, setActiveRadius] = useState<number>(1.5);
   const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [activeClusterCard, setActiveClusterCard] = useState<number | null>(
+    null,
+  );
 
   const center: [number, number] =
     places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
@@ -492,6 +495,8 @@ export default function UserMapComponent({
     setSelectedId(place.id);
     setClickedPlace(place);
     setClickedPoint({ lat, lng });
+    setZoomTarget(null);
+    setActiveClusterCard(parseCluster(place.cluster));
     const nearby = places
       .map((p) => ({
         ...p,
@@ -1032,6 +1037,8 @@ export default function UserMapComponent({
         places={places}
         geoClusterMap={geoClusterMap}
         onZoomToCluster={handleZoomToCluster}
+        activeCluster={activeClusterCard}
+        onActiveClusterChange={setActiveClusterCard}
       />
     </div>
   );

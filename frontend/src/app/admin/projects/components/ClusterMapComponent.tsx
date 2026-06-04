@@ -799,6 +799,9 @@ export default function ClusterAreaMap({
 }) {
   const [hoveredCluster, setHoveredCluster] = useState<number | null>(null);
   const [selectedCluster, setSelectedCluster] = useState<number | null>(null);
+  const [activeCardCluster, setActiveCardCluster] = useState<number | null>(
+    null,
+  );
   const mapRef = useRef<L.Map | null>(null);
 
   const groups: ClusterGroup[] = useMemo(() => {
@@ -855,6 +858,7 @@ export default function ClusterAreaMap({
 
   const handleSelectCluster = (gc: number | null) => {
     setSelectedCluster(gc);
+    setActiveCardCluster(gc);
     onSelectedClusterChange?.(gc);
 
     if (gc === null || gc === -999) return;
@@ -893,10 +897,7 @@ export default function ClusterAreaMap({
           selectedCluster={selectedCluster}
         />
         <div
-          style={{
-            display: "flex",
-            minHeight: "clamp(400px, 65vh, 700px)",
-          }}
+          style={{ display: "flex", minHeight: "clamp(400px, 65vh, 700px)" }}
         >
           <div
             style={{
@@ -953,13 +954,7 @@ export default function ClusterAreaMap({
         selectedCluster={selectedCluster}
       />
 
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          alignItems: "flex-start",
-        }}
-      >
+      <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
         <div
           style={{
             flex: 1,
@@ -1047,7 +1042,7 @@ export default function ClusterAreaMap({
                   radius={isNoise ? 5 : isHov ? 8 : 6}
                   pathOptions={{
                     fillColor: isNoise ? "#6b7280" : color,
-                    fillOpacity: isNoise ? 0.50 : isHov ? 1 : 0.9,
+                    fillOpacity: isNoise ? 0.5 : isHov ? 1 : 0.9,
                     color: "#fff",
                     weight: isNoise ? 1.2 : 1.5,
                   }}
@@ -1215,6 +1210,7 @@ export default function ClusterAreaMap({
             handleSelectCluster(geoCluster);
           }
         }}
+        activeClusterOverride={activeCardCluster}
       />
     </div>
   );
