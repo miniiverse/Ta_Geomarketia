@@ -25,7 +25,7 @@ export async function proxy(request: NextRequest) {
   let role: string | null = null;
   if (token) {
     try {
-      const server = process.env.NEXT_PUBLIC_SERVER;
+      const server = process.env.LARAVEL_API_URL ?? process.env.NEXT_PUBLIC_SERVER;
       const res = await fetch(`${server}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,

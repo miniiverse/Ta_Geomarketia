@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const server = process.env.LARAVEL_API_URL ?? process.env.NEXT_PUBLIC_SERVER;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const server = process.env.NEXT_PUBLIC_SERVER;
     const res = await fetch(`${server}/api/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
