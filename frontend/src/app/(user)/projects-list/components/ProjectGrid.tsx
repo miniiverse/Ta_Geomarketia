@@ -79,7 +79,7 @@ export default function ProjectGrid({
     if (category && category !== "ALL") params.set("category", category);
     if (city_id) params.set("city_id", city_id);
     if (project_date_year) params.set("project_date_year", project_date_year);
-    if (price_sort) params.set("sort", price_sort);
+    if (price_sort) params.set("price_sort", price_sort);
     if (page && page > 1) params.set("page", String(page));
 
     try {

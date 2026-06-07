@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     "category",
     "city_id",
     "search",
-    "sort",
+    "price_sort",
     "page",
     "per_page",
     "project_date_year",

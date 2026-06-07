@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 import ProjectStatsCard from "./components/ProjectStatsCard";
+import ProjectDetailAIChatPanel from "./components/ProjectDetailAIChatPanel";
 
 type Project = {
   id: number;
@@ -386,6 +387,17 @@ export default function UserProjectDetailPage() {
   const handleLoginRedirect = () => {
     router.push("/login");
   };
+
+  const projectInfo = project
+    ? {
+        name: project.name,
+        category: project.category,
+        totalData: project.totalData,
+        city: project.city,
+        province: project.province,
+        description: project.description,
+      }
+    : null;
 
   if (isLoading || isAuthenticated === null) {
     return (
@@ -990,6 +1002,14 @@ export default function UserProjectDetailPage() {
           )}
         </div>
       </div>
+
+      {projectInfo && activeTab === "map" && (
+        <ProjectDetailAIChatPanel mode="map" project={projectInfo} />
+      )}
+
+      {projectInfo && activeTab === "cluster" && (
+        <ProjectDetailAIChatPanel mode="cluster" project={projectInfo} />
+      )}
     </div>
   );
 }

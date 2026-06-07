@@ -59,7 +59,17 @@ class UserProjectController extends Controller
             );
         }
 
-        $query->orderBy('updated_at', 'desc');
+        if ($request->filled('price_sort')) {
+            if ($request->price_sort === 'price_asc') {
+                $query->orderBy('price', 'asc');
+            } elseif ($request->price_sort === 'price_desc') {
+                $query->orderBy('price', 'desc');
+            } else {
+                $query->orderBy('updated_at', 'desc');
+            }
+        } else {
+            $query->orderBy('updated_at', 'desc');
+        }
 
         $projects = $query->paginate($request->get('per_page', 9));
 
