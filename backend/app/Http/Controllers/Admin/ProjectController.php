@@ -15,7 +15,6 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with(['category', 'city'])
-            ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
@@ -26,7 +25,6 @@ class ProjectController extends Controller
     {
         $project = Project::with(['category', 'city'])
             ->where('project_id', $id)
-            ->where('user_id', Auth::id())
             ->firstOrFail();
 
         return response()->json(['success' => true, 'data' => $project]);
@@ -84,7 +82,6 @@ class ProjectController extends Controller
     public function destroy(string $id)
     {
         $project = Project::where('project_id', $id)
-            ->where('user_id', Auth::id())
             ->firstOrFail();
 
         if ($project->thumbnail) {
@@ -99,7 +96,6 @@ class ProjectController extends Controller
     public function update(Request $request, string $id)
     {
         $project = Project::where('project_id', $id)
-            ->where('user_id', Auth::id())
             ->firstOrFail();
 
         $validated = $request->validate([

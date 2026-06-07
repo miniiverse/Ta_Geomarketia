@@ -44,5 +44,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/categories',       [ProjectController::class, 'categories']);
     Route::get('/cities',           [ProjectController::class, 'cities']);
-    Route::get('/users',            [UserController::class, 'index']);
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::put('/users/{id}/promote', [UserController::class, 'promote']);
+        
 });

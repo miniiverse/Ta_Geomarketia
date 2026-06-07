@@ -8,10 +8,64 @@ export async function apiFetch(
   return fetch(`${SERVER}/api${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });
+}
+
+export interface AdminUser {
+  id: number;
+  fullname: string;
+  username: string;
+  email: string;
+  role: string;         // "admin" | "user"
+  profile_photo: string | null;
+  created_at: string;
+}
+
+export interface UpdateUserPayload {
+  fullname: string;
+  username: string;
+  email: string;
+}
+
+
+/** Ambil semua registered users */
+export async function getUsers(): Promise<AdminUser[]> {
+  const res = await fetch("/api/users");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? "Failed to fetch users.");
+  return data.users;
+}
+
+/** Update data user (fullname, username, email) */
+export async function updateUser(
+  id: number,
+  payload: UpdateUserPayload
+): Promise<void> {
+  const res = await fetch(`/api/users/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? "Failed to update user.");
+}
+
+/** Hapus user */
+export async function deleteUser(id: number): Promise<void> {
+  const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? "Failed to delete user.");
+}
+
+/** Toggle role user: user menjadi admin, admin menjadi user */
+export async function promoteUser(id: number): Promise<AdminUser> {
+  const res = await fetch(`/api/users/${id}/promote`, { method: "PUT" });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? "Failed to update user role.");
+  return data.user;
 }

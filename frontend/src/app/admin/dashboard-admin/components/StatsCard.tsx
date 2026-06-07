@@ -478,7 +478,7 @@ export default function StatCards() {
     {
       label: "Registered Users",
       value: totalUsers,
-      href: null,
+      href: "/admin/registered-users",
       icon: (
         <svg
           width="22"
