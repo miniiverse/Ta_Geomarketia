@@ -56,7 +56,7 @@ export default function StatsSection() {
     {
       label: "Total Transactions",
       value: loading ? "..." : String(data.totalTransactions),
-      sublabel: "Settled payments",
+      sublabel: "All Payments",
       color: "#059669",
       lightBg: "#ECFDF5",
       border: "#A7F3D0",

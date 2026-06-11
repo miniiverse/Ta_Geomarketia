@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\User;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
 class StatsController extends Controller
@@ -13,9 +13,7 @@ class StatsController extends Controller
             ->distinct('project_id')
             ->count('project_id');
 
-        $totalTransactions = DB::table('payments')
-            ->where('payment_status', 'settlement')
-            ->count();
+        $totalTransactions = DB::table('payments')->count();
 
         return response()->json([
             'totalProjects'     => $totalProjects,
