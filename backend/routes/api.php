@@ -9,6 +9,7 @@ use App\Http\Controllers\User\FilterController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\User\StatsController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public routes ───────────────────────────────────────────
@@ -41,7 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders',            [OrderController::class, 'store']);
     Route::get('/orders',             [OrderController::class, 'index']);
     Route::get('/orders/{id}',        [OrderController::class, 'show']);
+
+    // ── Cancel sekarang ditangani PaymentController (sync ke Midtrans) ──
     Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+    // routes/api.php
+    Route::get('/stats', [StatsController::class, 'index']);
 
     Route::post('/payment/snap-token',      [PaymentController::class, 'createSnapToken']);
     Route::get('/payment/status/{orderId}', [PaymentController::class, 'status']);

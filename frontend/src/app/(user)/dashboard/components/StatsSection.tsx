@@ -1,56 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const stats = [
-  {
-    label: "Total Maps",
-    value: "16",
-    sublabel: "All regions",
-    color: "#1A56DB",
-    lightBg: "#EBF3FF",
-    border: "#BFDBFE",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    trend: "+3 this month",
-    trendUp: true,
-    bar: 80,
-  },
-  {
-    label: "Recent Activity",
-    value: "1",
-    sublabel: "Last seen recently",
-    color: "#059669",
-    lightBg: "#ECFDF5",
-    border: "#A7F3D0",
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    trend: "+2 this week",
-    trendUp: true,
-    bar: 60,
-  },
-];
+type StatsData = {
+  totalProjects: number;
+  totalTransactions: number;
+};
 
 export default function StatsSection() {
   const [hovered, setHovered] = useState<number | null>(null);
+  const [data, setData] = useState<StatsData>({ totalProjects: 0, totalTransactions: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/stats");
+        if (!res.ok) throw new Error("Failed to fetch data");
+        const json: StatsData = await res.json();
+        setData(json);
+      } catch (err) {
+        setError("Failed to load data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const stats = [
+    {
+      label: "Total Projects",
+      value: loading ? "..." : String(data.totalProjects),
+      sublabel: "Purchased projects",
+      color: "#1A56DB",
+      lightBg: "#EBF3FF",
+      border: "#BFDBFE",
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      bar: Math.min((data.totalProjects / 50) * 100, 100),
+    },
+    {
+      label: "Total Transactions",
+      value: loading ? "..." : String(data.totalTransactions),
+      sublabel: "Settled payments",
+      color: "#059669",
+      lightBg: "#ECFDF5",
+      border: "#A7F3D0",
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+      bar: Math.min((data.totalTransactions / 100) * 100, 100),
+    },
+  ];
 
   return (
     <div
@@ -62,6 +85,22 @@ export default function StatsSection() {
         fontFamily: "'Inter', sans-serif",
       }}
     >
+      {error && (
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            padding: "10px 14px",
+            background: "#FEF2F2",
+            border: "1px solid #FECACA",
+            borderRadius: 10,
+            color: "#DC2626",
+            fontSize: 13,
+          }}
+        >
+          ⚠️ {error}
+        </div>
+      )}
+
       {stats.map((item, i) => (
         <div
           key={item.label}
@@ -83,6 +122,7 @@ export default function StatsSection() {
             transform: hovered === i ? "translateY(-3px)" : "translateY(0)",
           }}
         >
+          {/* Top accent bar */}
           <div
             style={{
               position: "absolute",
@@ -97,6 +137,7 @@ export default function StatsSection() {
             }}
           />
 
+          {/* Card number */}
           <div
             style={{
               position: "absolute",
@@ -111,6 +152,7 @@ export default function StatsSection() {
             {`0${i + 1}`}
           </div>
 
+          {/* Icon */}
           <div
             style={{
               width: 40,
@@ -130,15 +172,17 @@ export default function StatsSection() {
             {item.icon}
           </div>
 
+          {/* Value */}
           <div
             style={{
               fontSize: 36,
               fontWeight: 800,
-              color: item.color,
+              color: loading ? "#CBD5E1" : item.color,
               letterSpacing: "-0.04em",
               lineHeight: 1,
               marginBottom: 4,
               fontVariantNumeric: "tabular-nums",
+              transition: "color 0.3s",
             }}
           >
             {item.value}
@@ -159,20 +203,21 @@ export default function StatsSection() {
             {item.sublabel}
           </div>
 
+          {/* Progress bar */}
           <div
             style={{
               height: 5,
               background: `${item.color}14`,
               borderRadius: 999,
-              marginBottom: 0,
             }}
           >
             <div
               style={{
-                width: `${item.bar}%`,
+                width: loading ? "0%" : `${item.bar}%`,
                 height: "100%",
                 background: `linear-gradient(90deg, ${item.color}88, ${item.color})`,
                 borderRadius: 999,
+                transition: "width 0.8s ease",
               }}
             />
           </div>

@@ -4,7 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Midtrans\Config;
+use Midtrans\Transaction;
 
 class OrderController extends Controller
 {
@@ -55,31 +60,31 @@ class OrderController extends Controller
         ], 201);
     }
 
- public function index(Request $request)
-{
-    $query = Order::where('user_id', $request->user()->user_id);
-    if (!$request->boolean('all')) {
-        $query->where('order_status', 'paid');
+    public function index(Request $request)
+    {
+        $query = Order::where('user_id', $request->user()->user_id);
+        if (!$request->boolean('all')) {
+            $query->where('order_status', 'paid');
+        }
+
+        $orders = $query->with([
+                        'payment',
+                        'project' => function ($q) {
+                            $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail')
+                              ->with([
+                                  'category:category_id,name',
+                                  'city:city_id,name',
+                              ]);
+                        },
+                    ])
+                    ->orderByDesc('created_at')
+                    ->get();
+
+        return response()->json([
+            'success' => true,
+            'orders'  => $orders,
+        ]);
     }
-
-    $orders = $query->with([
-                    'payment',
-                    'project' => function ($q) {
-                        $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail')
-                          ->with([
-                              'category:category_id,name',
-                              'city:city_id,name',
-                          ]);
-                    },
-                ])
-                ->orderByDesc('created_at')
-                ->get();
-
-    return response()->json([
-        'success' => true,
-        'orders'  => $orders,
-    ]);
-}
 
     public function show(Request $request, $id)
     {
@@ -98,23 +103,121 @@ class OrderController extends Controller
     {
         $order = Order::where('order_id', $id)
                       ->where('user_id', $request->user()->user_id)
-                      ->where('order_status', 'paid')
-                      ->doesntExist();
+                      ->firstOrFail();
 
-        if (!$order) {
+        if ($order->order_status === 'paid') {
             return response()->json([
                 'success' => false,
                 'message' => 'A paid order cannot be cancelled.',
             ], 400);
         }
 
-        Order::where('order_id', $id)
-             ->where('user_id', $request->user()->user_id)
-             ->update(['order_status' => 'cancelled']);
+        if ($order->order_status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order already cancelled.',
+            ], 400);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Order cancelled successfully.',
-        ]);
+        $payment = Payment::where('order_id', $id)->first();
+
+        // ─── Helper: tandai order & payment sebagai cancelled ───────────────
+        $markCancelled = function () use ($order, $payment) {
+            $order->update(['order_status' => 'cancelled']);
+            $payment?->update([
+                'payment_status' => 'cancel',
+                'payment_time'   => now(),
+            ]);
+        };
+
+        if (!$payment || !$payment->midtrans_transaction_id) {
+            DB::transaction($markCancelled);
+
+            Log::info("Order #{$id} cancelled (no Midtrans transaction).");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order cancelled successfully.',
+            ]);
+        }
+
+        Config::$serverKey    = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized  = true;
+        Config::$is3ds        = true;
+
+        $midtransId = $payment->midtrans_transaction_id;
+
+        try {
+            Transaction::cancel($midtransId);
+
+            Log::info("Midtrans cancel OK: order #{$id} | tx: {$midtransId}");
+
+            DB::transaction($markCancelled);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order cancelled successfully.',
+            ]);
+
+        } catch (\Throwable $e) {
+            $message = $e->getMessage();
+            Log::warning("Midtrans cancel failed for order #{$id}: {$message}");
+
+            
+            if (str_contains($message, "doesn't exist") || str_contains($message, '404')) {
+                DB::transaction($markCancelled);
+
+                Log::info("Order #{$id} cancelled (Midtrans 404 - tx never created).");
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order cancelled successfully.',
+                ]);
+            }
+
+            if (str_contains($message, '500') || str_contains($message, 'unexpected issues')) {
+                Log::warning("Midtrans 500 for order #{$id}, retrying in 2s...");
+                sleep(2);
+
+                try {
+                    Transaction::cancel($midtransId);
+
+                    Log::info("Midtrans cancel OK (retry): order #{$id} | tx: {$midtransId}");
+
+                    DB::transaction($markCancelled);
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Order cancelled successfully.',
+                    ]);
+
+                } catch (\Throwable $retryE) {
+                    $retryMsg = $retryE->getMessage();
+                    Log::warning("Midtrans cancel retry also failed for order #{$id}: {$retryMsg}");
+
+                    if (
+                        str_contains($retryMsg, "doesn't exist") ||
+                        str_contains($retryMsg, '404')           ||
+                        str_contains($retryMsg, '500')           ||
+                        str_contains($retryMsg, 'unexpected issues')
+                    ) {
+                        DB::transaction($markCancelled);
+
+                        Log::info("Order #{$id} cancelled despite Midtrans error (no actual payment).");
+
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Order cancelled successfully.',
+                        ]);
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak bisa membatalkan pesanan: ' . $message,
+            ], 400);
+        }
     }
 }

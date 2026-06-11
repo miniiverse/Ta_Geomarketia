@@ -6,8 +6,8 @@ function getToken(request: NextRequest) {
   return request.cookies.get('token')?.value;
 }
 
-// GET /api/transactions/[id]
-export async function GET(
+// PUT /api/orders/[id]/cancel
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -17,7 +17,8 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const res = await fetch(`${SERVER}/api/payment/status/${id}`, {
+    const res = await fetch(`${SERVER}/api/orders/${id}/cancel`, {
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
@@ -29,7 +30,7 @@ export async function GET(
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (err: any) {
-    console.error('transaction GET error:', err.message);
+    console.error('order cancel PUT error:', err.message);
     return NextResponse.json({ message: err.message }, { status: 500 });
   }
 }

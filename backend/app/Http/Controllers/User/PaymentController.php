@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
@@ -22,6 +23,78 @@ class PaymentController extends Controller
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized  = true;
         Config::$is3ds        = true;
+    }
+
+    private function midtransBase(): string
+    {
+        return Config::$isProduction
+            ? 'https://api.midtrans.com/v2'
+            : 'https://api.sandbox.midtrans.com/v2';
+    }
+
+    private function midtransAuth(): string
+    {
+        return base64_encode(config('midtrans.server_key') . ':');
+    }
+
+
+    private function cancelOldMidtransTransactionIfPending(?string $oldMidtransOrderId): void
+    {
+        if (!$oldMidtransOrderId) {
+            return;
+        }
+
+        $base = $this->midtransBase();
+        $auth = $this->midtransAuth();
+
+        try {
+            $statusRes = Http::withHeaders([
+                'Accept'        => 'application/json',
+                'Authorization' => 'Basic ' . $auth,
+            ])->get("{$base}/{$oldMidtransOrderId}/status");
+
+            $statusData     = $statusRes->json();
+            $midtransStatus = $statusData['transaction_status'] ?? null;
+
+            Log::info("createSnapToken: cek transaksi lama {$oldMidtransOrderId} → status = {$midtransStatus}");
+
+            if (!in_array($midtransStatus, ['pending', 'authorize'])) {
+                return;
+            }
+
+            $cancelRes = Http::withHeaders([
+                'Accept'        => 'application/json',
+                'Authorization' => 'Basic ' . $auth,
+            ])->post("{$base}/{$oldMidtransOrderId}/cancel");
+
+            if ($cancelRes->successful()) {
+                Log::info("createSnapToken: transaksi lama {$oldMidtransOrderId} berhasil di-cancel.");
+                return;
+            }
+
+            $cancelBody   = $cancelRes->json();
+            $statusCode   = $cancelBody['status_code'] ?? null;
+
+            Log::warning("createSnapToken: gagal cancel transaksi lama {$oldMidtransOrderId}: " . json_encode($cancelBody));
+            if ($statusCode === '500' || str_contains($cancelBody['status_message'] ?? '', 'unexpected issues')) {
+                Log::info("createSnapToken: retry cancel {$oldMidtransOrderId} dalam 2 detik...");
+                sleep(2);
+
+                $retryRes = Http::withHeaders([
+                    'Accept'        => 'application/json',
+                    'Authorization' => 'Basic ' . $auth,
+                ])->post("{$base}/{$oldMidtransOrderId}/cancel");
+
+                if ($retryRes->successful()) {
+                    Log::info("createSnapToken: retry cancel {$oldMidtransOrderId} berhasil.");
+                } else {
+                    Log::warning("createSnapToken: retry cancel {$oldMidtransOrderId} tetap gagal: " . json_encode($retryRes->json()));
+                }
+            }
+
+        } catch (\Throwable $e) {
+            Log::warning("createSnapToken: error saat cek/cancel transaksi lama {$oldMidtransOrderId}: " . $e->getMessage());
+        }
     }
 
     public function createSnapToken(Request $request)
@@ -41,6 +114,10 @@ class PaymentController extends Controller
         if ($order->order_status === 'paid') {
             return response()->json(['success' => false, 'message' => 'Order ini sudah dibayar.'], 400);
         }
+
+        $existingPayment    = Payment::where('order_id', $order->order_id)->first();
+        $oldMidtransOrderId = $existingPayment?->midtrans_transaction_id;
+        $this->cancelOldMidtransTransactionIfPending($oldMidtransOrderId);
 
         DB::beginTransaction();
         try {
@@ -94,11 +171,14 @@ class PaymentController extends Controller
 
             DB::commit();
 
+            Log::info("createSnapToken OK: order #{$order->order_id} | tx: {$midtransOrderId}");
+
             return response()->json([
                 'success'    => true,
                 'snap_token' => $snapToken,
                 'order_id'   => $order->order_id,
             ]);
+
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('createSnapToken error: ' . $e->getMessage());
@@ -134,6 +214,13 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'OK']);
             }
 
+            if ($payment->midtrans_transaction_id
+                && $payment->midtrans_transaction_id !== $midtransOrderId
+                && $payment->payment_status !== 'pending') {
+                Log::info("Webhook diabaikan: order #{$orderId} sudah punya transaksi lain ({$payment->midtrans_transaction_id}), notif dari {$midtransOrderId} di-skip.");
+                return response()->json(['message' => 'OK']);
+            }
+
             $paymentStatus = match (true) {
                 $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'settlement',
                 $transactionStatus === 'settlement'                           => 'settlement',
@@ -151,11 +238,11 @@ class PaymentController extends Controller
                 default      => 'pending',
             };
 
-            DB::transaction(function () use ($order, $payment, $paymentStatus, $orderStatus, $transactionId, $paymentType, $grossAmount) {
+            DB::transaction(function () use ($order, $payment, $paymentStatus, $orderStatus, $paymentType, $grossAmount, $midtransOrderId) {
                 $order->update(['order_status' => $orderStatus]);
                 $payment->update([
                     'payment_status'          => $paymentStatus,
-                    'midtrans_transaction_id' => $transactionId ?? $payment->midtrans_transaction_id,
+                    'midtrans_transaction_id' => $midtransOrderId,
                     'payment_method'          => $paymentType,
                     'gross_amount'            => $grossAmount,
                     'payment_time'            => $paymentStatus === 'settlement' ? now() : $payment->payment_time,
@@ -165,6 +252,7 @@ class PaymentController extends Controller
             Log::info("Webhook OK: order #{$order->order_id} → {$orderStatus} | payment → {$paymentStatus}");
 
             return response()->json(['message' => 'OK']);
+
         } catch (\Throwable $e) {
             Log::error('Webhook error: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
@@ -181,6 +269,7 @@ class PaymentController extends Controller
         return response()->json([
             'success'                 => true,
             'order_id'                => $order->order_id,
+            'project_id'              => $order->project_id,
             'order_status'            => $order->order_status,
             'total_amount'            => $order->total_amount,
             'payment_status'          => $order->payment?->payment_status,

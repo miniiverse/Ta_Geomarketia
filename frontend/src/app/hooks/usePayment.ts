@@ -37,23 +37,16 @@ export function usePayment(): UsePaymentReturn {
     let orderId = payload.order_id;
 
     try {
-      // 1. Buat order dulu kalau belum ada
       if (!orderId) {
         orderId = await createOrder(payload.project_id, payload.total_amount);
       }
-
-      // 2. Load Snap.js
       await loadMidtransSnap();
-
-      // 3. Minta Snap Token
       const { snap_token } = await createSnapToken({ ...payload, order_id: orderId });
 
       setStatus("idle");
 
-      // 4. Tampilkan popup Midtrans
       window.snap.pay(snap_token, {
         onSuccess: (result: MidtransResult) => {
-          // Pembayaran berhasil → redirect ke invoice
           console.log("✅ Pembayaran berhasil:", result);
           setStatus("success");
           router.push(
@@ -62,11 +55,11 @@ export function usePayment(): UsePaymentReturn {
         },
 
         onPending: (_result: MidtransResult) => {
-          // Midtrans trigger ini saat menunggu pembayaran bank transfer
-          // TIDAK redirect — biarkan user tetap di halaman checkout
-          // User bisa bayar lagi atau cancel manual
           console.log("⏳ Menunggu pembayaran...");
           setStatus("idle");
+          router.push(
+            `/transactions/${orderId}?title=${encodeURIComponent(payload.title ?? "")}`
+          );
         },
 
         onError: (result: MidtransResult) => {
@@ -76,11 +69,11 @@ export function usePayment(): UsePaymentReturn {
         },
 
         onClose: () => {
-          // User tutup popup (klik X) — tetap di halaman checkout
-          // Order sudah masuk database dengan status pending
-          // User bisa klik Checkout lagi untuk bayar order yang sama
           console.log("ℹ️ Popup ditutup");
           setStatus("idle");
+          router.push(
+            `/transactions/${orderId}?title=${encodeURIComponent(payload.title ?? "")}`
+          );
         },
       });
     } catch (err) {
