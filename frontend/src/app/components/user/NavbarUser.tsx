@@ -17,6 +17,7 @@ const allNavLinks = [
   { label: "Dashboard", href: "/dashboard", authOnly: true },
   { label: "Projects", href: "/projects-list", authOnly: true },
   { label: "My Collections", href: "/collections", authOnly: true },
+  { label: "Transactions",   href: "/transactions",  authOnly: true }, 
 ];
 
 function CubeIcon({ size = 32 }: { size?: number }) {
@@ -256,6 +257,21 @@ const menuItems = [
       </svg>
     ),
   },
+
+   {
+    label: "Transactions",        
+    href: "/transactions",
+    danger: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+
   {
     label: "My Analysis",
     href: "/myanalysis",

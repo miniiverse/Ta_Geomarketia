@@ -1,6 +1,7 @@
 import WelcomeCard from "./components/WelcomeCard";
 import StatsSection from "./components/StatsSection";
 import CollectionSection from "./components/CollectionSection";
+import TransactionsSection from "./components/TransactionsSection";
 
 
 export default function DashboardPage() {
@@ -14,6 +15,7 @@ export default function DashboardPage() {
         <WelcomeCard />
         <StatsSection />
         <CollectionSection />
+        <TransactionsSection />
   
       </div>
     </>

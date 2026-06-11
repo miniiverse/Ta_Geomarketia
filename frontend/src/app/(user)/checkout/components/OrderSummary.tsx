@@ -5,9 +5,15 @@ interface OrderSummaryProps {
   formatRp: (n: number) => string;
   title?: string;
   category?: string;
+  onCheckout: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
 }
 
-export function OrderSummary({ subtotal, tax, total, formatRp, title, category }: OrderSummaryProps) {
+export function OrderSummary({
+  subtotal, tax, total, formatRp, title, category,
+  onCheckout, onCancel, isLoading,
+}: OrderSummaryProps) {
   return (
     <div
       className="order-summary"
@@ -16,14 +22,12 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
         border: "1px solid #E5E7EB",
         boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         overflow: "hidden",
-        position: "sticky",
-        top: "1.5rem",
+        position: "sticky", top: "1.5rem",
       }}
     >
 
       <div style={{
-        padding: "1rem 1.25rem",
-        borderBottom: "1px solid #EEF2FF",
+        padding: "1rem 1.25rem", borderBottom: "1px solid #EEF2FF",
         background: "linear-gradient(135deg, #F8FAFF, #EFF6FF)",
         display: "flex", alignItems: "center", gap: 10,
       }}>
@@ -49,8 +53,8 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
       <div style={{ padding: "1.15rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
         <div style={{ paddingBottom: "0.75rem", borderBottom: "1px dashed #E5E7EB" }}>
           <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap",
-            padding: "8px 10px", borderRadius: 8,
+            display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+            gap: 8, flexWrap: "wrap", padding: "8px 10px", borderRadius: 8,
             background: "#F8FAFF", border: "1px solid #EEF2FF",
           }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1 }}>
@@ -75,7 +79,7 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
                 )}
               </div>
             </div>
-            <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0, wordBreak: "break-word" }}>
+            <span style={{ fontSize: "0.78rem", color: "#111827", fontWeight: 700, flexShrink: 0 }}>
               {formatRp(subtotal)}
             </span>
           </div>
@@ -92,11 +96,10 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
         </div>
 
         <div style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap",
-          padding: "10px 12px", borderRadius: 10,
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          gap: 10, flexWrap: "wrap", padding: "10px 12px", borderRadius: 10,
           background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
-          border: "1px solid #BFDBFE",
-          marginTop: 2,
+          border: "1px solid #BFDBFE", marginTop: 2,
         }}>
           <span style={{ fontSize: "0.95rem", color: "#1E3A5F", fontWeight: 700 }}>Total</span>
           <span style={{ fontSize: "1.1rem", color: "#1A56DB", fontWeight: 900, letterSpacing: "-0.02em" }}>
@@ -114,37 +117,78 @@ export function OrderSummary({ subtotal, tax, total, formatRp, title, category }
           </svg>
           Protected by SSL encryption
         </div>
+
+        <button
+          onClick={onCheckout}
+          disabled={isLoading}
+          style={{
+            width: "100%", padding: "13px 14px", borderRadius: 10, marginTop: 4,
+            background: isLoading ? "#93C5FD" : "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)",
+            border: "none", color: "#fff", fontSize: "0.92rem", fontWeight: 700,
+            cursor: isLoading ? "not-allowed" : "pointer",
+            boxShadow: isLoading ? "none" : "0 4px 14px rgba(26,86,219,0.35)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            transition: "all 0.15s", fontFamily: "'Inter', system-ui, sans-serif",
+          }}
+        >
+          {isLoading ? (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                style={{ animation: "spin 0.8s linear infinite" }}>
+                <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" />
+                <path d="M12 3a9 9 0 019 9" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              Processing...
+            </>
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke="white" strokeWidth="1.8" />
+                <line x1="2" y1="10" x2="22" y2="10" stroke="white" strokeWidth="1.8" />
+                <line x1="6" y1="15" x2="10" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Checkout
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={onCancel}
+          disabled={isLoading}
+          style={{
+            width: "100%", padding: "11px 14px", borderRadius: 10,
+            background: "#fff", border: "1.5px solid #E5E7EB",
+            color: "#6B7280", fontSize: "0.92rem", fontWeight: 600,
+            cursor: isLoading ? "not-allowed" : "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            transition: "all 0.15s", fontFamily: "'Inter', system-ui, sans-serif",
+          }}
+          onMouseEnter={(e) => {
+            if (!isLoading) {
+              e.currentTarget.style.borderColor = "#FECACA";
+              e.currentTarget.style.color = "#DC2626";
+              e.currentTarget.style.background = "#FEF2F2";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#E5E7EB";
+            e.currentTarget.style.color = "#6B7280";
+            e.currentTarget.style.background = "#fff";
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          Cancel
+        </button>
       </div>
 
       <style>{`
-        /* ── Tablet: 768px — lepas sticky ── */
-        @media (max-width: 768px) {
-          .order-summary {
-            position: static !important;
-            top: unset !important;
-          }
-        }
-
-        /* ── Mobile: 640px ── */
-        @media (max-width: 640px) {
-          .order-summary {
-            border-radius: 12px !important;
-          }
-        }
-
-        /* ── Mobile XS: 400px ── */
-        @media (max-width: 400px) {
-          .order-summary {
-            border-radius: 10px !important;
-          }
-        }
-
-        /* ── Mobile 360px (Android mid-range) ── */
-        @media (max-width: 360px) {
-          .order-summary {
-            border-radius: 8px !important;
-          }
-        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .order-summary { position: static !important; top: unset !important; } }
+        @media (max-width: 640px) { .order-summary { border-radius: 12px !important; } }
+        @media (max-width: 400px) { .order-summary { border-radius: 10px !important; } }
+        @media (max-width: 360px) { .order-summary { border-radius: 8px !important; } }
       `}</style>
     </div>
   );

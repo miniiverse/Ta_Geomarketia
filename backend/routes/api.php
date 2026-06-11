@@ -1,41 +1,53 @@
 <?php
 
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\TransactionsController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\User\UserProjectController;
 use App\Http\Controllers\User\FilterController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\PaymentController;
+use App\Http\Controllers\User\OrderController;
 use Illuminate\Support\Facades\Route;
 
-// ── Public routes (tidak perlu token) ───────────────────────
+// ── Public routes ───────────────────────────────────────────
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
-// Password Reset — OTP Flow
 Route::prefix('password')->group(function () {
-    Route::post('/forgot',         [PasswordResetController::class, 'sendOtp']);       // Step 1: kirim OTP
-    Route::post('/verify-otp',     [PasswordResetController::class, 'verifyOtp']);     // Step 2: verifikasi OTP
-    Route::post('/reset',          [PasswordResetController::class, 'resetPassword']); // Step 3: reset password
+    Route::post('/forgot',     [PasswordResetController::class, 'sendOtp']);
+    Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp']);
+    Route::post('/reset',      [PasswordResetController::class, 'resetPassword']);
 });
 
-// Public
-Route::get('/user/projects',   [UserProjectController::class, 'index']);
-Route::get('/user/categories', [FilterController::class, 'categories']);
-Route::get('/user/provinces',  [FilterController::class, 'provinces']);
-Route::get('/user/cities',     [FilterController::class, 'cities']);
+Route::get('/user/projects',      [UserProjectController::class, 'index']);
+Route::get('/user/categories',    [FilterController::class, 'categories']);
+Route::get('/user/provinces',     [FilterController::class, 'provinces']);
+Route::get('/user/cities',        [FilterController::class, 'cities']);
 Route::get('/user/projects/{id}', [UserProjectController::class, 'show']);
 
-// Protected - semua user yang login
+// ── Webhook Midtrans ────────────────────────────────────────
+Route::post('/payment/webhook', [PaymentController::class, 'webhook']);
+
+// ── Protected - semua user yang login ───────────────────────
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',             [AuthController::class, 'me'])->middleware('throttle:120,1');
     Route::put('/profile',        [AuthController::class, 'updateProfile']);
     Route::put('/password',       [AuthController::class, 'updatePassword']);
     Route::post('/profile/photo', [AuthController::class, 'updatePhoto']);
     Route::post('/logout',        [AuthController::class, 'logout']);
+
+    Route::post('/orders',            [OrderController::class, 'store']);
+    Route::get('/orders',             [OrderController::class, 'index']);
+    Route::get('/orders/{id}',        [OrderController::class, 'show']);
+    Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+
+    Route::post('/payment/snap-token',      [PaymentController::class, 'createSnapToken']);
+    Route::get('/payment/status/{orderId}', [PaymentController::class, 'status']);
 });
 
-// Protected - admin only
+// ── Protected - admin only ───────────────────────────────────
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('/projects',         [ProjectController::class, 'index']);
     Route::get('/projects/{id}',    [ProjectController::class, 'show']);
@@ -44,10 +56,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/categories',       [ProjectController::class, 'categories']);
     Route::get('/cities',           [ProjectController::class, 'cities']);
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+    Route::get('/users',              [UserController::class, 'index']);
+    Route::get('/users/{id}',         [UserController::class, 'show']);
+    Route::put('/users/{id}',         [UserController::class, 'update']);
+    Route::delete('/users/{id}',      [UserController::class, 'destroy']);
     Route::put('/users/{id}/promote', [UserController::class, 'promote']);
-        
+
+    Route::get('/admin/transactions',      [TransactionsController::class, 'index']);
+    Route::get('/admin/transactions/{id}', [TransactionsController::class, 'show']);
 });

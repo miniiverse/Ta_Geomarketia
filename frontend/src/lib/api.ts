@@ -21,7 +21,7 @@ export interface AdminUser {
   fullname: string;
   username: string;
   email: string;
-  role: string;         // "admin" | "user"
+  role: string;
   profile_photo: string | null;
   created_at: string;
 }
@@ -31,7 +31,6 @@ export interface UpdateUserPayload {
   username: string;
   email: string;
 }
-
 
 /** Ambil semua registered users */
 export async function getUsers(): Promise<AdminUser[]> {
@@ -68,4 +67,41 @@ export async function promoteUser(id: number): Promise<AdminUser> {
   const data = await res.json();
   if (!res.ok) throw new Error(data.message ?? "Failed to update user role.");
   return data.user;
+}
+
+// ═════════════════════════════════════════════════════════════════
+// PAYMENT — Midtrans
+// ═════════════════════════════════════════════════════════════════
+
+export interface CreateSnapTokenPayload {
+  order_id: number;      // dari tabel orders
+  project_id: number;    // dari tabel orders
+  total_amount: number;  // total yang dibayar
+  title?: string;        // nama project untuk item_details Midtrans
+}
+
+export interface SnapTokenResponse {
+  snap_token: string;
+  order_id: number;
+}
+
+/**
+ * Minta Snap Token ke Laravel via Next.js API Route.
+ * Cookie "token" otomatis ikut — tidak perlu kirim manual.
+ */
+export async function createSnapToken(
+  payload: CreateSnapTokenPayload
+): Promise<SnapTokenResponse> {
+  const res = await fetch("/api/payment/snap-token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? "Gagal membuat token pembayaran.");
+  return data;
 }
