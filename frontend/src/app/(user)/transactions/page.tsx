@@ -99,25 +99,31 @@ const ITEMS_PER_PAGE = 4;
 export default function TransactionsPage() {
   const router = useRouter();
 
-  const [orders, setOrders]                   = useState<Order[]>([]);
-  const [loading, setLoading]                 = useState(true);
-  const [error, setError]                     = useState<string | null>(null);
-  const [filterStatus, setFilterStatus]       = useState("All");
-  const [filterCategory, setFilterCategory]   = useState("All");
-  const [filterPayment, setFilterPayment]     = useState("All");
-  const [search, setSearch]                   = useState("");
-  const [page, setPage]                       = useState(1);
+  const [orders, setOrders]                 = useState<Order[]>([]);
+  const [loading, setLoading]               = useState(true);
+  const [error, setError]                   = useState<string | null>(null);
+  const [filterStatus, setFilterStatus]     = useState("All");
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [filterPayment, setFilterPayment]   = useState("All");
+  const [search, setSearch]                 = useState("");
+  const [page, setPage]                     = useState(1);
 
   useEffect(() => {
-    setLoading(true);
-    fetch("/api/transactions")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load transaction data.");
-        return res.json();
-      })
-      .then((data: Order[]) => setOrders(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const load = (isFirst = false) => {
+      if (isFirst) setLoading(true);
+      fetch("/api/transactions")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load transaction data.");
+          return res.json();
+        })
+        .then((data: Order[]) => setOrders(data))
+        .catch((err) => setError(err.message))
+        .finally(() => { if (isFirst) setLoading(false); });
+    };
+
+    load(true);
+    const interval = setInterval(() => load(false), 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const filtered = orders.filter((o) => {
@@ -343,10 +349,8 @@ export default function TransactionsPage() {
           boxShadow: "0 1px 12px rgba(26,86,219,0.06)",
           overflow: "hidden",
         }}>
-
           <div className="trx-toolbar">
             <div className="trx-filters">
-
               <div style={{ position: "relative" }}>
                 <select value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }} style={selectStyle}>
                   <option value="All">All Categories</option>
@@ -451,10 +455,10 @@ export default function TransactionsPage() {
                         </td>
                       </tr>
                     ) : paginated.map((order, i) => {
-                      const status  = resolveStatus(order);
-                      const ss      = getStatusStyle(status);
-                      const cat     = getCategoryStyle(order.project?.category_id ?? 0);
-                      const date    = order.payment?.payment_time ?? order.created_at;
+                      const status = resolveStatus(order);
+                      const ss     = getStatusStyle(status);
+                      const cat    = getCategoryStyle(order.project?.category_id ?? 0);
+                      const date   = order.payment?.payment_time ?? order.created_at;
 
                       return (
                         <tr key={order.order_id} className="trx-row"

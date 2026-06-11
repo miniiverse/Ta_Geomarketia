@@ -334,7 +334,7 @@ export default function AnalysisSection() {
       <div style={{
         position: "relative", zIndex: 1,
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(4, 1fr)",
         gap: 12, alignItems: "stretch",
       }}>
         {loading

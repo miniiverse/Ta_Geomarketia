@@ -55,27 +55,31 @@ class OrderController extends Controller
         ], 201);
     }
 
-    public function index(Request $request)
-    {
-        $orders = Order::where('user_id', $request->user()->user_id)
-                       ->with([
-                           'payment',
-                           'project' => function ($q) {
-                               $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail') // ← tambah thumbnail
-                                 ->with([
-                                     'category:category_id,name',
-                                     'city:city_id,name',
-                                 ]);
-                           },
-                       ])
-                       ->orderByDesc('created_at')
-                       ->get();
-
-        return response()->json([
-            'success' => true,
-            'orders'  => $orders,
-        ]);
+ public function index(Request $request)
+{
+    $query = Order::where('user_id', $request->user()->user_id);
+    if (!$request->boolean('all')) {
+        $query->where('order_status', 'paid');
     }
+
+    $orders = $query->with([
+                    'payment',
+                    'project' => function ($q) {
+                        $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail')
+                          ->with([
+                              'category:category_id,name',
+                              'city:city_id,name',
+                          ]);
+                    },
+                ])
+                ->orderByDesc('created_at')
+                ->get();
+
+    return response()->json([
+        'success' => true,
+        'orders'  => $orders,
+    ]);
+}
 
     public function show(Request $request, $id)
     {

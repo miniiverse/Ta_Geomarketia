@@ -80,9 +80,7 @@ function SkeletonRow() {
       {[60, 140, 80, 80, 80, 70, 70].map((w, i) => (
         <td key={i} style={{ padding: "13px 16px" }}>
           <div style={{
-            height: 14,
-            width: w,
-            borderRadius: 6,
+            height: 14, width: w, borderRadius: 6,
             backgroundImage: "linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%)",
             backgroundSize: "200% 100%",
             animation: "shimmer 1.4s infinite",
@@ -98,11 +96,18 @@ export default function TransactionSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/orders")
-      .then((r) => r.json())
-      .then((d) => setOrders((d.orders ?? []).slice(0, 4)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const load = (isFirst = false) => {
+      if (isFirst) setLoading(true);
+      fetch("/api/transactions")
+        .then((r) => r.json())
+        .then((d) => setOrders((Array.isArray(d) ? d : []).slice(0, 4)))
+        .catch(() => {})
+        .finally(() => { if (isFirst) setLoading(false); });
+    };
+
+    load(true);
+    const interval = setInterval(() => load(false), 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -126,7 +131,6 @@ export default function TransactionSection() {
         }
       `}</style>
 
-      {/* Dot grid background */}
       <div style={{
         position: "absolute", inset: 0,
         backgroundImage: "radial-gradient(rgba(26,86,219,0.08) 1px, transparent 1px)",
@@ -135,7 +139,6 @@ export default function TransactionSection() {
         borderRadius: 20,
       }} />
 
-      {/* Header */}
       <div style={{
         position: "relative", zIndex: 1,
         display: "flex", justifyContent: "space-between", alignItems: "flex-end",
@@ -188,13 +191,10 @@ export default function TransactionSection() {
         </Link>
       </div>
 
-      {/* Table Card */}
       <div style={{
         position: "relative", zIndex: 1,
-        background: "#fff",
-        borderRadius: 14,
-        border: "1px solid #DBEAFE",
-        overflow: "hidden",
+        background: "#fff", borderRadius: 14,
+        border: "1px solid #DBEAFE", overflow: "hidden",
         boxShadow: "0 2px 12px rgba(26,86,219,0.08)",
       }}>
         <div style={{ overflowX: "auto" }}>
