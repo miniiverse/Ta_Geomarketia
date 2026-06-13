@@ -8,12 +8,16 @@ interface OrderSummaryProps {
   onCheckout: () => void;
   onCancel: () => void;
   isLoading: boolean;
+  disabled?: boolean; 
 }
 
 export function OrderSummary({
   subtotal, tax, total, formatRp, title, category,
-  onCheckout, onCancel, isLoading,
+  onCheckout, onCancel, isLoading, disabled = false,
 }: OrderSummaryProps) {
+
+  const checkoutDisabled = isLoading || disabled;
+
   return (
     <div
       className="order-summary"
@@ -118,17 +122,26 @@ export function OrderSummary({
           Protected by SSL encryption
         </div>
 
+
         <button
           onClick={onCheckout}
-          disabled={isLoading}
+          disabled={checkoutDisabled}
+          title={disabled ? "Project ini sudah dimiliki pengguna lain" : undefined}
           style={{
             width: "100%", padding: "13px 14px", borderRadius: 10, marginTop: 4,
-            background: isLoading ? "#93C5FD" : "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)",
-            border: "none", color: "#fff", fontSize: "0.92rem", fontWeight: 700,
-            cursor: isLoading ? "not-allowed" : "pointer",
-            boxShadow: isLoading ? "none" : "0 4px 14px rgba(26,86,219,0.35)",
+            background: disabled
+              ? "linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%)"
+              : isLoading
+              ? "#93C5FD"
+              : "linear-gradient(135deg, #1A56DB 0%, #2563EB 60%, #1d4ed8 100%)",
+            border: disabled ? "1.5px solid #D1D5DB" : "none",
+            color: disabled ? "#9CA3AF" : "#fff",
+            fontSize: "0.92rem", fontWeight: 700,
+            cursor: checkoutDisabled ? "not-allowed" : "pointer",
+            boxShadow: checkoutDisabled ? "none" : "0 4px 14px rgba(26,86,219,0.35)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             transition: "all 0.15s", fontFamily: "'Inter', system-ui, sans-serif",
+            opacity: disabled ? 0.7 : 1,
           }}
         >
           {isLoading ? (
@@ -139,6 +152,15 @@ export function OrderSummary({
                 <path d="M12 3a9 9 0 019 9" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
               Processing...
+            </>
+          ) : disabled ? (
+            <>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0110 0v4" />
+              </svg>
+              Not Available
             </>
           ) : (
             <>

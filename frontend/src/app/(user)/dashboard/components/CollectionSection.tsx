@@ -283,7 +283,7 @@ export default function AnalysisSection() {
   }, []);
 
   const handleViewMap = (projectId?: number) => {
-    if (projectId) window.location.href = `/project-detail/${projectId}`;
+    if (projectId) window.location.href = `/project-detail/${projectId}?source=collection&tab=cluster`;
   };
 
   return (

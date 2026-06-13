@@ -63,7 +63,6 @@ export function usePayment(): UsePaymentReturn {
         },
 
         onError: (result: MidtransResult) => {
-          console.error("❌ Pembayaran gagal:", result);
           setStatus("error");
           setErrorMessage("Pembayaran gagal. Silakan coba lagi.");
         },
@@ -77,7 +76,6 @@ export function usePayment(): UsePaymentReturn {
         },
       });
     } catch (err) {
-      console.error("❌ Error:", err);
       setStatus("error");
       setErrorMessage(
         err instanceof Error ? err.message : "Terjadi kesalahan. Coba lagi."

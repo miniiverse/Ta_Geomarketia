@@ -114,7 +114,7 @@ export default function CollectionCard({ data }: CollectionCardProps) {
 
   const handleViewDetail = () => {
     if (data.project_id) {
-      router.push(`/project-detail/${data.project_id}`);
+      router.push(`/project-detail/${data.project_id}?source=collection&tab=cluster`);
     }
   };
 

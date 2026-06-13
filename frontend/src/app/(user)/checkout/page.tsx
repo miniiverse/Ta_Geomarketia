@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { UserInfoCard } from "./components/UserInfoCard";
 import { ProjectInfoCard } from "./components/ProjectInfoCard";
@@ -18,8 +19,227 @@ function parsePrice(priceStr: string): number {
 // Deteksi apakah error karena project sudah dimiliki user lain
 function isProjectOwnedError(msg: string | null): boolean {
   if (!msg) return false;
-  return msg.toLowerCase().includes("sudah dimiliki") ||
-         msg.toLowerCase().includes("already owned");
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes("sudah dimiliki") ||
+    lower.includes("already owned") ||
+    lower.includes("already purchased") ||
+    lower.includes("already bought") ||
+    lower.includes("owned by another")
+  );
+}
+
+// Alert modal untuk project yang sudah dimiliki user lain
+function ProjectOwnedAlert({
+  onClose,
+  onGoToProjects,
+}: {
+  onClose: () => void;
+  onGoToProjects: () => void;
+}) {
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(15, 23, 42, 0.55)",
+          backdropFilter: "blur(4px)",
+          zIndex: 9998,
+          animation: "fadeIn 0.2s ease",
+        }}
+      />
+
+      {/* Modal */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 9999,
+          width: "min(92vw, 420px)",
+          background: "#fff",
+          borderRadius: "20px",
+          boxShadow:
+            "0 20px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(26,86,219,0.12)",
+          overflow: "hidden",
+          animation: "slideUp 0.25s ease",
+        }}
+      >
+ 
+        <div
+          style={{
+            height: "5px",
+            background: "linear-gradient(90deg, #EF4444 0%, #F97316 100%)",
+          }}
+        />
+
+        <div style={{ padding: "28px 28px 24px" }}>
+          <div
+            style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #FEF2F2 0%, #FFE4E4 100%)",
+              border: "2px solid #FECACA",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 20px",
+              color: "#DC2626",
+            }}
+          >
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+          </div>
+
+          <h2
+            style={{
+              margin: "0 0 10px",
+              fontSize: "18px",
+              fontWeight: 800,
+              color: "#1E3A6E",
+              textAlign: "center",
+              fontFamily: "'Inter', sans-serif",
+              letterSpacing: "-0.02em",
+            }}
+          >
+           Project Not Available
+          </h2>
+
+          <p
+            style={{
+              margin: "0 0 8px",
+              fontSize: "13.5px",
+              color: "#64748B",
+              textAlign: "center",
+              lineHeight: 1.7,
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            This project has been purchased and cannot be purchased again.
+          </p>
+          <p
+            style={{
+              margin: "0 0 24px",
+              fontSize: "13px",
+              color: "#94A3B8",
+              textAlign: "center",
+              lineHeight: 1.6,
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+           Please select another project that is still available.
+          </p>
+
+          <div
+            style={{
+              height: "1px",
+              background: "#F1F5F9",
+              margin: "0 0 20px",
+            }}
+          />
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: "11px 16px",
+                borderRadius: "10px",
+                border: "1.5px solid #E2E8F0",
+                background: "#fff",
+                color: "#475569",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "#F8FAFC";
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "#CBD5E1";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#fff";
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  "#E2E8F0";
+              }}
+            >
+              Close
+            </button>
+
+            <button
+              onClick={onGoToProjects}
+              style={{
+                flex: 2,
+                padding: "11px 16px",
+                borderRadius: "10px",
+                border: "none",
+                background: "linear-gradient(135deg, #1A56DB 0%, #2D7BE8 100%)",
+                color: "#fff",
+                fontSize: "13px",
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: "0 4px 14px rgba(26,86,219,0.30)",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = "0.88";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(0)";
+              }}
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+             View Other Projects
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translate(-50%, calc(-50% + 16px)); } to { opacity: 1; transform: translate(-50%, -50%); } }
+      `}</style>
+    </>
+  );
 }
 
 export default function PaymentPage() {
@@ -40,6 +260,13 @@ export default function PaymentPage() {
   const { status, errorMessage, pay } = usePayment();
   const isLoading = status === "loading";
   const isOwned   = isProjectOwnedError(errorMessage);
+  const [showOwnedAlert, setShowOwnedAlert] = useState(false);
+
+  useEffect(() => {
+    if (isOwned) {
+      setShowOwnedAlert(true);
+    }
+  }, [isOwned]);
 
   const handleCheckout = () => {
     pay({
@@ -54,6 +281,10 @@ export default function PaymentPage() {
     router.push("/projects-list");
   };
 
+  const handleGoToProjects = () => {
+    router.push("/projects-list");
+  };
+
   return (
     <main style={{
       minHeight: "100vh",
@@ -61,8 +292,13 @@ export default function PaymentPage() {
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       <PaymentHeader />
+      {showOwnedAlert && (
+        <ProjectOwnedAlert
+          onClose={() => setShowOwnedAlert(false)}
+          onGoToProjects={handleGoToProjects}
+        />
+      )}
 
-      {/* ── Error banner biasa ── */}
       {errorMessage && !isOwned && (
         <div style={{
           margin: "1rem 2rem 0", padding: "12px 16px", borderRadius: 10,
@@ -76,66 +312,6 @@ export default function PaymentPage() {
             <circle cx="12" cy="16" r="1" fill="white" />
           </svg>
           {errorMessage}
-        </div>
-      )}
-
-      {/* ── Banner khusus project sudah dimiliki user lain ── */}
-      {isOwned && (
-        <div style={{
-          margin: "1rem 2rem 0", padding: "16px 20px", borderRadius: 12,
-          background: "#EFF6FF", border: "1.5px solid #BFDBFE",
-          display: "flex", alignItems: "flex-start", gap: 12,
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
-            background: "#DBEAFE", border: "1.5px solid #93C5FD",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#1A56DB",
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0110 0v4" />
-            </svg>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontSize: "0.9rem", fontWeight: 700, color: "#1E3A6E", marginBottom: 4,
-            }}>
-              Project Tidak Tersedia
-            </div>
-            <div style={{
-              fontSize: "0.82rem", color: "#475569", lineHeight: 1.6, marginBottom: 12,
-            }}>
-              {errorMessage} Silakan pilih project lain yang masih tersedia.
-            </div>
-            <button
-              onClick={() => router.push("/projects-list")}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "8px 18px", borderRadius: 8, border: "none",
-                background: "linear-gradient(135deg, #1A56DB 0%, #2D7BE8 100%)",
-                color: "#fff", fontSize: "0.8rem", fontWeight: 700,
-                cursor: "pointer", fontFamily: "inherit",
-                boxShadow: "0 4px 12px rgba(26,86,219,0.25)",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.opacity = "0.88";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-              Lihat Project Lain
-            </button>
-          </div>
         </div>
       )}
 
@@ -157,7 +333,6 @@ export default function PaymentPage() {
           <UserInfoCard />
         </div>
 
-        {/* Sembunyikan OrderSummary & disable checkout jika project sudah dimiliki */}
         <OrderSummary
           subtotal={subtotal}
           tax={tax}
@@ -168,7 +343,7 @@ export default function PaymentPage() {
           onCheckout={handleCheckout}
           onCancel={handleCancel}
           isLoading={isLoading}
-          disabled={isOwned}  // ← tambah prop ini di OrderSummary
+          disabled={isOwned}
         />
       </div>
 

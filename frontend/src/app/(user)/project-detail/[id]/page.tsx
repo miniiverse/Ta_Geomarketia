@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import ProjectStatsCard from "./components/ProjectStatsCard";
 import ProjectDetailAIChatPanel from "./components/ProjectDetailAIChatPanel";
 
@@ -322,6 +322,125 @@ function PurchaseLockedState({ onCheckout }: { onCheckout: () => void }) {
   );
 }
 
+function CollectionLockedState({ onGoCollection }: { onGoCollection: () => void }) {
+  return (
+    <div
+      style={{
+        height: "clamp(420px, 65vh, 720px)",
+        background: "linear-gradient(135deg, #F8FAFF 0%, #EEF3FF 100%)",
+        borderRadius: "14px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1.5px dashed #BFDBFE",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(rgba(26,86,219,0.04) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "relative",
+          textAlign: "center",
+          padding: "0 24px",
+          maxWidth: "420px",
+        }}
+      >
+        <div
+          style={{
+            width: "80px",
+            height: "80px",
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #EEF3FF 0%, #DBEAFE 100%)",
+            border: "2px solid #BFDBFE",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+            color: "#1A56DB",
+          }}
+        >
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+            <line x1="12" y1="11" x2="12" y2="17" />
+            <line x1="9" y1="14" x2="15" y2="14" />
+          </svg>
+        </div>
+
+        <h3
+          style={{
+            margin: "0 0 10px",
+            fontSize: "17px",
+            fontWeight: 700,
+            color: "#1E3A6E",
+            fontFamily: "'Inter', sans-serif",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Access via My Collection
+        </h3>
+
+        <p
+          style={{
+            margin: "0 0 24px",
+            fontSize: "13.5px",
+            color: "#64748B",
+            lineHeight: 1.65,
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          
+          You have already purchased this project go to Collections to explore the Cluster Area.
+        </p>
+
+        <button
+          onClick={onGoCollection}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "10px 24px",
+            borderRadius: "10px",
+            border: "none",
+            background: "linear-gradient(135deg, #1A56DB 0%, #2D7BE8 100%)",
+            color: "#fff",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "'Inter', sans-serif",
+            boxShadow: "0 4px 14px rgba(26,86,219,0.30)",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.opacity = "0.88";
+            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+          </svg>
+          Go to My Collection
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const UserMapComponent = dynamic<{ places: PlaceData[] }>(
   () => import("./components/UserMapComponent"),
   {
@@ -390,9 +509,12 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
 export default function UserProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
 
-  const [activeTab, setActiveTab] = useState<TabId>("map");
+  const [activeTab, setActiveTab] = useState<TabId>(
+    searchParams.get("tab") === "cluster" ? "cluster" : "map"
+  );
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -404,6 +526,8 @@ export default function UserProjectDetailPage() {
   const [mapLoading, setMapLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const hasFetchedMap = useRef(false);
+  const openedFromCollection = searchParams.get("source") === "collection";
+  const canAccessCluster = isAuthenticated === true && hasPurchased && openedFromCollection;
 
   useEffect(() => {
     fetch("/api/me", { headers: { Accept: "application/json" } })
@@ -484,6 +608,11 @@ export default function UserProjectDetailPage() {
     router.push(
       `/checkout?project_id=${id}&title=${encodeURIComponent(project?.name ?? "")}&price=${encodeURIComponent(project?.price ?? "")}&category=${encodeURIComponent(project?.category ?? "")}&region=${encodeURIComponent(project?.city ?? "")}&description=${encodeURIComponent(project?.description ?? "")}`
     );
+  };
+
+  // Redirect user to Collection page to access Cluster Area
+  const handleGoCollection = () => {
+    router.push("/collections");
   };
 
   const projectInfo = project
@@ -653,7 +782,7 @@ export default function UserProjectDetailPage() {
               <div style={{ display: "flex", gap: "4px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
                 {TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
-                  const isLocked = !isAuthenticated || (tab.id === "cluster" && !hasPurchased);
+                  const isLocked = !isAuthenticated || (tab.id === "cluster" && !canAccessCluster);
                   return (
                     <button
                       key={tab.id}
@@ -743,13 +872,20 @@ export default function UserProjectDetailPage() {
                 <LockedState onLogin={handleLoginRedirect} />
               ) : !hasPurchased ? (
                 <PurchaseLockedState onCheckout={handleCheckoutRedirect} />
+              ) : !openedFromCollection ? (
+                <CollectionLockedState onGoCollection={handleGoCollection} />
               ) : (
                 <>
                   {mapLoading && (
                     <div style={{ height: "clamp(420px, 65vh, 720px)", background: "#F0F7FF", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #BFDBFE" }}>
                       <div style={{ textAlign: "center", color: "#1A56DB" }}>
                         <SpinIcon />
-                        <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "12px", fontFamily: "'Inter', sans-serif" }}>Loading cluster data...</div>
+                        <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "12px", fontFamily: "'Inter', sans-serif" }}>
+                          Loading cluster map...
+                        </div>
+                        <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "4px", fontFamily: "'Inter', sans-serif" }}>
+                          This may take a few seconds.
+                        </div>
                       </div>
                     </div>
                   )}
