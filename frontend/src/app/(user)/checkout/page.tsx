@@ -15,6 +15,13 @@ function parsePrice(priceStr: string): number {
   return parseInt(cleaned, 10) || 0;
 }
 
+// Deteksi apakah error karena project sudah dimiliki user lain
+function isProjectOwnedError(msg: string | null): boolean {
+  if (!msg) return false;
+  return msg.toLowerCase().includes("sudah dimiliki") ||
+         msg.toLowerCase().includes("already owned");
+}
+
 export default function PaymentPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -32,6 +39,7 @@ export default function PaymentPage() {
 
   const { status, errorMessage, pay } = usePayment();
   const isLoading = status === "loading";
+  const isOwned   = isProjectOwnedError(errorMessage);
 
   const handleCheckout = () => {
     pay({
@@ -54,7 +62,8 @@ export default function PaymentPage() {
     }}>
       <PaymentHeader />
 
-      {errorMessage && (
+      {/* ── Error banner biasa ── */}
+      {errorMessage && !isOwned && (
         <div style={{
           margin: "1rem 2rem 0", padding: "12px 16px", borderRadius: 10,
           background: "#FEF2F2", border: "1px solid #FECACA",
@@ -67,6 +76,66 @@ export default function PaymentPage() {
             <circle cx="12" cy="16" r="1" fill="white" />
           </svg>
           {errorMessage}
+        </div>
+      )}
+
+      {/* ── Banner khusus project sudah dimiliki user lain ── */}
+      {isOwned && (
+        <div style={{
+          margin: "1rem 2rem 0", padding: "16px 20px", borderRadius: 12,
+          background: "#EFF6FF", border: "1.5px solid #BFDBFE",
+          display: "flex", alignItems: "flex-start", gap: 12,
+        }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+            background: "#DBEAFE", border: "1.5px solid #93C5FD",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#1A56DB",
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: "0.9rem", fontWeight: 700, color: "#1E3A6E", marginBottom: 4,
+            }}>
+              Project Tidak Tersedia
+            </div>
+            <div style={{
+              fontSize: "0.82rem", color: "#475569", lineHeight: 1.6, marginBottom: 12,
+            }}>
+              {errorMessage} Silakan pilih project lain yang masih tersedia.
+            </div>
+            <button
+              onClick={() => router.push("/projects-list")}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "8px 18px", borderRadius: 8, border: "none",
+                background: "linear-gradient(135deg, #1A56DB 0%, #2D7BE8 100%)",
+                color: "#fff", fontSize: "0.8rem", fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit",
+                boxShadow: "0 4px 12px rgba(26,86,219,0.25)",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = "0.88";
+                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              Lihat Project Lain
+            </button>
+          </div>
         </div>
       )}
 
@@ -88,6 +157,7 @@ export default function PaymentPage() {
           <UserInfoCard />
         </div>
 
+        {/* Sembunyikan OrderSummary & disable checkout jika project sudah dimiliki */}
         <OrderSummary
           subtotal={subtotal}
           tax={tax}
@@ -98,6 +168,7 @@ export default function PaymentPage() {
           onCheckout={handleCheckout}
           onCancel={handleCancel}
           isLoading={isLoading}
+          disabled={isOwned}  // ← tambah prop ini di OrderSummary
         />
       </div>
 

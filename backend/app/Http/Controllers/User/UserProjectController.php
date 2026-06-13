@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -129,26 +130,37 @@ class UserProjectController extends Controller
             $thumbnailUrl = $appUrl . '/storage/' . ltrim($p->thumbnail, '/');
         }
 
-        $isAuthenticated = auth('sanctum')->check();
+        $user            = auth('sanctum')->user();
+        $isAuthenticated = $user !== null;
+
+        $hasPurchased = false;
+        if ($isAuthenticated) {
+            $hasPurchased = Order::where('user_id', $user->user_id)
+                ->where('project_id', $p->project_id)
+                ->where('order_status', 'paid')          
+                ->exists();
+        }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'project_id'   => $p->project_id,
-                'title'        => $p->title,
-                'description'  => $p->description ?? '',
-                'price'        => $p->price ?? 0,
-                'total_data'   => $p->total_data ?? 0,
-                'project_date' => $p->project_date
+                'project_id'    => $p->project_id,
+                'title'         => $p->title,
+                'description'   => $p->description ?? '',
+                'price'         => $p->price ?? 0,
+                'total_data'    => $p->total_data ?? 0,
+                'project_date'  => $p->project_date
                     ? Carbon::parse($p->project_date)->format('Y-m-d')
                     : null,
-                'category'     => ['name' => $p->category?->name ?? '-'],
-                'city'         => [
+                'category'      => ['name' => $p->category?->name ?? '-'],
+                'city'          => [
                     'name'     => $p->city?->name ?? '-',
                     'province' => ['name' => $p->city?->province?->name ?? '-'],
                 ],
-                'thumbnail'    => $thumbnailUrl,
-                'api_url'      => $isAuthenticated ? ($p->api_url ?? '') : null,
+                'thumbnail'     => $thumbnailUrl,
+
+                'api_url' => $isAuthenticated ? ($p->api_url ?? '') : null,
+                'has_purchased' => $hasPurchased,
             ],
         ]);
     }

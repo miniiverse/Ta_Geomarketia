@@ -36,7 +36,7 @@ export default function StatsSection() {
     {
       label: "Total Projects",
       value: loading ? "..." : String(data.totalProjects),
-      sublabel: "Purchased projects",
+      sublabel: "Projects you have purchased",
       color: "#1A56DB",
       lightBg: "#EBF3FF",
       border: "#BFDBFE",
@@ -56,7 +56,7 @@ export default function StatsSection() {
     {
       label: "Total Transactions",
       value: loading ? "..." : String(data.totalTransactions),
-      sublabel: "All Payments",
+      sublabel: "Your payment history",
       color: "#059669",
       lightBg: "#ECFDF5",
       border: "#A7F3D0",
