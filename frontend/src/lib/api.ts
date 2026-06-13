@@ -33,7 +33,6 @@ export interface UpdateUserPayload {
   email: string;
 }
 
-/** Ambil semua registered users */
 export async function getUsers(): Promise<AdminUser[]> {
   const res = await fetch("/api/users");
   const data = await res.json();
@@ -41,7 +40,6 @@ export async function getUsers(): Promise<AdminUser[]> {
   return data.users;
 }
 
-/** Update data user (fullname, username, email) */
 export async function updateUser(
   id: number,
   payload: UpdateUserPayload
@@ -55,14 +53,12 @@ export async function updateUser(
   if (!res.ok) throw new Error(data.message ?? "Failed to update user.");
 }
 
-/** Hapus user */
 export async function deleteUser(id: number): Promise<void> {
   const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message ?? "Failed to delete user.");
 }
 
-/** Toggle role user: user menjadi admin, admin menjadi user */
 export async function promoteUser(id: number, roleId: number): Promise<AdminUser> {
   const res = await fetch(`/api/users/${id}/promote`, {
     method: "PUT",
@@ -74,15 +70,11 @@ export async function promoteUser(id: number, roleId: number): Promise<AdminUser
   return data.user;
 }
 
-// ═════════════════════════════════════════════════════════════════
-// PAYMENT — Midtrans
-// ═════════════════════════════════════════════════════════════════
-
 export interface CreateSnapTokenPayload {
-  order_id: number;      // dari tabel orders
-  project_id: number;    // dari tabel orders
-  total_amount: number;  // total yang dibayar
-  title?: string;        // nama project untuk item_details Midtrans
+  order_id: number;      
+  project_id: number;    
+  total_amount: number;  
+  title?: string;        
 }
 
 export interface SnapTokenResponse {
@@ -90,10 +82,6 @@ export interface SnapTokenResponse {
   order_id: number;
 }
 
-/**
- * Minta Snap Token ke Laravel via Next.js API Route.
- * Cookie "token" otomatis ikut — tidak perlu kirim manual.
- */
 export async function createSnapToken(
   payload: CreateSnapTokenPayload
 ): Promise<SnapTokenResponse> {

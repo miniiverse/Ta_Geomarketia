@@ -1,7 +1,3 @@
-// lib/midtrans.ts
-// Utility untuk load Snap.js Midtrans ke browser secara dynamic
-// Dipanggil sekali saja, kalau sudah ada tidak akan load ulang
-
 declare global {
   interface Window {
     snap: {
@@ -28,19 +24,14 @@ export interface MidtransResult {
   finish_redirect_url?: string;
 }
 
-/**
- * Load Snap.js dari CDN Midtrans.
- * Aman dipanggil berkali-kali, tidak akan inject script duplikat.
- */
+
 export function loadMidtransSnap(): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Kalau sudah ada, langsung resolve
     if (window.snap) {
       resolve();
       return;
     }
 
-    // Kalau script sudah di-inject tapi belum selesai load
     const existing = document.getElementById("midtrans-snap");
     if (existing) {
       existing.addEventListener("load", () => resolve());
@@ -48,7 +39,6 @@ export function loadMidtransSnap(): Promise<void> {
       return;
     }
 
-    // Inject script baru
     const script = document.createElement("script");
     script.id = "midtrans-snap";
     script.src = process.env.NEXT_PUBLIC_MIDTRANS_SNAP_URL!;
