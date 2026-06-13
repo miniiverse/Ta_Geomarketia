@@ -48,7 +48,7 @@ function formatRp(n: number | string | null) {
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("id-ID", {
+  return new Date(dateStr).toLocaleDateString("en-US", {
     day: "2-digit", month: "short", year: "numeric",
   });
 }

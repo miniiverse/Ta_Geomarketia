@@ -21,7 +21,7 @@ export default function TransactionDetail({
   const formatRp = (n: number | string | null) => `Rp${Number(n ?? 0).toLocaleString("id-ID")}`;
   const formatDate = (d: string | null) => {
     if (!d) return "-";
-    return new Date(d).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    return new Date(d).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
   };
   const getPaymentLabel = (m: string | null) => {
     if (!m) return "-";
