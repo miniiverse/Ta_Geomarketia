@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ProjectsTable from "./components/ProjectsTable";
 import Link from "next/dist/client/link";
+import { useUser } from "../../hooks/useUser";
 
 type FastApiProject = {
   project_name: string;
@@ -62,6 +63,8 @@ function parseDate(str: string): string {
 }
 
 export default function ProjectsPage() {
+  const { user } = useUser();
+  const canAddProject = user?.role_id === 3;
   const [showAdd, setShowAdd] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -184,6 +187,11 @@ export default function ProjectsPage() {
   }
 
   async function handleSave() {
+    if (!canAddProject) {
+      alert("Only manager can add projects.");
+      return;
+    }
+
     if (!autoFilled) {
       alert("Pilih dataset terlebih dahulu.");
       return;
@@ -288,46 +296,48 @@ export default function ProjectsPage() {
           </span>
         </div>
 
-        <button
-          onClick={() => setShowAdd(true)}
-          className="prj-add-btn"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "9px 20px",
-            borderRadius: "12px",
-            border: "none",
-            background: "#1A56DB",
-            color: "#fff",
-            fontSize: "13.5px",
-            fontWeight: 600,
-            fontFamily: "'Inter', sans-serif",
-            cursor: "pointer",
-            boxShadow: "0 2px 12px rgba(26,86,219,0.3)",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "#1036A0";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "#1A56DB";
-          }}
-        >
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
+        {canAddProject && (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="prj-add-btn"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "9px 20px",
+              borderRadius: "12px",
+              border: "none",
+              background: "#1A56DB",
+              color: "#fff",
+              fontSize: "13.5px",
+              fontWeight: 600,
+              fontFamily: "'Inter', sans-serif",
+              cursor: "pointer",
+              boxShadow: "0 2px 12px rgba(26,86,219,0.3)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "#1036A0";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "#1A56DB";
+            }}
           >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          <span className="prj-add-btn-text">Add New Project</span>
-        </button>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span className="prj-add-btn-text">Add New Project</span>
+          </button>
+        )}
       </div>
 
       <div className="prj-content" style={{ padding: "32px" }}>
@@ -432,13 +442,13 @@ export default function ProjectsPage() {
         </div>
 
         <ProjectsTable
-          onAdd={() => setShowAdd(true)}
+          onAdd={() => canAddProject && setShowAdd(true)}
           refreshKey={refreshKey}
           onDelete={() => setRefreshKey((k) => k + 1)}
         />
       </div>
 
-      {showAdd && (
+      {showAdd && canAddProject && (
         <>
           <div
             className="prj-modal-overlay"

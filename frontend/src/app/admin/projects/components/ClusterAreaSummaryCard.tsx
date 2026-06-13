@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 type PlaceData = {
   id: number;
   address?: string;
+  category?: string;
   cluster?: number | string | null;
   rating?: number | null;
   review?: number | null;
@@ -63,6 +64,8 @@ type CardEntry = {
   avgRating: number;
   avgReview: number;
   isNoise: boolean;
+  topCategory: string;
+  topCategoryPct: number;
 };
 
 export default function ClusterAreaSummaryCard({
@@ -86,6 +89,7 @@ export default function ClusterAreaSummaryCard({
     {
       count: number;
       kecCount: Map<string, number>;
+      categoryCount: Map<string, number>;
       totalRating: number;
       ratingCount: number;
       totalReview: number;
@@ -100,6 +104,7 @@ export default function ClusterAreaSummaryCard({
       clusterData.set(geoCluster, {
         count: 0,
         kecCount: new Map(),
+        categoryCount: new Map(),
         totalRating: 0,
         ratingCount: 0,
         totalReview: 0,
@@ -113,6 +118,13 @@ export default function ClusterAreaSummaryCard({
     if (geoCluster >= 0) {
       const kec = extractKecamatan(place.address);
       if (kec) entry.kecCount.set(kec, (entry.kecCount.get(kec) ?? 0) + 1);
+
+      const category = place.category?.trim();
+      if (category)
+        entry.categoryCount.set(
+          category,
+          (entry.categoryCount.get(category) ?? 0) + 1,
+        );
 
       const rating = place.rating ?? 0;
       const review = place.review ?? 0;
@@ -144,6 +156,14 @@ export default function ClusterAreaSummaryCard({
       const avgReview =
         data.reviewCount > 0 ? data.totalReview / data.reviewCount : 0;
 
+      const sortedCategory = Array.from(data.categoryCount.entries()).sort(
+        (a, b) => b[1] - a[1],
+      );
+      const topCategory = sortedCategory[0]?.[0] ?? "";
+      const topCategoryCount = sortedCategory[0]?.[1] ?? 0;
+      const topCategoryPct =
+        data.count > 0 ? (topCategoryCount / data.count) * 100 : 0;
+
       return {
         geoCluster,
         color,
@@ -152,6 +172,8 @@ export default function ClusterAreaSummaryCard({
         avgRating,
         avgReview,
         isNoise,
+        topCategory,
+        topCategoryPct,
       };
     })
     .sort((a, b) => {
@@ -266,6 +288,8 @@ export default function ClusterAreaSummaryCard({
             avgRating,
             avgReview,
             isNoise,
+            topCategory,
+            topCategoryPct,
           }) => {
             const pct = ((count / totalBusiness) * 100).toFixed(1);
             const isActive = activeCluster === geoCluster;
@@ -500,8 +524,20 @@ export default function ClusterAreaSummaryCard({
                   </div>
                 )}
 
-                <div style={{ fontSize: "11px", color: "#94a3b8" }}>
-                  {isNoise ? "unclustered points" : "businesses detected"}
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#94a3b8",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {isNoise
+                    ? "unclustered points"
+                    : topCategory
+                      ? `${topCategory} • ${topCategoryPct.toFixed(0)}% of cluster`
+                      : "businesses detected"}
                 </div>
               </div>
             );

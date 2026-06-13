@@ -98,6 +98,7 @@ export default function TransactionDetailPage() {
   const [loading, setLoading]                 = useState(true);
   const [error, setError]                     = useState<string | null>(null);
   const [paying, setPaying]                   = useState(false);
+  const [payError, setPayError]               = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling]           = useState(false);
   const [cancelError, setCancelError]         = useState<string | null>(null);
@@ -146,9 +147,10 @@ export default function TransactionDetailPage() {
 
       setShowCancelModal(false);
       loadData(false);
-    } catch (err: any) {
-      console.error("Cancel error:", err.message);
-      setCancelError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gagal cancel order.";
+      console.error("Cancel error:", message);
+      setCancelError(message);
     } finally {
       setCancelling(false);
     }
@@ -159,6 +161,7 @@ export default function TransactionDetailPage() {
     if (!data) return;
     if (snapOpenRef.current) return;
     setPaying(true);
+    setPayError(null);
     try {
       await loadMidtransSnap();
       const { snap_token } = await createSnapToken({
@@ -204,6 +207,8 @@ export default function TransactionDetailPage() {
       });
     } catch (err) {
       console.error("Pay error:", err);
+      setPayError(err instanceof Error ? err.message : "Gagal memproses pembayaran.");
+      loadData(false);
     } finally {
       setPaying(false);
     }
@@ -303,6 +308,19 @@ export default function TransactionDetailPage() {
                 <span style={{ fontSize: "0.82rem", color: "#92400E", fontWeight: 600 }}>
                   Payment is pending. Complete your payment to access this project.
                 </span>
+              </div>
+            )}
+
+            {payError && (
+              <div style={{
+                padding: "12px 2rem",
+                background: "#FEF2F2",
+                borderBottom: "1px solid #FECACA",
+                color: "#DC2626",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+              }}>
+                {payError}
               </div>
             )}
 

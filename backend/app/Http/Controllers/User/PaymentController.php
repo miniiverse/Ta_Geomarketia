@@ -37,6 +37,59 @@ class PaymentController extends Controller
         return base64_encode(config('midtrans.server_key') . ':');
     }
 
+    private function fetchMidtransStatus(string $midtransOrderId): ?array
+    {
+        try {
+            $res = Http::withHeaders([
+                'Accept'        => 'application/json',
+                'Authorization' => 'Basic ' . $this->midtransAuth(),
+            ])->get($this->midtransBase() . "/{$midtransOrderId}/status");
+
+            return $res->successful() ? $res->json() : null;
+        } catch (\Throwable $e) {
+            Log::warning("Midtrans status check failed for {$midtransOrderId}: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function markOrderFromMidtransStatus(Order $order, Payment $payment, array $statusData): bool
+    {
+        $transactionStatus = $statusData['transaction_status'] ?? null;
+        $fraudStatus       = $statusData['fraud_status'] ?? null;
+
+        $paymentStatus = match (true) {
+            $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'settlement',
+            $transactionStatus === 'settlement'                           => 'settlement',
+            $transactionStatus === 'pending'                              => 'pending',
+            $transactionStatus === 'deny'                                 => 'deny',
+            $transactionStatus === 'expire'                               => 'expire',
+            $transactionStatus === 'cancel'                               => 'cancel',
+            default                                                       => null,
+        };
+
+        if (!$paymentStatus) {
+            return false;
+        }
+
+        $orderStatus = match ($paymentStatus) {
+            'settlement' => 'paid',
+            'cancel', 'expire' => 'cancelled',
+            default => 'pending',
+        };
+
+        DB::transaction(function () use ($order, $payment, $statusData, $paymentStatus, $orderStatus) {
+            $order->update(['order_status' => $orderStatus]);
+            $payment->update([
+                'payment_status' => $paymentStatus,
+                'payment_method' => $statusData['payment_type'] ?? $payment->payment_method,
+                'gross_amount'   => $statusData['gross_amount'] ?? $payment->gross_amount,
+                'payment_time'   => $paymentStatus === 'settlement' ? now() : $payment->payment_time,
+            ]);
+        });
+
+        return true;
+    }
+
 
     private function cancelOldMidtransTransactionIfPending(?string $oldMidtransOrderId): void
     {
@@ -117,6 +170,21 @@ class PaymentController extends Controller
 
         $existingPayment    = Payment::where('order_id', $order->order_id)->first();
         $oldMidtransOrderId = $existingPayment?->midtrans_transaction_id;
+
+        if ($existingPayment && $oldMidtransOrderId) {
+            $statusData = $this->fetchMidtransStatus($oldMidtransOrderId);
+            $midtransStatus = $statusData['transaction_status'] ?? null;
+
+            if ($statusData && in_array($midtransStatus, ['settlement', 'capture'])) {
+                $this->markOrderFromMidtransStatus($order, $existingPayment, $statusData);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order ini sudah dibayar.',
+                ], 400);
+            }
+        }
+
         $this->cancelOldMidtransTransactionIfPending($oldMidtransOrderId);
 
         DB::beginTransaction();
@@ -265,6 +333,17 @@ class PaymentController extends Controller
                       ->where('user_id', $request->user()->user_id)
                       ->with('payment')
                       ->firstOrFail();
+
+        if (
+            $order->payment?->midtrans_transaction_id
+            && $order->payment->payment_status !== 'settlement'
+        ) {
+            $statusData = $this->fetchMidtransStatus($order->payment->midtrans_transaction_id);
+            if ($statusData) {
+                $this->markOrderFromMidtransStatus($order, $order->payment, $statusData);
+                $order->refresh()->load('payment');
+            }
+        }
 
         return response()->json([
             'success'                 => true,

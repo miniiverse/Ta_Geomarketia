@@ -16,6 +16,8 @@ const C = {
   white: "#ffffff",
 } as const;
 
+const ADMIN_ROLE_IDS = [2, 3];
+
 function CubeIcon({ size = 36 }: { size?: number }) {
   const a = `login-a-${size}`;
   const b = `login-b-${size}`;
@@ -306,7 +308,9 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.user.role === "admin") {
+      const roleId = data.user.role_id;
+
+      if (ADMIN_ROLE_IDS.includes(roleId)) {
         window.location.href = "/admin/dashboard-admin";
       } else {
         window.location.href = "/dashboard";
@@ -410,7 +414,12 @@ export default function LoginPage() {
           }}
         />
 
-        <div style={{ padding: "clamp(24px, 5vw, 36px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 40px)", }}>
+        <div
+          style={{
+            padding:
+              "clamp(24px, 5vw, 36px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 40px)",
+          }}
+        >
           <div
             style={{
               display: "flex",

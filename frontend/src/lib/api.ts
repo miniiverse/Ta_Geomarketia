@@ -22,6 +22,7 @@ export interface AdminUser {
   username: string;
   email: string;
   role: string;
+  role_id: number;
   profile_photo: string | null;
   created_at: string;
 }
@@ -62,8 +63,12 @@ export async function deleteUser(id: number): Promise<void> {
 }
 
 /** Toggle role user: user menjadi admin, admin menjadi user */
-export async function promoteUser(id: number): Promise<AdminUser> {
-  const res = await fetch(`/api/users/${id}/promote`, { method: "PUT" });
+export async function promoteUser(id: number, roleId: number): Promise<AdminUser> {
+  const res = await fetch(`/api/users/${id}/promote`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role_id: roleId }),
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message ?? "Failed to update user role.");
   return data.user;

@@ -15,20 +15,24 @@ export async function PUT(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const body = await request.json();
 
   try {
     const res = await fetch(`${SERVER}/api/users/${id}/promote`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
         Accept: "application/json",
       },
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch (err: any) {
-    console.error("users promote error:", err.message);
-    return NextResponse.json({ message: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to update user role.";
+    console.error("users promote error:", message);
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

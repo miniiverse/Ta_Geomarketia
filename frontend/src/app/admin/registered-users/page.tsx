@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getUsers, AdminUser } from "../../../lib/api";
+import { useUser } from "../../hooks/useUser";
 import UserTable from "../registered-users/components/UserTable";
 import EditUserModal from "../registered-users/components/EditUserModal";
 
@@ -87,6 +88,7 @@ function StatCard({
 }
 
 export default function RegisteredUsersPage() {
+  const { user: currentUser } = useUser();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -112,6 +114,7 @@ export default function RegisteredUsersPage() {
   console.log(users);
   const safeUsers = Array.isArray(users) ? users : [];
   const totalUsers = safeUsers.length;
+  const totalManagers = safeUsers.filter((u) => u.role === "manager").length;
   const totalAdmins = safeUsers.filter((u) => u.role === "admin").length;
   const totalRegular = safeUsers.filter((u) => u.role === "user").length;
 
@@ -139,7 +142,7 @@ export default function RegisteredUsersPage() {
         .users-body { padding: 32px; }
         .users-stats-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(4, 1fr);
           gap: 16px;
           margin-bottom: 28px;
         }
@@ -186,25 +189,24 @@ export default function RegisteredUsersPage() {
           }}
         >
           <div>
-              <h1
-                className="users-title"
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: C.blue,
-                  letterSpacing: "-0.04em",
-                  margin: "0 0 4px",
-                }}
-              >
-                Registered Users
-              </h1>
+            <h1
+              className="users-title"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 28,
+                fontWeight: 700,
+                color: C.blue,
+                letterSpacing: "-0.04em",
+                margin: "0 0 4px",
+              }}
+            >
+              Registered Users
+            </h1>
             <p style={{ fontSize: 13.5, color: C.muted, margin: 0 }}>
               Manage all user accounts on Geomarketia
             </p>
           </div>
         </div>
-
 
         {!loading && !error && (
           <div className="users-stats-grid">
@@ -213,7 +215,15 @@ export default function RegisteredUsersPage() {
               value={totalUsers}
               color="#1A56DB"
               icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
                   <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
@@ -225,7 +235,15 @@ export default function RegisteredUsersPage() {
               value={totalAdmins}
               color="#D97706"
               icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               }
@@ -235,9 +253,35 @@ export default function RegisteredUsersPage() {
               value={totalRegular}
               color="#16A34A"
               icon={
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
                   <circle cx="12" cy="8" r="4" />
                   <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                </svg>
+              }
+            />
+            <StatCard
+              label="Managers"
+              value={totalManagers}
+              color="#7C3AED"
+              icon={
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               }
             />
@@ -264,10 +308,28 @@ export default function RegisteredUsersPage() {
               fill="none"
               style={{ animation: "spin 0.8s linear infinite" }}
             >
-              <circle cx="12" cy="12" r="9" stroke="#E2E8F0" strokeWidth="2.5" />
-              <path d="M12 3a9 9 0 019 9" stroke={C.blue} strokeWidth="2.5" strokeLinecap="round" />
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+                stroke="#E2E8F0"
+                strokeWidth="2.5"
+              />
+              <path
+                d="M12 3a9 9 0 019 9"
+                stroke={C.blue}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
             </svg>
-            <p style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: 14, color: C.muted, margin: 0 }}>
+            <p
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: 14,
+                color: C.muted,
+                margin: 0,
+              }}
+            >
               Loading users…
             </p>
           </div>
@@ -283,16 +345,40 @@ export default function RegisteredUsersPage() {
               gap: 14,
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#EF4444"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             <div>
-              <p style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: 14, fontWeight: 600, color: "#EF4444", margin: "0 0 4px" }}>
+              <p
+                style={{
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "#EF4444",
+                  margin: "0 0 4px",
+                }}
+              >
                 Failed to load users
               </p>
-              <p style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: 13, color: "#EF4444", margin: 0, opacity: 0.8 }}>
+              <p
+                style={{
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontSize: 13,
+                  color: "#EF4444",
+                  margin: 0,
+                  opacity: 0.8,
+                }}
+              >
                 {error}
               </p>
             </div>
@@ -316,11 +402,12 @@ export default function RegisteredUsersPage() {
             </button>
           </div>
         ) : (
-         <UserTable
+          <UserTable
             users={safeUsers}
+            currentUserRoleId={currentUser?.role_id}
             onEdit={setEditUser}
             onDataChange={setUsers}
-            />
+          />
         )}
       </div>
 
@@ -329,7 +416,7 @@ export default function RegisteredUsersPage() {
         onClose={() => setEditUser(null)}
         onSuccess={(updated) => {
           setUsers((prev) =>
-            prev.map((u) => (u.id === updated.id ? updated : u))
+            prev.map((u) => (u.id === updated.id ? updated : u)),
           );
           setEditUser(null);
         }}

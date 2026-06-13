@@ -9,6 +9,7 @@ export interface CurrentUser {
   username: string;
   email: string;
   role: string;
+  role_id: number;
   profile_photo: string | null;
 }
 

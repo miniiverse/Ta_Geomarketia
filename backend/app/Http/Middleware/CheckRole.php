@@ -10,11 +10,11 @@ class CheckRole
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, string $role): mixed
+    public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         $user = $request->user();
 
-        if (!$user || !$user->role || $user->role->role_name !== $role) {
+        if (!$user || !$user->role || !in_array($user->role->role_name, $roles, true)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden. Akses ditolak.',

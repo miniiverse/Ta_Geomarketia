@@ -53,10 +53,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // ── Protected - admin only ───────────────────────────────────
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
     Route::get('/projects',         [ProjectController::class, 'index']);
     Route::get('/projects/{id}',    [ProjectController::class, 'show']);
-    Route::post('/projects',        [ProjectController::class, 'store']);
     Route::post('/projects/{id}',   [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/categories',       [ProjectController::class, 'categories']);
@@ -70,4 +69,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::get('/admin/transactions',      [TransactionsController::class, 'index']);
     Route::get('/admin/transactions/{id}', [TransactionsController::class, 'show']);
+});
+
+Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {
+    Route::post('/projects', [ProjectController::class, 'store']);
 });

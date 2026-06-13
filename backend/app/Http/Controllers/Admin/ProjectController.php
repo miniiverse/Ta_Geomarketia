@@ -42,6 +42,13 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->user()?->role_id !== 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only manager can add projects.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title'        => 'required|string|max:255',
             'category_id'  => 'nullable|integer|exists:categories,category_id',

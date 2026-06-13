@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const ADMIN_ROLES = ["admin", "manager"];
+
 export async function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
@@ -56,13 +58,13 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAdminRoute) {
-    if (role !== "admin") {
+    if (!role || !ADMIN_ROLES.includes(role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
   if (isProtectedUserRoute) {
-    if (role === "admin") {
+    if (role && ADMIN_ROLES.includes(role)) {
       return NextResponse.redirect(
         new URL("/admin/dashboard-admin", request.url),
       );
@@ -71,7 +73,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthRoute && token) {
     const destination =
-      role === "admin" ? "/admin/dashboard-admin" : "/dashboard";
+      role && ADMIN_ROLES.includes(role) ? "/admin/dashboard-admin" : "/dashboard";
     return NextResponse.redirect(new URL(destination, request.url));
   }
 

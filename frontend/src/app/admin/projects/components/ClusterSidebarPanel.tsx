@@ -456,8 +456,8 @@ export default function ClusterSidebarPanel({
 
   const top5Businesses = useMemo(() => {
     return [...group.places]
-      .filter((p) => p.rating >= 4.5 && p.review > 0)
-      .sort((a, b) => b.review - a.review || b.rating - a.rating)
+      .filter((p) => p.rating > 0 && p.review > 0)
+      .sort((a, b) => b.rating * b.review - a.rating * a.review)
       .slice(0, 5);
   }, [group.places]);
 

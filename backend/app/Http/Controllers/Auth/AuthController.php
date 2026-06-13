@@ -12,14 +12,10 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
-    /**
-     * Register a new user.
-     * Email wajib @gmail.com (divalidasi oleh RegisterRequest).
-     */
     public function register(RegisterRequest $request)
     {
         $user = User::create([
-            'role_id'  => 2,
+            'role_id'  => 1,
             'fullname' => $request->fullname,
             'username' => $request->username,
             'email'    => $request->email,
@@ -32,10 +28,6 @@ class AuthController extends Controller
         ], 201);
     }
 
-    /**
-     * Log in an existing user.
-     * Token dikembalikan di response body, lalu Next.js yang set HTTP Only Cookie.
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -66,7 +58,6 @@ class AuthController extends Controller
 
         RateLimiter::clear($key);
 
-        // Hapus semua token lama sebelum buat yang baru
         $user->tokens()->delete();
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -80,14 +71,12 @@ class AuthController extends Controller
                 'username'      => $user->username,
                 'email'         => $user->email,
                 'role'          => $user->role->role_name,
+                'role_id'       => $user->role_id,
                 'profile_photo' => $user->profile_photo,
             ],
         ]);
     }
 
-    /**
-     * Get the authenticated user's profile.
-     */
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
@@ -100,6 +89,7 @@ class AuthController extends Controller
                 'username'      => $user->username,
                 'email'         => $user->email,
                 'role'          => $user->role->role_name,
+                'role_id'       => $user->role_id,
                 'profile_photo' => $user->profile_photo
                     ? asset('storage/' . $user->profile_photo)
                     : null,
@@ -108,9 +98,6 @@ class AuthController extends Controller
         ])->header('Cache-Control', 'no-store');
     }
 
-    /**
-     * Update the authenticated user's profile.
-     */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -138,9 +125,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Update the authenticated user's profile photo.
-     */
     public function updatePhoto(Request $request)
     {
         $request->validate([
@@ -153,7 +137,7 @@ class AuthController extends Controller
             Storage::disk('public')->delete($user->profile_photo);
         }
 
-        $folder = $user->role_id === 1 ? 'photos/admin' : 'photos';
+        $folder = $user->role_id === 3 ? 'photos/manager' : ($user->role_id === 2 ? 'photos/admin' : 'photos');
         $path   = $request->file('photo')->store($folder, 'public');
 
         $user->update(['profile_photo' => $path]);
@@ -164,9 +148,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Log out the authenticated user.
-     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

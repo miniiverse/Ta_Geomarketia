@@ -12,6 +12,10 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    private const ROLE_USER = 1;
+    private const ROLE_ADMIN = 2;
+    private const ROLE_MANAGER = 3;
+
     public function index()
     {
         $users = User::with('role')
@@ -38,6 +42,13 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+
+        if ($request->user()?->role_id === self::ROLE_ADMIN && $user->role_id === self::ROLE_MANAGER) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Admin cannot edit manager accounts.',
+            ], 403);
+        }
 
         $validated = $request->validate([
             'fullname' => ['required', 'string', 'max:100'],
@@ -75,6 +86,13 @@ class UserController extends Controller
             ], 422);
         }
 
+        if ($user->role_id === self::ROLE_MANAGER) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Manager account cannot be deleted from this panel.',
+            ], 422);
+        }
+
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
         }
@@ -94,25 +112,41 @@ class UserController extends Controller
 
     public function promote(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-        $adminRole = Role::where('role_name', 'admin')->first();
-        $userRole = Role::where('role_name', 'user')->first();
+        if ($request->user()?->role_id !== self::ROLE_MANAGER) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only manager can update user roles.',
+            ], 403);
+        }
 
-        if (! $adminRole || ! $userRole) {
+        $user = User::findOrFail($id);
+        $validated = $request->validate([
+            'role_id' => ['required', 'integer', Rule::in([self::ROLE_USER, self::ROLE_ADMIN])],
+        ]);
+
+        if ($user->role_id === self::ROLE_MANAGER) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Manager role can only be managed manually in the database.',
+            ], 422);
+        }
+
+        $targetRole = Role::where('role_id', $validated['role_id'])->first();
+        $adminRole = Role::where('role_id', self::ROLE_ADMIN)->first();
+
+        if (! $targetRole || ! $adminRole) {
             return response()->json([
                 'success' => false,
                 'message' => 'Required roles not found.',
             ], 500);
         }
 
-        if ($request->user()->user_id === $user->user_id && $user->role_id === $adminRole->role_id) {
+        if ($request->user()->user_id === $user->user_id && $user->role_id === $adminRole->role_id && $targetRole->role_id !== $adminRole->role_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'You cannot demote your own admin account.',
             ], 422);
         }
-
-        $targetRole = $user->role_id === $adminRole->role_id ? $userRole : $adminRole;
 
         $user->update([
             'role_id' => $targetRole->role_id,
@@ -135,6 +169,7 @@ class UserController extends Controller
             'username' => $user->username,
             'email' => $user->email,
             'role' => $user->role?->role_name,
+            'role_id' => $user->role_id,
             'profile_photo' => $user->profile_photo
                 ? asset('storage/' . $user->profile_photo)
                 : null,
