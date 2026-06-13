@@ -26,6 +26,14 @@ const labelStyle: React.CSSProperties = {
   marginBottom: "5px",
 };
 
+function formatRupiah(value: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 function ExportExcelCard() {
   const [showModal, setShowModal] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -401,6 +409,7 @@ function ExportExcelCard() {
 export default function StatCards() {
   const [totalProjects, setTotalProjects] = useState<string>("...");
   const [totalUsers, setTotalUsers] = useState<string>("...");
+  const [totalEarnings, setTotalEarnings] = useState<string>("...");
 
   useEffect(() => {
     fetch("/api/project", { cache: "no-store" })
@@ -420,11 +429,20 @@ export default function StatCards() {
         setTotalUsers(String(total));
       })
       .catch(() => setTotalUsers("0"));
+
+    fetch("/api/transactions-admin?per_page=1", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((json) => {
+        const revenue = Number(json.stats?.total_revenue ?? 0);
+        setTotalEarnings(formatRupiah(Number.isFinite(revenue) ? revenue : 0));
+      })
+      .catch(() => setTotalEarnings(formatRupiah(0)));
   }, []);
 
   const isLoading = (label: string) =>
     (label === "Total Project" && totalProjects === "...") ||
-    (label === "Registered Users" && totalUsers === "...");
+    (label === "Registered Users" && totalUsers === "...") ||
+    (label === "Total Earnings" && totalEarnings === "...");
 
   const regularStats = [
     {
@@ -454,7 +472,7 @@ export default function StatCards() {
     },
     {
       label: "Total Earnings",
-      value: "Rp800.000",
+      value: totalEarnings,
       href: "/admin/transactions",
       icon: (
         <svg

@@ -15,6 +15,13 @@ type FastApiProject = {
   total_data: number;
 };
 
+type ProjectApiItem = {
+  api_url?: string | null;
+  category?: {
+    name?: string | null;
+  } | null;
+};
+
 const CATEGORY_MAP: Record<string, number> = {
   Retail: 1,
   "F&B": 2,
@@ -74,6 +81,8 @@ export default function ProjectsPage() {
   const [categoryNames, setCategoryNames] = useState("");
 
   const [fastapiProjects, setFastapiProjects] = useState<FastApiProject[]>([]);
+  const [fastapiBaseUrl, setFastapiBaseUrl] = useState("http://127.0.0.1:8080");
+  const [metaError, setMetaError] = useState("");
   const [metaLoading, setMetaLoading] = useState(false);
   const [selectedDbId, setSelectedDbId] = useState("");
   const [autoFilled, setAutoFilled] = useState<FastApiProject | null>(null);
@@ -136,14 +145,18 @@ export default function ProjectsPage() {
         setTotalProjects(data.length);
 
         const uniqueCats = [
-          ...new Set(data.map((p: any) => p.category?.name).filter(Boolean)),
-        ] as string[];
+          ...new Set(
+            data
+              .map((p: ProjectApiItem) => p.category?.name)
+              .filter((name): name is string => Boolean(name)),
+          ),
+        ];
         setTotalCategories(uniqueCats.length);
         setCategoryNames(uniqueCats.join(" · "));
 
         const ids = new Set<string>(
           data
-            .map((p: any) => {
+            .map((p: ProjectApiItem) => {
               if (!p.api_url) return null;
               const match = p.api_url.match(/\/api\/v1\/([^/]+)\/places/);
               return match ? match[1] : null;
@@ -158,10 +171,23 @@ export default function ProjectsPage() {
   useEffect(() => {
     if (!showAdd) return;
     setMetaLoading(true);
+    setMetaError("");
     fetch("/api/meta")
-      .then((r) => r.json())
-      .then((d) => setFastapiProjects(d.fastapiProjects || []))
-      .catch(() => setFastapiProjects([]))
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.message || "Failed to load datasets.");
+        return data;
+      })
+      .then((d) => {
+        setFastapiBaseUrl(d.fastapiBaseUrl || "http://127.0.0.1:8080");
+        setFastapiProjects(d.fastapiProjects || []);
+      })
+      .catch((err: unknown) => {
+        setFastapiProjects([]);
+        setMetaError(
+          err instanceof Error ? err.message : "Failed to load datasets.",
+        );
+      })
       .finally(() => setMetaLoading(false));
   }, [showAdd]);
 
@@ -224,7 +250,7 @@ export default function ProjectsPage() {
       formData.append("project_date", parseDate(autoFilled.date));
       formData.append(
         "api_url",
-        `http://127.0.0.1:8080/api/v1/${autoFilled.db_id}/places`,
+        `${fastapiBaseUrl}/api/v1/${autoFilled.db_id}/places`,
       );
       if (resolvedCategoryId)
         formData.append("category_id", String(resolvedCategoryId));
@@ -244,8 +270,8 @@ export default function ProjectsPage() {
       setShowAdd(false);
       resetForm();
       setRefreshKey((k) => k + 1);
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal menyimpan.");
     } finally {
       setIsSaving(false);
     }
@@ -601,12 +627,13 @@ export default function ProjectsPage() {
                   <div
                     style={{
                       ...inputStyle,
-                      color: "#94a3b8",
-                      background: "#f8fafc",
+                      color: metaError ? "#ef4444" : "#94a3b8",
+                      background: metaError ? "#fff5f5" : "#f8fafc",
+                      border: `1px solid ${metaError ? "#fecaca" : "#e2e8f0"}`,
                       textAlign: "center",
                     }}
                   >
-                    No datasets found from FastAPI.
+                    {metaError || "No datasets found from FastAPI."}
                   </div>
                 ) : availableCount === 0 ? (
                   <div
@@ -797,7 +824,7 @@ export default function ProjectsPage() {
                         <line x1="12" y1="17" x2="12.01" y2="17" />
                       </svg>
                       <span>
-                        Category "{autoFilled.category}" not yet available in
+                        Category &quot;{autoFilled.category}&quot; not yet available in
                         the database, will be saved without a category.
                       </span>
                     </div>

@@ -13,6 +13,9 @@ class TransactionsController extends Controller
     {
         $query = Order::with(['payment', 'project', 'user'])
             ->orderByDesc('created_at');
+        $totalRevenue = Payment::where('payment_status', 'settlement')
+            ->whereHas('order', fn($q) => $q->where('order_status', 'paid'))
+            ->sum('gross_amount');
 
         if ($request->filled('status')) {
             $status = $request->status;
@@ -70,7 +73,7 @@ class TransactionsController extends Controller
                 'paid'          => Order::where('order_status', 'paid')->count(),
                 'pending'       => Order::where('order_status', 'pending')->count(),
                 'cancelled'     => Order::where('order_status', 'cancelled')->count(),
-                'total_revenue' => Payment::where('payment_status', 'settlement')->sum('gross_amount'),
+                'total_revenue' => $totalRevenue,
             ],
         ]);
     }

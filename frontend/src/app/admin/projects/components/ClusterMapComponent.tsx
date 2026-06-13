@@ -629,10 +629,6 @@ function ClusterStatsCards({
         display: "flex",
         flexWrap: "wrap",
         gap: "12px",
-        padding: "16px",
-        background: "#fff",
-        borderRadius: "14px",
-        border: "1px solid #e2e8f0",
         marginBottom: "12px",
       }}
     >

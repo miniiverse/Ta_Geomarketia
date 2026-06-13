@@ -3,6 +3,7 @@
 type PlaceData = {
   id: number;
   address?: string;
+  category?: string;
   cluster?: number | string | null;
   rating?: number | null;
   review?: number | null;
@@ -54,6 +55,8 @@ type CardEntry = {
   avgRating: number;
   avgReview: number;
   isNoise: boolean;
+  topCategory: string;
+  topCategoryPct: number;
 };
 
 type UserClusterAreaSummaryCardProps = {
@@ -78,6 +81,7 @@ export default function UserClusterAreaSummaryCard({
     {
       count: number;
       kecCount: Map<string, number>;
+      categoryCount: Map<string, number>;
       totalRating: number;
       ratingCount: number;
       totalReview: number;
@@ -91,6 +95,7 @@ export default function UserClusterAreaSummaryCard({
       clusterData.set(geoCluster, {
         count: 0,
         kecCount: new Map(),
+        categoryCount: new Map(),
         totalRating: 0,
         ratingCount: 0,
         totalReview: 0,
@@ -102,6 +107,14 @@ export default function UserClusterAreaSummaryCard({
     if (geoCluster >= 0) {
       const kec = extractKecamatan(place.address);
       if (kec) entry.kecCount.set(kec, (entry.kecCount.get(kec) ?? 0) + 1);
+
+      const category = place.category?.trim();
+      if (category)
+        entry.categoryCount.set(
+          category,
+          (entry.categoryCount.get(category) ?? 0) + 1,
+        );
+
       const rating = place.rating ?? 0;
       const review = place.review ?? 0;
       if (rating > 0) {
@@ -130,6 +143,15 @@ export default function UserClusterAreaSummaryCard({
         data.ratingCount > 0 ? data.totalRating / data.ratingCount : 0;
       const avgReview =
         data.reviewCount > 0 ? data.totalReview / data.reviewCount : 0;
+
+      const sortedCategory = Array.from(data.categoryCount.entries()).sort(
+        (a, b) => b[1] - a[1],
+      );
+      const topCategory = sortedCategory[0]?.[0] ?? "";
+      const topCategoryCount = sortedCategory[0]?.[1] ?? 0;
+      const topCategoryPct =
+        data.count > 0 ? (topCategoryCount / data.count) * 100 : 0;
+
       return {
         geoCluster,
         color,
@@ -138,6 +160,8 @@ export default function UserClusterAreaSummaryCard({
         avgRating,
         avgReview,
         isNoise,
+        topCategory,
+        topCategoryPct,
       };
     })
     .sort((a, b) => {
@@ -251,6 +275,8 @@ export default function UserClusterAreaSummaryCard({
             avgRating,
             avgReview,
             isNoise,
+            topCategory,
+            topCategoryPct,
           }) => {
             const pct = ((count / totalBusiness) * 100).toFixed(1);
             const isActive = activeCluster === geoCluster;
@@ -482,8 +508,20 @@ export default function UserClusterAreaSummaryCard({
                   </div>
                 )}
 
-                <div style={{ fontSize: "11px", color: "#94a3b8" }}>
-                  {isNoise ? "unclustered points" : "businesses detected"}
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#94a3b8",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {isNoise
+                    ? "unclustered points"
+                    : topCategory
+                      ? `${topCategory} • ${topCategoryPct.toFixed(0)}% of cluster`
+                      : "businesses detected"}
                 </div>
               </div>
             );

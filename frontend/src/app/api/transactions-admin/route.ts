@@ -31,8 +31,10 @@ export async function GET(request: NextRequest) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (err: any) {
-    console.error('transactions-admin GET error:', err.message);
-    return NextResponse.json({ message: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : 'Failed to fetch transactions.';
+    console.error('transactions-admin GET error:', message);
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
