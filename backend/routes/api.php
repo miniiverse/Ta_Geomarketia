@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TransactionsController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -69,6 +70,8 @@ Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
 
     Route::get('/admin/transactions',      [TransactionsController::class, 'index']);
     Route::get('/admin/transactions/{id}', [TransactionsController::class, 'show']);
+    Route::get('/admin/dashboard/monthly-income', [DashboardController::class, 'monthlyIncome']);
+    Route::get('/admin/dashboard/category-sales', [DashboardController::class, 'categorySales']);
 });
 
 Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {

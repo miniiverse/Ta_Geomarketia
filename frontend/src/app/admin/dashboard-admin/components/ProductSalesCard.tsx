@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const productData = [
-  { label: "Retail", sold: 142, color: "#2DD4BF" },
-  { label: "Food & Beverage", sold: 98, color: "#FBBF24" },
-  { label: "Healthcare", sold: 60, color: "#818CF8" },
-];
+type CategoryRow = {
+  category_id: number;
+  category_name: string;
+  total_sold: number;
+  total_revenue: number;
+};
 
-const totalSold = productData.reduce((s, c) => s + c.sold, 0);
+type CategoryData = Record<number, CategoryRow[]>;
 
-function DonutChart() {
+const CATEGORY_COLORS = ["#2DD4BF", "#FBBF24", "#818CF8", "#F87171", "#34D399", "#A78BFA"];
+
+function DonutChart({ data, total }: { data: CategoryRow[]; total: number }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   const size = 220;
@@ -21,14 +24,15 @@ function DonutChart() {
   const circumference = 2 * Math.PI * r;
   const GAP = (3 / 360) * circumference;
 
-  let cumulative = 0;
-  const slices = productData.map((cat, i) => {
-    const pct = cat.sold / totalSold;
-    const dash = pct * circumference - GAP;
+  const percentages = data.map((cat) => (total > 0 ? cat.total_sold / total : 0));
+  const slices = data.map((cat, i) => {
+    const pct = percentages[i];
+    const cumulative = percentages.slice(0, i).reduce((sum, value) => sum + value, 0);
+    const dash = Math.max(pct * circumference - GAP, 0);
     const gap = circumference - dash;
     const offset = circumference - cumulative * circumference + GAP / 2;
-    cumulative += pct;
-    return { ...cat, dash, gap, offset, i, pct };
+    const color = CATEGORY_COLORS[(cat.category_id - 1 + CATEGORY_COLORS.length) % CATEGORY_COLORS.length];
+    return { ...cat, dash, gap, offset, i, pct, color };
   });
 
   const hov = hovered !== null ? slices[hovered] : null;
@@ -51,7 +55,7 @@ function DonutChart() {
 
         {slices.map((s) => (
           <circle
-            key={s.i}
+            key={s.category_id}
             cx={cx}
             cy={cy}
             r={r}
@@ -97,7 +101,7 @@ function DonutChart() {
               fontFamily="'DM Sans', sans-serif"
               fontWeight={800}
             >
-              {totalSold}
+              {total}
             </text>
             <text
               x={cx}
@@ -122,7 +126,7 @@ function DonutChart() {
               fill="#94a3b8"
               fontFamily="'DM Sans', sans-serif"
             >
-              {hov.label}
+              {hov.category_name}
             </text>
             <text
               x={cx}
@@ -133,7 +137,7 @@ function DonutChart() {
               fontFamily="'DM Sans', sans-serif"
               fontWeight={800}
             >
-              {hov.sold}
+              {hov.total_sold}
             </text>
             <text
               x={cx}
@@ -153,10 +157,51 @@ function DonutChart() {
 }
 
 export default function ProductSalesCard() {
+  const [categoryData, setCategoryData] = useState<CategoryData>({});
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/product-sales-admin")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data) {
+          const parsed: CategoryData = {};
+          Object.keys(d.data).forEach((key) => {
+            parsed[Number(key)] = d.data[key];
+          });
+          setCategoryData(parsed);
+
+          const years = Object.keys(parsed).map(Number).sort();
+          const currentYear = new Date().getFullYear();
+          setSelectedYear(years.includes(currentYear) ? currentYear : years[years.length - 1] ?? null);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const availableYears = Object.keys(categoryData).map(Number).sort();
+  const data = (selectedYear !== null ? categoryData[selectedYear] ?? [] : [])
+    .slice()
+    .sort((a, b) => a.category_id - b.category_id);
+  const totalSold = data.reduce((s, c) => s + c.total_sold, 0);
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+        .psc-year-btn {
+          border: none;
+          border-radius: 8px;
+          padding: 5px 12px;
+          font-size: 12px;
+          font-weight: 700;
+          font-family: 'DM Sans', sans-serif;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
       `}</style>
 
       <div
@@ -176,6 +221,8 @@ export default function ProductSalesCard() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "10px",
           }}
         >
           <h2
@@ -190,119 +237,186 @@ export default function ProductSalesCard() {
           >
             Product Sales Overview
           </h2>
-        </div>
 
-        <div style={{ maxWidth: 220, width: "100%", margin: "0 auto" }}>
-          <DonutChart />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          {productData.map((cat) => (
+          {availableYears.length > 0 && (
             <div
-              key={cat.label}
-              style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              style={{
+                display: "flex",
+                background: "#F1F5F9",
+                borderRadius: "10px",
+                padding: "3px",
+                gap: "2px",
+                flexShrink: 0,
+              }}
             >
-              <span
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "50%",
-                  background: cat.color,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: "12px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: "#374151",
-                  fontWeight: 500,
-                }}
-              >
-                {cat.label}
-              </span>
-              <span
-                style={{
-                  fontSize: "12px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: "#94a3b8",
-                  fontWeight: 400,
-                }}
-              >
-                ({cat.sold})
-              </span>
+              {availableYears.map((y) => (
+                <button
+                  key={y}
+                  className="psc-year-btn"
+                  onClick={() => setSelectedYear(y)}
+                  style={{
+                    background: selectedYear === y ? "#fff" : "transparent",
+                    color: selectedYear === y ? "#1A56DB" : "#94a3b8",
+                    boxShadow:
+                      selectedYear === y ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                  }}
+                >
+                  {y}
+                </button>
+              ))}
             </div>
-          ))}
+          )}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "4px",
-          }}
-        >
-          {productData.map((cat) => {
-            const pct = (cat.sold / totalSold) * 100;
-            return (
-              <div key={cat.label}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'DM Sans', sans-serif",
-                      color: "#374151",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {cat.label}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      fontFamily: "'DM Sans', sans-serif",
-                      color: "#64748b",
-                    }}
-                  >
-                    {pct.toFixed(1)}%
-                  </span>
-                </div>
-                <div
-                  style={{
-                    background: "#F1F5F9",
-                    borderRadius: "999px",
-                    height: "6px",
-                    overflow: "hidden",
-                  }}
-                >
+        {loading ? (
+          <div
+            style={{
+              height: "220px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#94a3b8",
+              fontSize: "13px",
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            Loading...
+          </div>
+        ) : data.length === 0 || totalSold === 0 ? (
+          <div
+            style={{
+              height: "220px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#94a3b8",
+              fontSize: "13px",
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            No data available
+          </div>
+        ) : (
+          <>
+            <div style={{ maxWidth: 220, width: "100%", margin: "0 auto" }}>
+              <DonutChart data={data} total={totalSold} />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "20px",
+                flexWrap: "wrap",
+              }}
+            >
+              {data.map((cat) => {
+                const color =
+                  CATEGORY_COLORS[(cat.category_id - 1 + CATEGORY_COLORS.length) % CATEGORY_COLORS.length];
+                return (
                   <div
-                    style={{
-                      width: `${pct}%`,
-                      height: "100%",
-                      background: cat.color,
-                      borderRadius: "999px",
-                      transition: "width 0.5s ease",
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    key={cat.category_id}
+                    style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                  >
+                    <span
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        background: color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: "#374151",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {cat.category_name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: "#94a3b8",
+                        fontWeight: 400,
+                      }}
+                    >
+                      ({cat.total_sold})
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                marginTop: "4px",
+              }}
+            >
+              {data.map((cat) => {
+                const pct = (cat.total_sold / totalSold) * 100;
+                const color =
+                  CATEGORY_COLORS[(cat.category_id - 1 + CATEGORY_COLORS.length) % CATEGORY_COLORS.length];
+                return (
+                  <div key={cat.category_id}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: "#374151",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {cat.category_name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: "#64748b",
+                        }}
+                      >
+                        {pct.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        background: "#F1F5F9",
+                        borderRadius: "999px",
+                        height: "6px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${pct}%`,
+                          height: "100%",
+                          background: color,
+                          borderRadius: "999px",
+                          transition: "width 0.5s ease",
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
     </>
   );

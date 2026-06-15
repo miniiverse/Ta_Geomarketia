@@ -1,42 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const incomeData: Record<number, { month: string; amount: number }[]> = {
-  2024: [
-    { month: "Jan", amount: 620000000 },
-    { month: "Feb", amount: 850000000 },
-    { month: "Mar", amount: 720000000 },
-    { month: "Apr", amount: 1100000000 },
-    { month: "May", amount: 980000000 },
-    { month: "Jun", amount: 1350000000 },
-    { month: "Jul", amount: 1600000000 },
-    { month: "Aug", amount: 1200000000 },
-    { month: "Sep", amount: 900000000 },
-    { month: "Oct", amount: 1050000000 },
-    { month: "Nov", amount: 1400000000 },
-    { month: "Dec", amount: 1750000000 },
-  ],
-  2025: [
-    { month: "Jan", amount: 820000000 },
-    { month: "Feb", amount: 1450000000 },
-    { month: "Mar", amount: 1100000000 },
-    { month: "Apr", amount: 1780000000 },
-    { month: "May", amount: 2500000000 },
-    { month: "Jun", amount: 16200000000 },
-    { month: "Jul", amount: 15800000000 },
-    { month: "Aug", amount: 4500000000 },
-    { month: "Sep", amount: 500000000 },
-    { month: "Oct", amount: 600000000 },
-    { month: "Nov", amount: 750000000 },
-    { month: "Dec", amount: 500000000 },
-  ],
-  2026: [
-    { month: "Jan", amount: 2100000000 },
-    { month: "Feb", amount: 3200000000 },
-    { month: "Mar", amount: 5000000000 },
-  ],
-};
+type MonthAmount = { month: string; amount: number };
+type IncomeData = Record<number, MonthAmount[]>;
 
 function formatRpAxis(n: number): string {
   if (n === 0) return "0";
@@ -46,20 +13,17 @@ function formatRpAxis(n: number): string {
 }
 
 function formatRpFull(n: number): string {
-  if (n >= 1_000_000_000)
-    return `Rp ${(n / 1_000_000_000).toFixed(2)}B`;
-  if (n >= 1_000_000)
-    return `Rp ${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000_000_000) return `Rp ${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `Rp ${(n / 1_000_000).toFixed(1)}M`;
   return "Rp " + n.toLocaleString("id-ID");
 }
 
-function LineChart({ year }: { year: number }) {
+function LineChart({ year, data }: { year: number; data: MonthAmount[] }) {
   const [hovered, setHovered] = useState<number | null>(null);
-  const data = incomeData[year] ?? [];
 
   const W = 620;
   const H = 240;
-  const padL = 52;   
+  const padL = 52;
   const padR = 20;
   const padT = 20;
   const padB = 36;
@@ -273,8 +237,31 @@ function LineChart({ year }: { year: number }) {
 }
 
 export default function MonthlyIncomeCard() {
+  const [incomeData, setIncomeData] = useState<IncomeData>({});
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/monthly-income-admin")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data) {
+          const parsed: IncomeData = {};
+          Object.keys(d.data).forEach((key) => {
+            parsed[Number(key)] = d.data[key];
+          });
+          setIncomeData(parsed);
+
+          const years = Object.keys(parsed).map(Number).sort();
+          const currentYear = new Date().getFullYear();
+          setSelectedYear(years.includes(currentYear) ? currentYear : years[years.length - 1] ?? null);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   const availableYears = Object.keys(incomeData).map(Number).sort();
-  const [selectedYear, setSelectedYear] = useState(2025);
 
   return (
     <>
@@ -328,36 +315,68 @@ export default function MonthlyIncomeCard() {
             Monthly Payment Income
           </h2>
 
-          <div
-            style={{
-              display: "flex",
-              background: "#F1F5F9",
-              borderRadius: "10px",
-              padding: "3px",
-              gap: "2px",
-              flexShrink: 0,
-            }}
-          >
-            {availableYears.map((y) => (
-              <button
-                key={y}
-                className="mic-year-btn"
-                onClick={() => setSelectedYear(y)}
-                style={{
-                  background: selectedYear === y ? "#fff" : "transparent",
-                  color: selectedYear === y ? "#1A56DB" : "#94a3b8",
-                  boxShadow:
-                    selectedYear === y ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                }}
-              >
-                {y}
-              </button>
-            ))}
-          </div>
+          {availableYears.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                background: "#F1F5F9",
+                borderRadius: "10px",
+                padding: "3px",
+                gap: "2px",
+                flexShrink: 0,
+              }}
+            >
+              {availableYears.map((y) => (
+                <button
+                  key={y}
+                  className="mic-year-btn"
+                  onClick={() => setSelectedYear(y)}
+                  style={{
+                    background: selectedYear === y ? "#fff" : "transparent",
+                    color: selectedYear === y ? "#1A56DB" : "#94a3b8",
+                    boxShadow:
+                      selectedYear === y ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                  }}
+                >
+                  {y}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div style={{ width: "100%", minHeight: 0 }}>
-          <LineChart year={selectedYear} />
+          {loading ? (
+            <div
+              style={{
+                height: "240px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#94a3b8",
+                fontSize: "13px",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Loading...
+            </div>
+          ) : selectedYear !== null && incomeData[selectedYear] ? (
+            <LineChart year={selectedYear} data={incomeData[selectedYear]} />
+          ) : (
+            <div
+              style={{
+                height: "240px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#94a3b8",
+                fontSize: "13px",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              No data available
+            </div>
+          )}
         </div>
       </div>
     </>
