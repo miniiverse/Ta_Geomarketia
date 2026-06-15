@@ -115,4 +115,68 @@ class DashboardController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function monthlySalesSummary(Request $request)
+    {
+        $orders = Order::with('payment')
+            ->where('order_status', 'paid')
+            ->whereHas('payment', function ($q) {
+                $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
+                  ->whereNotNull('payment_time');
+            })
+            ->get();
+
+        $grouped = [];
+
+        foreach ($orders as $order) {
+            $payment = $order->payment;
+            if (!$payment || !$payment->payment_time) {
+                continue;
+            }
+
+            $date = \Carbon\Carbon::parse($payment->payment_time);
+            $year = (int) $date->year;
+            $monthIndex = $date->month - 1;
+
+            if (!isset($grouped[$year])) {
+                $grouped[$year] = array_fill(0, 12, [
+                    'amount' => 0,
+                    'products_sold' => 0,
+                    'transactions' => 0,
+                ]);
+            }
+
+            $grouped[$year][$monthIndex]['amount'] += (float) ($payment->gross_amount ?? 0);
+            $grouped[$year][$monthIndex]['products_sold'] += 1;
+            $grouped[$year][$monthIndex]['transactions'] += 1;
+        }
+
+        if (empty($grouped)) {
+            $grouped[(int) now()->year] = array_fill(0, 12, [
+                'amount' => 0,
+                'products_sold' => 0,
+                'transactions' => 0,
+            ]);
+        }
+
+        $data = [];
+        foreach ($grouped as $year => $months) {
+            $data[$year] = [];
+            foreach ($months as $i => $val) {
+                $data[$year][] = [
+                    'month' => self::MONTHS[$i],
+                    'amount' => $val['amount'],
+                    'products_sold' => $val['products_sold'],
+                    'transactions' => $val['transactions'],
+                ];
+            }
+        }
+
+        ksort($data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
 }

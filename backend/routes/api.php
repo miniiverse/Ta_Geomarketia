@@ -72,6 +72,8 @@ Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
     Route::get('/admin/transactions/{id}', [TransactionsController::class, 'show']);
     Route::get('/admin/dashboard/monthly-income', [DashboardController::class, 'monthlyIncome']);
     Route::get('/admin/dashboard/category-sales', [DashboardController::class, 'categorySales']);
+    Route::get('/admin/dashboard/monthly-sales-summary', [DashboardController::class, 'monthlySalesSummary']);
+    Route::get('/admin/monthly-sales-summary', [DashboardController::class, 'monthlySalesSummary']);
 });
 
 Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {
