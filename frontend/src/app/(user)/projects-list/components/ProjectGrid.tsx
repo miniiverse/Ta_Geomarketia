@@ -49,7 +49,11 @@ const FALLBACK_IMAGE: Record<string, string> = {
 
 function resolveImage(thumbnail: string | null, category: string): string {
   if (thumbnail && thumbnail.trim() !== "") {
-    return thumbnail.replace("http://localhost/", `${SERVER_URL}/`);
+    if (/^https?:\/\//i.test(thumbnail)) {
+      return thumbnail.replace("http://localhost/", `${SERVER_URL}/`);
+    }
+
+    return `${SERVER_URL}/storage/${thumbnail.replace(/^\/+/, "")}`;
   }
   return FALLBACK_IMAGE[category] ?? FALLBACK_IMAGE.default;
 }

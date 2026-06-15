@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
+    private const MANAGER_PROJECT_THUMBNAIL_PATH = 'projects/manager';
+
     public function index()
     {
         $projects = Project::with(['category', 'city'])
@@ -64,7 +66,7 @@ class ProjectController extends Controller
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')
-                ->store('projects/admin', 'public');
+                ->store(self::MANAGER_PROJECT_THUMBNAIL_PATH, 'public');
         }
 
         $project = Project::create([
@@ -116,7 +118,7 @@ class ProjectController extends Controller
                 Storage::disk('public')->delete($project->thumbnail);
             }
             $validated['thumbnail'] = $request->file('thumbnail')
-                ->store('projects/admin', 'public');
+                ->store(self::MANAGER_PROJECT_THUMBNAIL_PATH, 'public');
         }
 
         $project->update([

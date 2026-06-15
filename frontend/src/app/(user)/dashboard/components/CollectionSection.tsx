@@ -14,7 +14,10 @@ const CATEGORY_IMAGES: Record<string, string> = {
 };
 
 function getImageUrl(thumbnail?: string, category?: string): string {
-  if (thumbnail) return `${SERVER}/storage/${thumbnail}`;
+  if (thumbnail) {
+    if (/^https?:\/\//i.test(thumbnail)) return thumbnail;
+    return `${SERVER}/storage/${thumbnail.replace(/^\/+/, "")}`;
+  }
   return CATEGORY_IMAGES[category ?? ""] ?? CATEGORY_IMAGES["default"];
 }
 

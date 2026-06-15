@@ -37,6 +37,8 @@ function formatDate(dateStr: string | null): string {
 
 const categoryColors: Record<string, { color: string; bg: string }> = {
   Retail: { color: "#1A56DB", bg: "#EBF3FF" },
+  "F&B": { color: "#d97706", bg: "#FFFBEB" },
+  "Food & Beverage": { color: "#d97706", bg: "#FFFBEB" },
   "Food and Beverage": { color: "#d97706", bg: "#FFFBEB" },
   Healthcare: { color: "#059669", bg: "#ECFDF5" },
 };

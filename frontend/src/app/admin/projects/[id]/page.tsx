@@ -48,6 +48,14 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
+function resolveThumbnailUrl(thumbnail?: string | null): string | null {
+  if (!thumbnail || thumbnail.trim() === "") return null;
+  if (/^https?:\/\//i.test(thumbnail)) return thumbnail;
+
+  const server = process.env.NEXT_PUBLIC_SERVER;
+  return `${server}/storage/${thumbnail.replace(/^\/+/, "")}`;
+}
+
 function useWindowWidth() {
   const [width, setWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1200,
@@ -411,10 +419,7 @@ export default function ProjectDetailPage() {
     );
   }
 
-  const SERVER = process.env.NEXT_PUBLIC_SERVER;
-  const thumbnailUrl = project.thumbnail
-    ? `${SERVER}/storage/${project.thumbnail}`
-    : null;
+  const thumbnailUrl = resolveThumbnailUrl(project.thumbnail);
   const dbId = project.api_url
     ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "-")
     : "-";

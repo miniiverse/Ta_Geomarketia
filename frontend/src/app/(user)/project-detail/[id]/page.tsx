@@ -39,6 +39,14 @@ type PlaceData = {
 
 type TabId = "map" | "cluster";
 
+function resolveThumbnailUrl(thumbnail?: string | null): string | null {
+  if (!thumbnail || thumbnail.trim() === "") return null;
+  if (/^https?:\/\//i.test(thumbnail)) return thumbnail;
+
+  const server = process.env.NEXT_PUBLIC_SERVER;
+  return `${server}/storage/${thumbnail.replace(/^\/+/, "")}`;
+}
+
 function formatPrice(price: string | number | null): string {
   if (!price) return "Rp0";
   const num = typeof price === "string" ? parseFloat(price) : price;
@@ -595,10 +603,7 @@ export default function UserProjectDetailPage() {
       .finally(() => setMapLoading(false));
   }, [project, isAuthenticated, hasPurchased]);
 
-  const SERVER = process.env.NEXT_PUBLIC_SERVER;
-  const thumbnailUrl = project?.thumbnail
-    ? `${SERVER}/storage/${project.thumbnail}`
-    : null;
+  const thumbnailUrl = resolveThumbnailUrl(project?.thumbnail);
 
   const handleLoginRedirect = () => {
     router.push("/login");

@@ -23,10 +23,21 @@ type ProjectApiItem = {
 };
 
 const CATEGORY_MAP: Record<string, number> = {
-  Retail: 1,
-  "F&B": 2,
-  Healthcare: 3,
+  retail: 1,
+  kuliner: 2,
+  "f&b": 2,
+  "food & beverage": 2,
+  "food and beverage": 2,
+  healthcare: 3,
 };
+
+function resolveCategoryId(category: string): number | null {
+  return CATEGORY_MAP[category.trim().toLowerCase()] ?? null;
+}
+
+function displayCategoryName(category: string): string {
+  return resolveCategoryId(category) === 2 ? "F&B" : category;
+}
 
 function resolveCityId(city: string): number | null {
   const c = (city ?? "").toLowerCase().trim();
@@ -148,7 +159,7 @@ export default function ProjectsPage() {
           ...new Set(
             data
               .map((p: ProjectApiItem) => p.category?.name)
-              .filter((name): name is string => Boolean(name)),
+              .filter((name: string | undefined): name is string => Boolean(name)),
           ),
         ];
         setTotalCategories(uniqueCats.length);
@@ -230,7 +241,7 @@ export default function ProjectsPage() {
       return;
     }
 
-    const resolvedCategoryId = CATEGORY_MAP[autoFilled.category] ?? null;
+    const resolvedCategoryId = resolveCategoryId(autoFilled.category);
     const resolvedCityId = resolveCityId(autoFilled.city);
 
     // ── Generate project name dari db_id ──
@@ -693,7 +704,7 @@ export default function ProjectsPage() {
                           }}
                         >
                           {isUsed ? "✓ " : ""}
-                          {p.project_name} · {p.city} ({p.category}) (
+                          {p.project_name} · {p.city} ({displayCategoryName(p.category)}) (
                           {p.total_data.toLocaleString()} data)
                           {isUsed ? " — Already added" : ""}
                         </option>
@@ -747,7 +758,7 @@ export default function ProjectsPage() {
                       <label style={labelStyle}>Category</label>
                       <input
                         readOnly
-                        value={autoFilled.category}
+                        value={displayCategoryName(autoFilled.category)}
                         style={readonlyStyle}
                       />
                     </div>
@@ -794,7 +805,7 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  {!CATEGORY_MAP[autoFilled.category] && (
+                  {!resolveCategoryId(autoFilled.category) && (
                     <div
                       style={{
                         display: "flex",
@@ -824,8 +835,9 @@ export default function ProjectsPage() {
                         <line x1="12" y1="17" x2="12.01" y2="17" />
                       </svg>
                       <span>
-                        Category &quot;{autoFilled.category}&quot; not yet available in
-                        the database, will be saved without a category.
+                        Category &quot;{displayCategoryName(autoFilled.category)}
+                        &quot; not yet available in the database, will be saved
+                        without a category.
                       </span>
                     </div>
                   )}

@@ -74,6 +74,35 @@ function clusterLabel(geoCluster: number): string {
   return `Cluster ${letters[idx]}${round > 0 ? round : ""}`;
 }
 
+function isValidCoordinate(place: PlaceData): boolean {
+  return (
+    Number.isFinite(place.latitude) &&
+    Number.isFinite(place.longitude) &&
+    place.latitude >= -90 &&
+    place.latitude <= 90 &&
+    place.longitude >= -180 &&
+    place.longitude <= 180
+  );
+}
+
+function getMapCoordinates(places: PlaceData[]): [number, number][] {
+  return places
+    .filter(isValidCoordinate)
+    .map((p) => [p.latitude, p.longitude] as [number, number]);
+}
+
+function getMapCenter(places: PlaceData[]): [number, number] {
+  const coordinates = getMapCoordinates(places);
+  if (coordinates.length === 0) return [0, 0];
+
+  const [latSum, lngSum] = coordinates.reduce(
+    ([lat, lng], [nextLat, nextLng]) => [lat + nextLat, lng + nextLng],
+    [0, 0],
+  );
+
+  return [latSum / coordinates.length, lngSum / coordinates.length];
+}
+
 function cross(O: [number, number], A: [number, number], B: [number, number]) {
   return (A[0] - O[0]) * (B[1] - O[1]) - (A[1] - O[1]) * (B[0] - O[0]);
 }
@@ -225,14 +254,19 @@ function createClusterLabelIcon(
 function FitBounds({ places }: { places: PlaceData[] }) {
   const map = useMap();
   const fitted = useRef(false);
+  const lastBoundsKey = useRef("");
   useEffect(() => {
-    if (places.length === 0 || fitted.current) return;
+    const coordinates = getMapCoordinates(places);
+    const boundsKey = coordinates.map(([lat, lng]) => `${lat},${lng}`).join("|");
+    if (boundsKey !== lastBoundsKey.current) {
+      fitted.current = false;
+      lastBoundsKey.current = boundsKey;
+    }
+    if (coordinates.length === 0 || fitted.current) return;
     const tryFit = () => {
       try {
         map.invalidateSize();
-        const bounds = L.latLngBounds(
-          places.map((p) => [p.latitude, p.longitude] as [number, number]),
-        );
+        const bounds = L.latLngBounds(coordinates);
         if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [48, 48] });
           fitted.current = true;
@@ -873,8 +907,7 @@ export default function ClusterAreaMap({
     }
   };
 
-  const center: [number, number] =
-    places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
+  const center = useMemo(() => getMapCenter(places), [places]);
 
   if (places.length === 0) {
     return (

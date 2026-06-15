@@ -36,6 +36,10 @@ type ClickedPoint = {
   lng: number;
 };
 
+type NearbyApiPlace = PlaceData & {
+  cluster_id?: number | string | null;
+};
+
 const CLUSTER_COLORS = [
   "#ef4444",
   "#22c55e",
@@ -67,6 +71,35 @@ function clusterLabel(geoCluster: number): string {
   const idx = geoCluster % letters.length;
   const round = Math.floor(geoCluster / letters.length);
   return `Cluster ${letters[idx]}${round > 0 ? round : ""}`;
+}
+
+function isValidCoordinate(place: PlaceData): boolean {
+  return (
+    Number.isFinite(place.latitude) &&
+    Number.isFinite(place.longitude) &&
+    place.latitude >= -90 &&
+    place.latitude <= 90 &&
+    place.longitude >= -180 &&
+    place.longitude <= 180
+  );
+}
+
+function getMapCoordinates(places: PlaceData[]): [number, number][] {
+  return places
+    .filter(isValidCoordinate)
+    .map((p) => [p.latitude, p.longitude] as [number, number]);
+}
+
+function getMapCenter(places: PlaceData[]): [number, number] {
+  const coordinates = getMapCoordinates(places);
+  if (coordinates.length === 0) return [0, 0];
+
+  const [latSum, lngSum] = coordinates.reduce(
+    ([lat, lng], [nextLat, nextLng]) => [lat + nextLat, lng + nextLng],
+    [0, 0],
+  );
+
+  return [latSum / coordinates.length, lngSum / coordinates.length];
 }
 
 function haversineMeters(
@@ -154,16 +187,21 @@ function renderStars(rating: number) {
 function FitBounds({ places }: { places: PlaceData[] }) {
   const map = useMap();
   const fitted = useRef(false);
+  const lastBoundsKey = useRef("");
   useEffect(() => {
-    if (places.length === 0 || fitted.current) return;
+    const coordinates = getMapCoordinates(places);
+    const boundsKey = coordinates.map(([lat, lng]) => `${lat},${lng}`).join("|");
+    if (boundsKey !== lastBoundsKey.current) {
+      fitted.current = false;
+      lastBoundsKey.current = boundsKey;
+    }
+    if (coordinates.length === 0 || fitted.current) return;
     const tryFit = () => {
       try {
         const container = map.getContainer();
         if (!container || !container.offsetParent) return;
         map.invalidateSize();
-        const bounds = L.latLngBounds(
-          places.map((p) => [p.latitude, p.longitude] as [number, number]),
-        );
+        const bounds = L.latLngBounds(coordinates);
         if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [40, 40] });
           fitted.current = true;
@@ -220,7 +258,7 @@ function RadiusCircle({
 
   useEffect(() => {
     if (circleRef.current) {
-      const el = (circleRef.current as any)._path;
+      const el = (circleRef.current as L.Circle & { _path?: SVGElement })._path;
       if (el) {
         el.style.pointerEvents = "none";
       }
@@ -466,8 +504,7 @@ export default function MapWithNearby({
     null,
   );
 
-  const center: [number, number] =
-    places.length > 0 ? [places[0].latitude, places[0].longitude] : [0, 0];
+  const center = useMemo(() => getMapCenter(places), [places]);
 
   const geoClusterMap = useMemo(() => {
     const map = new Map<number, number>();
@@ -499,7 +536,10 @@ export default function MapWithNearby({
         );
         if (!res.ok) throw new Error("API error");
         const json = await res.json();
-        const data: PlaceData[] = (json.data ?? json ?? []).map((p: any) => ({
+        const dataSource: NearbyApiPlace[] = Array.isArray(json)
+          ? json
+          : (json.data ?? []);
+        const data: PlaceData[] = dataSource.map((p: NearbyApiPlace) => ({
           ...p,
           cluster: p.cluster_id ?? p.cluster ?? null,
         }));
