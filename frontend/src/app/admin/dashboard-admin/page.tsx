@@ -13,7 +13,6 @@ export default function DashboardAdminPage() {
   const [fullname, setFullname] = useState<string>("Admin");
   const [currentDate, setCurrentDate] = useState<string>("");
 
-  // Fetch user info untuk dapatkan fullname
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -155,8 +154,6 @@ export default function DashboardAdminPage() {
         </div>
       </div>
 
-      <StatsCard />
-
       <style>{`
         .charts-grid {
           display: grid;
@@ -171,16 +168,25 @@ export default function DashboardAdminPage() {
         }
       `}</style>
 
-      <div className="charts-grid">
-        <MonthlyIncomeCard />
-        <ProductSalesCard />
-      </div>
+      <div
+        data-pdf-content
+        style={{
+          background: "#F5F7FB",
+        }}
+      >
+        <StatsCard />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <ProjectList />
-        <RecentTransactions />
-        <MonthlySalesSummary />
-        <TopSellingServices />
+        <div className="charts-grid">
+          <MonthlyIncomeCard />
+          <ProductSalesCard />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <ProjectList />
+          <RecentTransactions />
+          <MonthlySalesSummary />
+          <TopSellingServices />
+        </div>
       </div>
     </div>
   );

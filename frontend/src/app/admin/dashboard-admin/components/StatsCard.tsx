@@ -3,29 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "9px 12px",
-  borderRadius: "10px",
-  border: "1px solid #e2e8f0",
-  fontSize: "13px",
-  fontFamily: "'Inter', sans-serif",
-  color: "#0f172a",
-  outline: "none",
-  boxSizing: "border-box",
-  background: "#fff",
-  cursor: "pointer",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontSize: "11.5px",
-  fontWeight: 600,
-  fontFamily: "'Inter', sans-serif",
-  color: "#64748b",
-  marginBottom: "5px",
-};
-
 function formatRupiah(value: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -34,375 +11,241 @@ function formatRupiah(value: number): string {
   }).format(value);
 }
 
-function ExportExcelCard() {
-  const [showModal, setShowModal] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+function ExportPDFCard() {
+  const [loading, setLoading] = useState(false);
 
-  const handleExport = () => {
-    if (!startDate || !endDate) {
-      alert("Please fill in the start date and end date.");
-      return;
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import("jspdf"),
+        import("html2canvas"),
+      ]);
+
+      const dashboard =
+        document.querySelector<HTMLElement>("[data-pdf-content]");
+      if (!dashboard) {
+        alert("Dashboard content not found.");
+        setLoading(false);
+        return;
+      }
+
+      const canvas = await html2canvas(dashboard, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#F5F7FB",
+        logging: false,
+        windowWidth: 1280,
+        onclone: (clonedDocument) => {
+          clonedDocument
+            .querySelectorAll<HTMLElement>("[data-pdf-exclude]")
+            .forEach((element) => {
+              element.style.display = "none";
+            });
+
+          const clonedContent =
+            clonedDocument.querySelector<HTMLElement>("[data-pdf-content]");
+          if (clonedContent) {
+            clonedContent.style.width = "1180px";
+            clonedContent.style.padding = "8px 0 20px";
+            clonedContent.style.boxSizing = "border-box";
+          }
+        },
+      });
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const contentW = pageW - margin * 2;
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const ratio = contentW / imgW;
+      const totalH = imgH * ratio;
+
+      const today = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      pdf.setFontSize(9);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Geomarketia Dashboard Report — ${today}`, margin, 7);
+
+      let yOffset = 0;
+      const usableH = pageH - 14;
+      let page = 0;
+
+      while (yOffset < totalH) {
+        if (page > 0) pdf.addPage();
+
+        const srcY = yOffset / ratio;
+        const sliceH = Math.min(usableH / ratio, imgH - srcY);
+
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = imgW;
+        sliceCanvas.height = sliceH;
+        const ctx = sliceCanvas.getContext("2d")!;
+        ctx.drawImage(canvas, 0, srcY, imgW, sliceH, 0, 0, imgW, sliceH);
+
+        const sliceData = sliceCanvas.toDataURL("image/png");
+        pdf.addImage(sliceData, "PNG", margin, 10, contentW, sliceH * ratio);
+
+        yOffset += usableH;
+        page++;
+      }
+
+      const filename = `geomarketia-dashboard-${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(filename);
+    } catch (err) {
+      console.error(err);
+      alert("Gagal export PDF.");
+    } finally {
+      setLoading(false);
     }
-    if (new Date(startDate) > new Date(endDate)) {
-      alert("Start date cannot be later than end date.");
-      return;
-    }
-    setShowModal(false);
-    alert(
-      `Excel file downloaded successfully!\nPeriod: ${startDate} to ${endDate}`,
-    );
   };
 
   return (
-    <>
-      {showModal && (
-        <div
-          onClick={() => setShowModal(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(15,23,42,0.45)",
-            backdropFilter: "blur(2px)",
-            zIndex: 1000,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "20px",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: "20px",
-              width: "100%",
-              maxWidth: "400px",
-              boxShadow:
-                "0 20px 60px rgba(5,150,105,0.15), 0 4px 16px rgba(0,0,0,0.08)",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                background: "#059669",
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "12px" }}
-              >
-                <div
-                  style={{
-                    width: "34px",
-                    height: "34px",
-                    borderRadius: "10px",
-                    background: "rgba(255,255,255,0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#fff"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
-                </div>
-                <div>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "15px",
-                      fontWeight: 700,
-                      color: "#fff",
-                    }}
-                  >
-                    Export Excel
-                  </h3>
-                  <p
-                    style={{
-                      margin: "2px 0 0",
-                      fontSize: "12px",
-                      color: "rgba(255,255,255,0.75)",
-                    }}
-                  >
-                    Select the date range to export
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  background: "rgba(255,255,255,0.15)",
-                  border: "none",
-                  borderRadius: "8px",
-                  width: "30px",
-                  height: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  color: "#fff",
-                }}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            <div
-              style={{
-                padding: "24px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-              }}
-            >
-              <div>
-                <label style={labelStyle}>Start Date</label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) =>
-                    (e.currentTarget.style.borderColor = "#059669")
-                  }
-                  onBlur={(e) =>
-                    (e.currentTarget.style.borderColor = "#e2e8f0")
-                  }
-                />
-              </div>
-              <div>
-                <label style={labelStyle}>End Date</label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) =>
-                    (e.currentTarget.style.borderColor = "#059669")
-                  }
-                  onBlur={(e) =>
-                    (e.currentTarget.style.borderColor = "#e2e8f0")
-                  }
-                />
-              </div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "12px",
-                  color: "#94a3b8",
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                Transaction data within the selected date range will be
-                downloaded in{" "}
-                <strong style={{ color: "#374151" }}>.xlsx</strong> format
-              </p>
-            </div>
-
-            <div
-              style={{
-                padding: "14px 24px 20px",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
-                borderTop: "1px solid #f1f5f9",
-              }}
-            >
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  padding: "8px 20px",
-                  borderRadius: "10px",
-                  border: "1px solid #e2e8f0",
-                  background: "#fff",
-                  color: "#64748b",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  fontFamily: "'Inter', sans-serif",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleExport}
-                style={{
-                  padding: "8px 20px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "#059669",
-                  color: "#fff",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  fontFamily: "'Inter', sans-serif",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "7px",
-                  boxShadow: "0 1px 4px rgba(5,150,105,0.3)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#047857";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#059669";
-                }}
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                Export .xlsx
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div
+      data-pdf-exclude
+      style={{
+        background: "#ffffff",
+        borderRadius: "16px",
+        padding: "22px 22px 18px",
+        border: "1px solid #f1f5f9",
+        boxShadow: "0 1px 8px rgba(26,86,219,0.05)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "14px",
+      }}
+    >
       <div
         style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "22px 22px 18px",
-          border: "1px solid #f1f5f9",
-          boxShadow: "0 1px 8px rgba(26,86,219,0.05)",
           display: "flex",
-          flexDirection: "column",
-          gap: "14px",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div
+        <p
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            margin: 0,
+            fontSize: "16px",
+            fontWeight: 500,
+            fontFamily: "'Inter', sans-serif",
+            color: "#64748b",
           }}
         >
-          <p
-            style={{
-              margin: 0,
-              fontSize: "16px",
-              fontWeight: 500,
-              fontFamily: "'Inter', sans-serif",
-              color: "#64748b",
-            }}
-          >
-            Export Excel
-          </p>
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#ECFDF5",
-              border: "1px solid #A7F3D0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#059669",
-              flexShrink: 0,
-            }}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="12" y1="18" x2="12" y2="12" />
-              <line x1="9" y1="15" x2="15" y2="15" />
-            </svg>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setShowModal(true)}
+          Export PDF
+        </p>
+        <div
           style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "12px",
+            background: "#FEF2F2",
+            border: "1px solid #FECACA",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "7px",
-            padding: "8px 14px",
-            borderRadius: "10px",
-            border: "none",
-            background: "#059669",
-            color: "#fff",
-            fontSize: "12.5px",
-            fontWeight: 600,
-            fontFamily: "'Inter', sans-serif",
-            cursor: "pointer",
-            boxShadow: "0 1px 4px rgba(5,150,105,0.25)",
-            transition: "all 0.15s",
-            width: "100%",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#047857";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#059669";
+            color: "#dc2626",
+            flexShrink: 0,
           }}
         >
           <svg
-            width="13"
-            height="13"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.5"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="12" y1="18" x2="12" y2="12" />
+            <line x1="9" y1="15" x2="15" y2="15" />
           </svg>
-          Export Excel
-        </button>
+        </div>
       </div>
-    </>
+
+      <button
+        onClick={handleExport}
+        disabled={loading}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "7px",
+          padding: "8px 14px",
+          borderRadius: "10px",
+          border: "none",
+          background: loading ? "#94a3b8" : "#dc2626",
+          color: "#fff",
+          fontSize: "12.5px",
+          fontWeight: 600,
+          fontFamily: "'Inter', sans-serif",
+          cursor: loading ? "not-allowed" : "pointer",
+          boxShadow: "0 1px 4px rgba(220,38,38,0.25)",
+          transition: "all 0.15s",
+          width: "100%",
+        }}
+        onMouseEnter={(e) => {
+          if (!loading) e.currentTarget.style.background = "#b91c1c";
+        }}
+        onMouseLeave={(e) => {
+          if (!loading) e.currentTarget.style.background = "#dc2626";
+        }}
+      >
+        {loading ? (
+          <>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ animation: "spin 1s linear infinite" }}
+            >
+              <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.25" />
+              <path d="M21 12a9 9 0 00-9-9" />
+            </svg>
+            Generating...
+          </>
+        ) : (
+          <>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Export PDF
+          </>
+        )}
+      </button>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </div>
   );
 }
 
@@ -633,7 +476,7 @@ export default function StatCards() {
           );
         })}
 
-        <ExportExcelCard />
+        <ExportPDFCard />
       </div>
 
       <style>{`
