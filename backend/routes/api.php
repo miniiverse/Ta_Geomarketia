@@ -74,6 +74,8 @@ Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
     Route::get('/admin/dashboard/category-sales', [DashboardController::class, 'categorySales']);
     Route::get('/admin/dashboard/monthly-sales-summary', [DashboardController::class, 'monthlySalesSummary']);
     Route::get('/admin/monthly-sales-summary', [DashboardController::class, 'monthlySalesSummary']);
+    Route::get('/admin/dashboard/top-selling-services', [DashboardController::class, 'topSellingServices']);
+    Route::get('/admin/top-selling-services', [DashboardController::class, 'topSellingServices']);
 });
 
 Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {

@@ -179,4 +179,56 @@ class DashboardController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function topSellingServices(Request $request)
+    {
+        $orders = Order::with('project.category')
+            ->with('payment')
+            ->where('order_status', 'paid')
+            ->whereHas('payment', function ($q) {
+                $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
+                  ->whereNotNull('payment_time');
+            })
+            ->get();
+
+        $grouped = [];
+
+        foreach ($orders as $order) {
+            $payment = $order->payment;
+            if (!$payment || !$payment->payment_time) {
+                continue;
+            }
+
+            $projectId = $order->project_id ?? 0;
+            $projectName = $order->project?->title ?? 'Unknown';
+            $categoryName = $order->project?->category?->name ?? 'Uncategorized';
+
+            if (!isset($grouped[$projectId])) {
+                $grouped[$projectId] = [
+                    'name' => $projectName,
+                    'category' => $categoryName,
+                    'sold' => 0,
+                    'revenue' => 0,
+                ];
+            }
+
+            $grouped[$projectId]['sold'] += 1;
+            $grouped[$projectId]['revenue'] += (float) ($payment->gross_amount ?? 0);
+        }
+
+        $data = array_values($grouped);
+
+        usort($data, function ($a, $b) {
+            $revenueCompare = $b['revenue'] <=> $a['revenue'];
+
+            return $revenueCompare !== 0
+                ? $revenueCompare
+                : $b['sold'] <=> $a['sold'];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
 }
