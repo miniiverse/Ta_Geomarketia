@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import ProjectStatsCard from "./components/ProjectStatsCard";
-import ProjectDetailAIChatPanel from "./components/ProjectDetailAIChatPanel";
+// import ProjectDetailAIChatPanel from "./components/ProjectDetailAIChatPanel";
 
 type Project = {
   id: number;
@@ -263,7 +263,6 @@ function PurchaseLockedState({ onCheckout }: { onCheckout: () => void }) {
             <path d="M16 10a4 4 0 01-8 0" />
           </svg>
         </div>
-
         <h3
           style={{
             margin: "0 0 10px",
@@ -276,7 +275,6 @@ function PurchaseLockedState({ onCheckout }: { onCheckout: () => void }) {
         >
           Purchase Required
         </h3>
-
         <p
           style={{
             margin: "0 0 24px",
@@ -289,7 +287,6 @@ function PurchaseLockedState({ onCheckout }: { onCheckout: () => void }) {
           You cannot access this feature because you have not made a purchase.
           Buy this project to access the Cluster Area.
         </p>
-
         <button
           onClick={onCheckout}
           style={{
@@ -384,7 +381,6 @@ function CollectionLockedState({ onGoCollection }: { onGoCollection: () => void 
             <line x1="9" y1="14" x2="15" y2="14" />
           </svg>
         </div>
-
         <h3
           style={{
             margin: "0 0 10px",
@@ -397,7 +393,6 @@ function CollectionLockedState({ onGoCollection }: { onGoCollection: () => void 
         >
           Access via My Collection
         </h3>
-
         <p
           style={{
             margin: "0 0 24px",
@@ -407,10 +402,8 @@ function CollectionLockedState({ onGoCollection }: { onGoCollection: () => void 
             fontFamily: "'Inter', sans-serif",
           }}
         >
-          
           You have already purchased this project go to Collections to explore the Cluster Area.
         </p>
-
         <button
           onClick={onGoCollection}
           style={{
@@ -615,21 +608,21 @@ export default function UserProjectDetailPage() {
     );
   };
 
-  // Redirect user to Collection page to access Cluster Area
   const handleGoCollection = () => {
     router.push("/collections");
   };
 
-  const projectInfo = project
-    ? {
-        name: project.name,
-        category: project.category,
-        totalData: project.totalData,
-        city: project.city,
-        province: project.province,
-        description: project.description,
-      }
-    : null;
+  // Used by ProjectDetailAIChatPanel - uncomment when backend is ready
+  // const projectInfo = project
+  //   ? {
+  //       name: project.name,
+  //       category: project.category,
+  //       totalData: project.totalData,
+  //       city: project.city,
+  //       province: project.province,
+  //       description: project.description,
+  //     }
+  //   : null;
 
   if (isLoading || isAuthenticated === null) {
     return (
@@ -823,7 +816,6 @@ export default function UserProjectDetailPage() {
           </div>
         </div>
 
-
         <div style={{ animation: "fadeUp 0.5s 0.1s ease both" }}>
           {activeTab === "map" && (
             <div style={{ background: "#fff", borderRadius: "20px", border: "1.5px solid #E0ECFF", padding: "24px", boxShadow: "0 2px 20px rgba(26,86,219,0.06)" }}>
@@ -922,12 +914,13 @@ export default function UserProjectDetailPage() {
         </div>
       </div>
 
-      {projectInfo && activeTab === "map" && (
+      {/* AI Chat Panel - hidden until backend is ready */}
+      {/* {projectInfo && activeTab === "map" && (
         <ProjectDetailAIChatPanel mode="map" project={projectInfo} />
       )}
       {projectInfo && activeTab === "cluster" && (
         <ProjectDetailAIChatPanel mode="cluster" project={projectInfo} />
-      )}
+      )} */}
     </div>
   );
 }

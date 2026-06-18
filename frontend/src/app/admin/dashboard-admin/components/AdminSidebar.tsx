@@ -32,7 +32,7 @@ const navItems = [
       </svg>
     ),
   },
-   {
+  {
     label: "Registered Users",
     href: "/admin/registered-users",
     icon: (
@@ -91,28 +91,6 @@ const navItems = [
         <rect x="2" y="6" width="20" height="13" rx="2" />
         <path d="M2 10h20" />
         <path d="M7 15h2M13 15h4" />
-      </svg>
-    ),
-  },
-  {
-    label: "Export Reports",
-    href: "/admin/export-reports",
-    icon: (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="12" y1="18" x2="12" y2="12" />
-        <line x1="9" y1="15" x2="12" y2="18" />
-        <line x1="15" y1="15" x2="12" y2="18" />
       </svg>
     ),
   },
