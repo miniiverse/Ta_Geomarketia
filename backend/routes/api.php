@@ -68,8 +68,9 @@ Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
     Route::delete('/users/{id}',      [UserController::class, 'destroy']);
     Route::put('/users/{id}/promote', [UserController::class, 'promote']);
 
-    Route::get('/admin/transactions',      [TransactionsController::class, 'index']);
-    Route::get('/admin/transactions/{id}', [TransactionsController::class, 'show']);
+    Route::get('/admin/transactions',              [TransactionsController::class, 'index']);
+    Route::get('/admin/transactions/export-excel', [TransactionsController::class, 'exportExcel']);
+    Route::get('/admin/transactions/{id}',         [TransactionsController::class, 'show']);
     Route::get('/admin/dashboard/monthly-income', [DashboardController::class, 'monthlyIncome']);
     Route::get('/admin/dashboard/category-sales', [DashboardController::class, 'categorySales']);
     Route::get('/admin/dashboard/monthly-sales-summary', [DashboardController::class, 'monthlySalesSummary']);

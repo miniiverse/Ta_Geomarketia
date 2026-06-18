@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-type ServiceRow = {
-  name: string;
+type CategoryRow = {
   category: string;
   sold: number;
   revenue: string;
 };
-
-const columns = ["Service Name", "Category", "Sold", "Revenue"];
 
 const categoryColors: Record<string, { color: string; bg: string }> = {
   "Food & Beverage": { color: "#d97706", bg: "#FFFBEB" },
@@ -25,8 +22,10 @@ function formatRupiah(amount: number): string {
   return "Rp " + amount.toLocaleString("id-ID");
 }
 
+const rankColors = ["#f59e0b", "#94a3b8", "#b45309"];
+
 export default function TopSellingServices() {
-  const [rows, setRows] = useState<ServiceRow[]>([]);
+  const [rows, setRows] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,19 +45,13 @@ export default function TopSellingServices() {
         const json = await res.json();
         if (!json.success) throw new Error("Response tidak sukses");
 
-        const mapped: ServiceRow[] = json.data.map(
-          (item: {
-            name: string;
-            category: string;
-            sold: number;
-            revenue: number;
-          }) => ({
-            name: item.name,
+        const mapped: CategoryRow[] = json.data
+          .slice(0, 5)
+          .map((item: { category: string; sold: number; revenue: number }) => ({
             category: item.category,
             sold: item.sold,
             revenue: formatRupiah(item.revenue),
-          }),
-        );
+          }));
 
         setRows(mapped);
       } catch (err: unknown) {
@@ -87,13 +80,6 @@ export default function TopSellingServices() {
           border-bottom: 1px solid #f1f5f9;
         }
         .tss-card:last-child { border-bottom: none; }
-        .tss-card-name {
-          font-family: 'Inter', sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          color: #374151;
-          margin-bottom: 8px;
-        }
         .tss-card-row {
           display: flex;
           justify-content: space-between;
@@ -157,7 +143,7 @@ export default function TopSellingServices() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Top Selling Services
+              Top Selling Categories
             </h2>
             <p
               style={{
@@ -166,7 +152,9 @@ export default function TopSellingServices() {
                 color: "#94a3b8",
                 fontFamily: "'Inter', sans-serif",
               }}
-            />
+            >
+              Kategori dengan transaksi terbanyak
+            </p>
           </div>
         </div>
 
@@ -218,33 +206,38 @@ export default function TopSellingServices() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#F8FAFF" }}>
-                    {columns.map((col) => (
-                      <th
-                        key={col}
-                        style={{
-                          padding: "11px 18px",
-                          textAlign: "left",
-                          fontSize: "11.5px",
-                          fontWeight: 600,
-                          fontFamily: "'Inter', sans-serif",
-                          color: "#64748b",
-                          letterSpacing: "0.04em",
-                          textTransform: "uppercase",
-                          whiteSpace: "nowrap",
-                          borderBottom: "1px solid #f1f5f9",
-                        }}
-                      >
-                        {col}
-                      </th>
-                    ))}
+                    {["Rank", "Category", "Total Sold", "Total Revenue"].map(
+                      (col) => (
+                        <th
+                          key={col}
+                          style={{
+                            padding: "11px 18px",
+                            textAlign: "left",
+                            fontSize: "11.5px",
+                            fontWeight: 600,
+                            fontFamily: "'Inter', sans-serif",
+                            color: "#64748b",
+                            letterSpacing: "0.04em",
+                            textTransform: "uppercase",
+                            whiteSpace: "nowrap",
+                            borderBottom: "1px solid #f1f5f9",
+                          }}
+                        >
+                          {col}
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((row, i) => {
                     const cat = categoryColors[row.category] ?? defaultColor;
+                    const rankColor = rankColors[i] ?? "#cbd5e1";
+                    const rankLabel = i + 1;
+
                     return (
                       <tr
-                        key={row.name}
+                        key={row.category}
                         style={{
                           borderBottom:
                             i < rows.length - 1 ? "1px solid #f8fafc" : "none",
@@ -260,16 +253,26 @@ export default function TopSellingServices() {
                         }
                       >
                         <td
-                          style={{
-                            padding: "13px 18px",
-                            fontFamily: "'Inter', sans-serif",
-                            fontSize: "13px",
-                            color: "#374151",
-                            fontWeight: 500,
-                            whiteSpace: "nowrap",
-                          }}
+                          style={{ padding: "13px 18px", whiteSpace: "nowrap" }}
                         >
-                          {row.name}
+                          <div
+                            style={{
+                              width: "28px",
+                              height: "28px",
+                              borderRadius: "8px",
+                              background: rankColor + "22",
+                              border: `1px solid ${rankColor}55`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              fontFamily: "'Inter', sans-serif",
+                              color: rankColor,
+                            }}
+                          >
+                            {rankLabel}
+                          </div>
                         </td>
                         <td
                           style={{ padding: "13px 18px", whiteSpace: "nowrap" }}
@@ -293,7 +296,8 @@ export default function TopSellingServices() {
                             padding: "13px 18px",
                             fontFamily: "'Inter', sans-serif",
                             fontSize: "13px",
-                            color: "#374151",
+                            fontWeight: 600,
+                            color: "#0f172a",
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -319,14 +323,35 @@ export default function TopSellingServices() {
             </div>
 
             <div className="tss-mobile-list">
-              {rows.map((row) => {
+              {rows.map((row, i) => {
                 const cat = categoryColors[row.category] ?? defaultColor;
-                return (
-                  <div key={row.name} className="tss-card">
-                    <div className="tss-card-name">{row.name}</div>
+                const rankColor = rankColors[i] ?? "#cbd5e1";
 
-                    <div className="tss-card-row">
-                      <span className="tss-card-label">Category</span>
+                return (
+                  <div key={row.category} className="tss-card">
+                    <div
+                      className="tss-card-row"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      <div
+                        style={{
+                          width: "26px",
+                          height: "26px",
+                          borderRadius: "7px",
+                          background: rankColor + "22",
+                          border: `1px solid ${rankColor}55`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          fontFamily: "'Inter', sans-serif",
+                          color: rankColor,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {i + 1}
+                      </div>
                       <span
                         style={{
                           background: cat.bg,
@@ -343,12 +368,12 @@ export default function TopSellingServices() {
                     </div>
 
                     <div className="tss-card-row">
-                      <span className="tss-card-label">Sold</span>
+                      <span className="tss-card-label">Total Sold</span>
                       <span className="tss-card-value muted">{row.sold}</span>
                     </div>
 
                     <div className="tss-card-row">
-                      <span className="tss-card-label">Revenue</span>
+                      <span className="tss-card-label">Total Revenue</span>
                       <span className="tss-card-value">{row.revenue}</span>
                     </div>
                   </div>

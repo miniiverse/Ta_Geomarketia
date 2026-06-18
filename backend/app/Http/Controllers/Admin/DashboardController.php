@@ -17,7 +17,7 @@ class DashboardController extends Controller
             ->where('order_status', 'paid')
             ->whereHas('payment', function ($q) {
                 $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
-                  ->whereNotNull('payment_time');
+                    ->whereNotNull('payment_time');
             })
             ->get();
 
@@ -67,7 +67,7 @@ class DashboardController extends Controller
             ->where('order_status', 'paid')
             ->whereHas('payment', function ($q) {
                 $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
-                  ->whereNotNull('payment_time');
+                    ->whereNotNull('payment_time');
             })
             ->get();
 
@@ -122,7 +122,7 @@ class DashboardController extends Controller
             ->where('order_status', 'paid')
             ->whereHas('payment', function ($q) {
                 $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
-                  ->whereNotNull('payment_time');
+                    ->whereNotNull('payment_time');
             })
             ->get();
 
@@ -187,7 +187,7 @@ class DashboardController extends Controller
             ->where('order_status', 'paid')
             ->whereHas('payment', function ($q) {
                 $q->whereIn('payment_status', self::SOLD_PAYMENT_STATUSES)
-                  ->whereNotNull('payment_time');
+                    ->whereNotNull('payment_time');
             })
             ->get();
 
@@ -199,36 +199,35 @@ class DashboardController extends Controller
                 continue;
             }
 
-            $projectId = $order->project_id ?? 0;
-            $projectName = $order->project?->title ?? 'Unknown';
+            $categoryId   = $order->project?->category_id ?? 0;
             $categoryName = $order->project?->category?->name ?? 'Uncategorized';
 
-            if (!isset($grouped[$projectId])) {
-                $grouped[$projectId] = [
-                    'name' => $projectName,
-                    'category' => $categoryName,
-                    'sold' => 0,
-                    'revenue' => 0,
+            if (!isset($grouped[$categoryId])) {
+                $grouped[$categoryId] = [
+                    'category'      => $categoryName,
+                    'sold'          => 0,
+                    'revenue'       => 0,
                 ];
             }
 
-            $grouped[$projectId]['sold'] += 1;
-            $grouped[$projectId]['revenue'] += (float) ($payment->gross_amount ?? 0);
+            $grouped[$categoryId]['sold']    += 1;
+            $grouped[$categoryId]['revenue'] += (float) ($payment->gross_amount ?? 0);
         }
 
         $data = array_values($grouped);
 
         usort($data, function ($a, $b) {
-            $revenueCompare = $b['revenue'] <=> $a['revenue'];
-
-            return $revenueCompare !== 0
-                ? $revenueCompare
-                : $b['sold'] <=> $a['sold'];
+            $soldCompare = $b['sold'] <=> $a['sold'];
+            return $soldCompare !== 0
+                ? $soldCompare
+                : $b['revenue'] <=> $a['revenue'];
         });
+
+        $data = array_slice($data, 0, 5);
 
         return response()->json([
             'success' => true,
-            'data' => $data,
+            'data'    => $data,
         ]);
     }
 }
