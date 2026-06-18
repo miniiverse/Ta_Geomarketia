@@ -154,7 +154,7 @@ function ExportModal({ onClose }: { onClose: () => void }) {
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
-                Export Excel
+                Export Transaction
               </h3>
               <p
                 style={{
@@ -515,25 +515,28 @@ export default function TransactionPage() {
               gap: "7px",
               padding: "10px 18px",
               borderRadius: "12px",
-              border: "1px solid #A7F3D0",
-              background: "#ECFDF5",
-              color: "#059669",
+              border: "none",
+              background: "#059669",
+              color: "#fff",
               fontSize: "13px",
-              fontWeight: 600,
+              fontWeight: 500,
               fontFamily: "'Inter', sans-serif",
               cursor: "pointer",
               whiteSpace: "nowrap",
               transition: "all 0.15s",
+              boxShadow: "0 2px 8px rgba(5,150,105,0.25)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#059669";
-              e.currentTarget.style.color = "#fff";
-              e.currentTarget.style.borderColor = "#059669";
+              e.currentTarget.style.background = "#047857";
+              e.currentTarget.style.boxShadow =
+                "0 4px 16px rgba(5,150,105,0.35)";
+              e.currentTarget.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#ECFDF5";
-              e.currentTarget.style.color = "#059669";
-              e.currentTarget.style.borderColor = "#A7F3D0";
+              e.currentTarget.style.background = "#059669";
+              e.currentTarget.style.boxShadow =
+                "0 2px 8px rgba(5,150,105,0.25)";
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <svg
@@ -551,7 +554,7 @@ export default function TransactionPage() {
               <line x1="12" y1="18" x2="12" y2="12" />
               <line x1="9" y1="15" x2="15" y2="15" />
             </svg>
-            Export Excel
+            Export Transaction
           </button>
         </div>
 
