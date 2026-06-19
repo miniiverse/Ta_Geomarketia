@@ -30,7 +30,7 @@ type PlaceData = {
   cluster?: number | null;
 };
 
-type Tab = "overview" | "sp-map" | "cluster";
+type Tab = "overview" | "sp-map" | "cluster" | "intelligent";
 
 function formatPrice(price: string | number | null): string {
   if (!price) return "Rp0";
@@ -51,7 +51,6 @@ function formatDate(dateStr: string | null): string {
 function resolveThumbnailUrl(thumbnail?: string | null): string | null {
   if (!thumbnail || thumbnail.trim() === "") return null;
   if (/^https?:\/\//i.test(thumbnail)) return thumbnail;
-
   const server = process.env.NEXT_PUBLIC_SERVER;
   return `${server}/storage/${thumbnail.replace(/^\/+/, "")}`;
 }
@@ -68,21 +67,29 @@ function useWindowWidth() {
   return width;
 }
 
-const tabs: { key: Tab; label: string; icon: string }[] = [
+const tabs: { key: Tab; label: string; iconPath: string }[] = [
   {
     key: "overview",
     label: "Overview",
-    icon: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+    iconPath: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
   },
   {
     key: "sp-map",
     label: "Map Analysis",
-    icon: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
+    iconPath:
+      "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
   },
   {
     key: "cluster",
     label: "Cluster Area",
-    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+    iconPath:
+      "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+  },
+  {
+    key: "intelligent",
+    label: "Intelligent System",
+    iconPath:
+      "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
   },
 ];
 
@@ -256,6 +263,40 @@ const ClusterMapComponent = dynamic(
   },
 );
 
+const IntelligentSystemMap = dynamic(
+  () => import("../components/IntelligentSystemMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          background: "#f0f7ff",
+          borderRadius: "14px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "clamp(400px, 65vh, 700px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ textAlign: "center", color: "#1A56DB" }}>
+            <IconLoading />
+            <div
+              style={{ fontSize: "13px", fontWeight: 600, marginTop: "8px" }}
+            >
+              Loading intelligent system...
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+);
+
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -328,6 +369,10 @@ export default function ProjectDetailPage() {
       .catch((err) => setMapError(err.message))
       .finally(() => setMapLoading(false));
   }, [project]);
+
+  const dbName = project?.api_url
+    ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "")
+    : "";
 
   const labelStyle: React.CSSProperties = {
     display: "block",
@@ -423,6 +468,16 @@ export default function ProjectDetailPage() {
   const dbId = project.api_url
     ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "-")
     : "-";
+
+  const statsCards = [
+    {
+      label: "Total Points",
+      value: mapLoading ? "..." : places.length.toLocaleString(),
+      icon: <IconPin />,
+    },
+    { label: "Category", value: project.category || "-", icon: <IconTag /> },
+    { label: "City", value: project.city || "-", icon: <IconMapIcon /> },
+  ];
 
   return (
     <div
@@ -644,7 +699,7 @@ export default function ProjectDetailPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d={t.icon} />
+                  <path d={t.iconPath} />
                 </svg>
                 {t.label}
               </button>
@@ -776,7 +831,7 @@ export default function ProjectDetailPage() {
                 <textarea
                   readOnly
                   rows={3}
-                  value={project.description || "Tidak ada deskripsi."}
+                  value={project.description || "No description available."}
                   style={{ ...readonlyStyle, resize: "none", lineHeight: 1.6 }}
                 />
               </div>
@@ -833,33 +888,16 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {tab === "sp-map" && (
-            <div>
+          {(tab === "sp-map" || tab === "cluster" || tab === "intelligent") && (
+            <div style={{ marginBottom: "16px" }}>
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
                   gap: "12px",
-                  marginBottom: "16px",
                 }}
               >
-                {[
-                  {
-                    label: "Total Points",
-                    value: mapLoading ? "..." : places.length.toLocaleString(),
-                    icon: <IconPin />,
-                  },
-                  {
-                    label: "Category",
-                    value: project.category || "-",
-                    icon: <IconTag />,
-                  },
-                  {
-                    label: "City",
-                    value: project.city || "-",
-                    icon: <IconMapIcon />,
-                  },
-                ].map((item) => (
+                {statsCards.map((item) => (
                   <div
                     key={item.label}
                     style={{
@@ -903,7 +941,11 @@ export default function ProjectDetailPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
 
+          {tab === "sp-map" && (
+            <div>
               {mapLoading && (
                 <div
                   style={{
@@ -940,7 +982,6 @@ export default function ProjectDetailPage() {
                   </div>
                 </div>
               )}
-
               {mapError && (
                 <div
                   style={{
@@ -977,18 +1018,11 @@ export default function ProjectDetailPage() {
                   </div>
                 </div>
               )}
-
               {!mapLoading && !mapError && places.length > 0 && (
-                <div
-                  style={{
-                    borderRadius: "14px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div style={{ borderRadius: "14px", overflow: "hidden" }}>
                   <MapComponent places={places} />
                 </div>
               )}
-
               {!mapLoading && !mapError && places.length === 0 && (
                 <div
                   style={{
@@ -1014,76 +1048,99 @@ export default function ProjectDetailPage() {
 
           {tab === "cluster" && (
             <div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-                  gap: "12px",
-                  marginBottom: "16px",
-                }}
-              >
-                {[
-                  {
-                    label: "Total Points",
-                    value: mapLoading ? "..." : places.length.toLocaleString(),
-                    icon: <IconPin />,
-                  },
-                  {
-                    label: "Category",
-                    value: project.category || "-",
-                    icon: <IconTag />,
-                  },
-                  {
-                    label: "City",
-                    value: project.city || "-",
-                    icon: <IconMapIcon />,
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    style={{
-                      background: "#F8FAFF",
-                      borderRadius: "12px",
-                      padding: "14px 16px",
-                      border: "1px solid #EBF3FF",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
+              <ClusterMapComponent places={places} />
+            </div>
+          )}
+
+          {tab === "intelligent" && (
+            <div>
+              {mapLoading && (
+                <div
+                  style={{
+                    height: "clamp(400px, 65vh, 700px)",
+                    background: "#f0f7ff",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #bfdbfe",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                    <IconLoading />
                     <div
                       style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        background: "#EBF3FF",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        marginTop: "12px",
                       }}
                     >
-                      {item.icon}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "11px", color: "#64748b" }}>
-                        {item.label}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "16px",
-                          fontWeight: 700,
-                          color: "#0f172a",
-                        }}
-                      >
-                        {item.value}
-                      </div>
+                      Loading data for analysis...
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <ClusterMapComponent places={places} />
+                </div>
+              )}
+              {mapError && (
+                <div
+                  style={{
+                    height: "clamp(400px, 65vh, 700px)",
+                    background: "#fff5f5",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #fecaca",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <IconWarning />
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "#ef4444",
+                        marginTop: "12px",
+                      }}
+                    >
+                      Failed to load data
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "11.5px",
+                        color: "#64748b",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {mapError}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!mapLoading && !mapError && places.length > 0 && dbName && (
+                <IntelligentSystemMap places={places} dbName={dbName} />
+              )}
+              {!mapLoading && !mapError && (places.length === 0 || !dbName) && (
+                <div
+                  style={{
+                    height: "clamp(400px, 65vh, 700px)",
+                    background: "#f8fafc",
+                    borderRadius: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <div style={{ textAlign: "center", color: "#94a3b8" }}>
+                    <IconMapEmpty />
+                    <div style={{ fontSize: "13px", marginTop: "12px" }}>
+                      {!dbName
+                        ? "API URL is not available for this project."
+                        : "No location data available."}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -161,7 +161,7 @@ function ConfirmDialog({
           >
             Are you sure you want to delete the project{" "}
             <span style={{ fontWeight: 700, color: "#0f172a" }}>
-              "{projectName}"
+              &quot;{projectName}&quot;
             </span>
             ? Deleted data cannot be recovered.
           </p>
@@ -296,7 +296,7 @@ export default function ProjectsTable({
       }));
       setProjects(mapped);
     } catch (err) {
-      console.error("Gagal fetch projects:", err);
+      console.error("Failed to fetch projects:", err);
     } finally {
       setIsLoading(false);
     }
@@ -318,7 +318,7 @@ export default function ProjectsTable({
     setDeletingId(id);
     try {
       const res = await fetch(`/api/project/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal hapus");
+      if (!res.ok) throw new Error("Failed to delete");
       setTimeout(() => {
         setProjects((prev) => prev.filter((p) => p.id !== id));
         setDeletingId(null);
@@ -361,7 +361,7 @@ export default function ProjectsTable({
 
       const text = await res.text();
       const data = JSON.parse(text);
-      if (!res.ok) throw new Error(data.message || "Gagal menyimpan.");
+      if (!res.ok) throw new Error(data.message || "Failed to save.");
 
       closeEdit();
       fetchProjects();
@@ -953,7 +953,7 @@ export default function ProjectsTable({
                       fontFamily: "'Inter', sans-serif",
                     }}
                   >
-                    Thumbnail saat ini akan tetap dipakai jika tidak diganti.
+                    The current thumbnail will remain in use if it is not changed.
                   </p>
                 )}
               </FieldRow>
@@ -1020,10 +1020,10 @@ export default function ProjectsTable({
                       >
                         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                       </svg>
-                      Menyimpan...
+                      Saving...
                     </span>
                   ) : (
-                    "Simpan Perubahan"
+                    "Save Changes"
                   )}
                 </button>
               </div>
@@ -1218,7 +1218,7 @@ export default function ProjectsTable({
                       >
                         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                       </svg>
-                      <span>Memuat data...</span>
+                      <span>Loading data...</span>
                     </div>
                     <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
                   </td>
@@ -1478,7 +1478,7 @@ export default function ProjectsTable({
                               <path d="M10 11v6M14 11v6" />
                               <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                             </svg>
-                            <span className="pt-btn-label">Hapus</span>
+                            <span className="pt-btn-label">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -1520,7 +1520,7 @@ export default function ProjectsTable({
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   <line x1="8" y1="11" x2="14" y2="11" />
                 </svg>
-                <span>Tidak ada project ditemukan.</span>
+                <span>No projects found.</span>
               </div>
             </div>
           )}
@@ -1557,7 +1557,7 @@ export default function ProjectsTable({
                 >
                   <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                 </svg>
-                <span>Memuat data...</span>
+                <span>Loading data...</span>
               </div>
             </div>
           )}
@@ -1594,7 +1594,7 @@ export default function ProjectsTable({
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   <line x1="8" y1="11" x2="14" y2="11" />
                 </svg>
-                <span>Tidak ada project ditemukan.</span>
+                <span>No projects found.</span>
               </div>
             </div>
           )}

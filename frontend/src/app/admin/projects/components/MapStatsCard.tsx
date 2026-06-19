@@ -20,7 +20,7 @@ export default function MapStatsCard({
   activeRadius,
   clickedPoint,
 }: MapStatsCardProps) {
-  // Fallback: jika tidak ada clickedPoint, pakai semua places untuk avg rating
+  // Fallback: if there is no clicked point, use all places for the average rating.
   const displayPlaces = clickedPoint && nearbyPlaces ? nearbyPlaces : places;
 
   const avgRating = useMemo(() => {

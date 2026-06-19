@@ -30,14 +30,19 @@ type PlaceData = {
   address: string;
   rating: number;
   review: number;
-  cluster?: number | null;
+  cluster?: number | string | null;
   services?: string | null;
   open_hours?: string | null;
   phone?: string | null;
   url?: string | null;
 };
 
-type TabId = "map" | "cluster";
+type ApiPlace = Omit<PlaceData, "cluster"> & {
+  cluster?: number | string | null;
+  cluster_id?: number | string | null;
+};
+
+type TabId = "map" | "cluster" | "intelligent";
 
 function resolveThumbnailUrl(thumbnail?: string | null): string | null {
   if (!thumbnail || thumbnail.trim() === "") return null;
@@ -494,6 +499,32 @@ const UserClusterMapComponent = dynamic(
   }
 );
 
+const UserIntelligentSystemMap = dynamic(
+  () => import("./components/UserIntelligentSystemMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: "clamp(420px, 65vh, 720px)",
+          background: "#f0f7ff",
+          borderRadius: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#1A56DB" }}>
+          <SpinIcon />
+          <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "10px", fontFamily: "'Inter', sans-serif" }}>
+            Loading intelligent system...
+          </div>
+        </div>
+      </div>
+    ),
+  }
+);
+
 const TABS: { id: TabId; label: string; icon: string }[] = [
   {
     id: "map",
@@ -505,6 +536,11 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
     label: "Cluster Area",
     icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
   },
+  {
+    id: "intelligent",
+    label: "Intelligent System",
+    icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+  },
 ];
 
 export default function UserProjectDetailPage() {
@@ -514,7 +550,9 @@ export default function UserProjectDetailPage() {
   const id = params?.id as string;
 
   const [activeTab, setActiveTab] = useState<TabId>(
-    searchParams.get("tab") === "cluster" ? "cluster" : "map"
+    searchParams.get("tab") === "cluster" || searchParams.get("tab") === "intelligent"
+      ? (searchParams.get("tab") as TabId)
+      : "map"
   );
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -538,12 +576,17 @@ export default function UserProjectDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    setIsLoading(true);
-    fetch(`/api/projects-user/${id}`)
-      .then((r) => r.json())
-      .then((json) => {
+
+    let cancelled = false;
+
+    async function loadProject() {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/projects-user/${id}`);
+        const json = await response.json();
         if (!json.success) throw new Error(json.message || "Project not found");
         const p = json.data;
+        if (cancelled) return;
         setProject({
           id: p.project_id,
           name: p.title,
@@ -559,9 +602,22 @@ export default function UserProjectDetailPage() {
           has_purchased: p.has_purchased ?? false,
         });
         setHasPurchased(p.has_purchased ?? false);
-      })
-      .catch((err) => setFetchError(err.message))
-      .finally(() => setIsLoading(false));
+      } catch (error) {
+        if (!cancelled) {
+          setFetchError(
+            error instanceof Error ? error.message : "Project not found",
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    void loadProject();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   useEffect(() => {
@@ -574,15 +630,23 @@ export default function UserProjectDetailPage() {
     if (!apiBase) return;
 
     hasFetchedMap.current = true;
-    setMapLoading(true);
-    setMapError(null);
+    const placesApiBase = apiBase;
 
-    fetch(`/api/places?api_url=${encodeURIComponent(apiBase)}`)
-      .then((r) => r.json())
-      .then((d) => {
-        const valid = (d.data ?? [])
-          .filter((p: any) => p.latitude && p.longitude)
-          .map((p: any) => ({
+    let cancelled = false;
+
+    async function loadPlaces() {
+      setMapLoading(true);
+      setMapError(null);
+
+      try {
+        const response = await fetch(
+          `/api/places?api_url=${encodeURIComponent(placesApiBase)}`,
+        );
+        const data = await response.json();
+        const rows = Array.isArray(data.data) ? (data.data as ApiPlace[]) : [];
+        const valid = rows
+          .filter((p) => p.latitude && p.longitude)
+          .map((p) => ({
             ...p,
             cluster: p.cluster_id ?? p.cluster ?? null,
             services: p.services ?? null,
@@ -590,13 +654,31 @@ export default function UserProjectDetailPage() {
             phone: p.phone ?? null,
             url: p.url ?? null,
           }));
-        setPlaces(valid);
-      })
-      .catch((err) => setMapError(err.message))
-      .finally(() => setMapLoading(false));
+        if (!cancelled) {
+          setPlaces(valid);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setMapError(
+            error instanceof Error ? error.message : "Failed to load map data",
+          );
+        }
+      } finally {
+        if (!cancelled) setMapLoading(false);
+      }
+    }
+
+    void loadPlaces();
+
+    return () => {
+      cancelled = true;
+    };
   }, [project, isAuthenticated, hasPurchased]);
 
   const thumbnailUrl = resolveThumbnailUrl(project?.thumbnail);
+  const dbName = project?.api_url
+    ? (project.api_url.split("/api/v1/")[1]?.replace("/places", "") ?? "")
+    : "";
 
   const handleLoginRedirect = () => {
     router.push("/login");
@@ -780,7 +862,10 @@ export default function UserProjectDetailPage() {
               <div style={{ display: "flex", gap: "4px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
                 {TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
-                  const isLocked = !isAuthenticated || (tab.id === "cluster" && !canAccessCluster);
+                  const isLocked =
+                    !isAuthenticated ||
+                    ((tab.id === "cluster" || tab.id === "intelligent") &&
+                      !canAccessCluster);
                   return (
                     <button
                       key={tab.id}
@@ -906,6 +991,60 @@ export default function UserProjectDetailPage() {
                   )}
                   {!mapLoading && !mapError && places.length > 0 && (
                     <UserClusterMapComponent places={places} />
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === "intelligent" && (
+            <div style={{ background: "#fff", borderRadius: "20px", border: "1.5px solid #E0ECFF", padding: "24px", boxShadow: "0 2px 20px rgba(26,86,219,0.06)" }}>
+              {!isAuthenticated ? (
+                <LockedState onLogin={handleLoginRedirect} />
+              ) : !hasPurchased ? (
+                <PurchaseLockedState onCheckout={handleCheckoutRedirect} />
+              ) : !openedFromCollection ? (
+                <CollectionLockedState onGoCollection={handleGoCollection} />
+              ) : (
+                <>
+                  {mapLoading && (
+                    <div style={{ height: "clamp(420px, 65vh, 720px)", background: "#F0F7FF", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #BFDBFE" }}>
+                      <div style={{ textAlign: "center", color: "#1A56DB" }}>
+                        <SpinIcon />
+                        <div style={{ fontSize: "13px", fontWeight: 600, marginTop: "12px", fontFamily: "'Inter', sans-serif" }}>
+                          Loading data for analysis...
+                        </div>
+                        <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "4px", fontFamily: "'Inter', sans-serif" }}>
+                          This may take a few seconds.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {mapError && (
+                    <div style={{ height: "clamp(420px, 65vh, 720px)", background: "#FFF5F5", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #FECACA" }}>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#EF4444", marginBottom: "6px", fontFamily: "'Inter', sans-serif" }}>Failed to load intelligent system data</div>
+                        <div style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Inter', sans-serif" }}>{mapError}</div>
+                      </div>
+                    </div>
+                  )}
+                  {!mapLoading && !mapError && places.length > 0 && dbName && (
+                    <UserIntelligentSystemMap places={places} dbName={dbName} />
+                  )}
+                  {!mapLoading && !mapError && (places.length === 0 || !dbName) && (
+                    <div style={{ height: "clamp(420px, 65vh, 720px)", background: "#F8FAFC", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px dashed #CBD5E1" }}>
+                      <div style={{ textAlign: "center", color: "#94A3B8" }}>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="11" cy="11" r="8" />
+                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <div style={{ fontSize: "13px", marginTop: "12px", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
+                          {!dbName
+                            ? "API URL is not available for this project."
+                            : "No location data available"}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </>
               )}

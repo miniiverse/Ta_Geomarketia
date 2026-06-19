@@ -230,13 +230,13 @@ export default function ProjectsPage() {
     }
 
     if (!autoFilled) {
-      alert("Pilih dataset terlebih dahulu.");
+      alert("Please select a dataset first.");
       return;
     }
 
     if (usedDbIds.has(autoFilled.db_id)) {
       alert(
-        `Dataset "${autoFilled.project_name}" sudah digunakan sebagai project.`,
+        `Dataset "${autoFilled.project_name}" is already used as a project.`,
       );
       return;
     }
@@ -244,9 +244,9 @@ export default function ProjectsPage() {
     const resolvedCategoryId = resolveCategoryId(autoFilled.category);
     const resolvedCityId = resolveCityId(autoFilled.city);
 
-    // ── Generate project name dari db_id ──
-    // Format db_id: "Indonesia.Batam.Kuliner.202410290644"
-    // Hasil: "Kuliner Batam Indonesia"
+    // Generate the project name from db_id.
+    // db_id format: "Indonesia.Batam.Culinary.202410290644"
+    // Result: "Culinary Batam, Indonesia"
     const dbParts = autoFilled.db_id.split(".");
     const generatedTitle =
       dbParts.length >= 3
@@ -276,13 +276,13 @@ export default function ProjectsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Gagal menyimpan.");
+      if (!res.ok) throw new Error(data.message || "Failed to save.");
 
       setShowAdd(false);
       resetForm();
       setRefreshKey((k) => k + 1);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Gagal menyimpan.");
+      alert(err instanceof Error ? err.message : "Failed to save.");
     } finally {
       setIsSaving(false);
     }
@@ -691,7 +691,7 @@ export default function ProjectsPage() {
                     onChange={(e) => setSelectedDbId(e.target.value)}
                     style={inputStyle}
                   >
-                    <option value="">-- Pilih Dataset --</option>
+                    <option value="">-- Select Dataset --</option>
                     {fastapiProjects.map((p) => {
                       const isUsed = usedDbIds.has(p.db_id);
                       return (
@@ -969,7 +969,7 @@ export default function ProjectsPage() {
                         : "pointer",
                   }}
                 >
-                  {isSaving ? "Menyimpan..." : "Save Project"}
+                  {isSaving ? "Saving..." : "Save Project"}
                 </button>
               </div>
             </div>
