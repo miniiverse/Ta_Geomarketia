@@ -25,7 +25,7 @@
   },
   {
     "category":"Alternative medicine practitioner",
-    "valid_rows":43
+    "valid_rows":42
   },
   {
     "category":"Midwife",
@@ -36,16 +36,16 @@
     "valid_rows":35
   },
   {
-    "category":"Barber shop",
-    "valid_rows":33
-  },
-  {
     "category":"Skin care clinic",
     "valid_rows":33
   },
   {
     "category":"Medical office",
     "valid_rows":33
+  },
+  {
+    "category":"Barber shop",
+    "valid_rows":32
   },
   {
     "category":"Dental clinic",
@@ -56,12 +56,8 @@
     "valid_rows":28
   },
   {
-    "category":"Health consultant",
-    "valid_rows":27
-  },
-  {
     "category":"Massage therapist",
-    "valid_rows":26
+    "valid_rows":25
   },
   {
     "category":"Physical therapist",
@@ -72,39 +68,39 @@
     "valid_rows":24
   },
   {
-    "category":"Gym and Fitness Centre",
-    "valid_rows":22
+    "category":"Health consultant",
+    "valid_rows":24
   },
   {
-    "category":"Cosmetics store",
-    "valid_rows":21
+    "category":"Gym and Fitness Centre",
+    "valid_rows":22
   },
   {
     "category":"Organic shop",
     "valid_rows":21
   },
   {
+    "category":"Cosmetics store",
+    "valid_rows":20
+  },
+  {
     "category":"Drug store",
     "valid_rows":16
-  },
-  {
-    "category":"Vitamin & supplements store",
-    "valid_rows":16
-  },
-  {
-    "category":"Medical supply store",
-    "valid_rows":15
   },
   {
     "category":"Massage spa",
     "valid_rows":15
   },
   {
-    "category":"Health food store",
-    "valid_rows":13
+    "category":"Vitamin & supplements store",
+    "valid_rows":15
   },
   {
-    "category":"General practitioner",
+    "category":"Medical supply store",
+    "valid_rows":15
+  },
+  {
+    "category":"Optician",
     "valid_rows":13
   },
   {
@@ -112,7 +108,11 @@
     "valid_rows":13
   },
   {
-    "category":"Optician",
+    "category":"General practitioner",
+    "valid_rows":13
+  },
+  {
+    "category":"Health food store",
     "valid_rows":13
   },
   {
@@ -132,11 +132,11 @@
     "valid_rows":11
   },
   {
-    "category":"Herbal medicine store",
+    "category":"Health spa",
     "valid_rows":10
   },
   {
-    "category":"Health spa",
+    "category":"Herbal medicine store",
     "valid_rows":10
   },
   {
@@ -164,15 +164,11 @@
     "valid_rows":7
   },
   {
-    "category":"Pharmaceutical company",
-    "valid_rows":6
-  },
-  {
     "category":"Medical laboratory",
     "valid_rows":6
   },
   {
-    "category":"Nutritionist",
+    "category":"Medical Center",
     "valid_rows":6
   },
   {
@@ -180,7 +176,7 @@
     "valid_rows":6
   },
   {
-    "category":"Medical Center",
+    "category":"Nutritionist",
     "valid_rows":6
   },
   {
@@ -192,12 +188,12 @@
     "valid_rows":6
   },
   {
-    "category":"Day spa",
+    "category":"Pharmaceutical company",
     "valid_rows":6
   },
   {
-    "category":"Beauty supply store",
-    "valid_rows":5
+    "category":"Day spa",
+    "valid_rows":6
   },
   {
     "category":"Corporate office",
@@ -208,23 +204,23 @@
     "valid_rows":5
   },
   {
-    "category":"Medical equipment supplier",
+    "category":"Beauty supply store",
     "valid_rows":5
   },
   {
-    "category":"Government hospital",
-    "valid_rows":4
-  },
-  {
-    "category":"Cemetery",
-    "valid_rows":4
+    "category":"Medical equipment supplier",
+    "valid_rows":5
   },
   {
     "category":"Family practice physician",
     "valid_rows":4
   },
   {
-    "category":"Women's health clinic",
+    "category":"Denture care center",
+    "valid_rows":4
+  },
+  {
+    "category":"Government hospital",
     "valid_rows":4
   },
   {
@@ -236,7 +232,11 @@
     "valid_rows":4
   },
   {
-    "category":"Denture care center",
+    "category":"Cemetery",
+    "valid_rows":4
+  },
+  {
+    "category":"Herb shop",
     "valid_rows":4
   },
   {
@@ -252,27 +252,19 @@
     "valid_rows":4
   },
   {
-    "category":"Herb shop",
+    "category":"Women's health clinic",
     "valid_rows":4
-  },
-  {
-    "category":"Beautician",
-    "valid_rows":3
-  },
-  {
-    "category":"Cafe",
-    "valid_rows":3
   },
   {
     "category":"Foot massage parlor",
     "valid_rows":3
   },
   {
-    "category":"Health",
+    "category":"Beauty product supplier",
     "valid_rows":3
   },
   {
-    "category":"Obstetrician-gynecologist",
+    "category":"Health",
     "valid_rows":3
   },
   {
@@ -284,19 +276,15 @@
     "valid_rows":3
   },
   {
-    "category":"Hypnotherapy service",
-    "valid_rows":3
-  },
-  {
     "category":"Make-up artist",
     "valid_rows":3
   },
   {
-    "category":"Yoga studio",
+    "category":"Hypnotherapy service",
     "valid_rows":3
   },
   {
-    "category":"Beauty product supplier",
+    "category":"Obstetrician-gynecologist",
     "valid_rows":3
   },
   {
@@ -304,7 +292,19 @@
     "valid_rows":3
   },
   {
+    "category":"Cafe",
+    "valid_rows":3
+  },
+  {
+    "category":"Beautician",
+    "valid_rows":3
+  },
+  {
     "category":"Urology clinic",
+    "valid_rows":3
+  },
+  {
+    "category":"Yoga studio",
     "valid_rows":3
   },
   {
@@ -312,11 +312,7 @@
     "valid_rows":3
   },
   {
-    "category":"Rehabilitation center",
-    "valid_rows":2
-  },
-  {
-    "category":"City clerk's office",
+    "category":"School",
     "valid_rows":2
   },
   {
@@ -324,19 +320,19 @@
     "valid_rows":2
   },
   {
-    "category":"Health counselor",
+    "category":"Rehabilitation center",
     "valid_rows":2
   },
   {
-    "category":"Electronics manufacturer",
+    "category":"Diner",
     "valid_rows":2
   },
   {
-    "category":"Dermatologist",
+    "category":"Fitness center",
     "valid_rows":2
   },
   {
-    "category":"Occupational therapist",
+    "category":"Insurance agency",
     "valid_rows":2
   },
   {
@@ -344,11 +340,15 @@
     "valid_rows":2
   },
   {
-    "category":"Occupational safety and health",
+    "category":"Nursing home",
     "valid_rows":2
   },
   {
-    "category":"Nursing home",
+    "category":"Occupational therapist",
+    "valid_rows":2
+  },
+  {
+    "category":"Occupational safety and health",
     "valid_rows":2
   },
   {
@@ -360,11 +360,7 @@
     "valid_rows":2
   },
   {
-    "category":"Martial arts school",
-    "valid_rows":2
-  },
-  {
-    "category":"School",
+    "category":"Local medical services",
     "valid_rows":2
   },
   {
@@ -388,11 +384,11 @@
     "valid_rows":2
   },
   {
-    "category":"Fitness center",
+    "category":"Family service center",
     "valid_rows":2
   },
   {
-    "category":"Family service center",
+    "category":"Electronics manufacturer",
     "valid_rows":2
   },
   {
@@ -400,7 +396,15 @@
     "valid_rows":2
   },
   {
-    "category":"Diner",
+    "category":"Dermatologist",
+    "valid_rows":2
+  },
+  {
+    "category":"City clerk's office",
+    "valid_rows":2
+  },
+  {
+    "category":"Martial arts school",
     "valid_rows":2
   },
   {
@@ -408,15 +412,11 @@
     "valid_rows":2
   },
   {
-    "category":"Local medical services",
-    "valid_rows":2
-  },
-  {
-    "category":"Insurance agency",
-    "valid_rows":2
-  },
-  {
     "category":"Riau Islands",
+    "valid_rows":2
+  },
+  {
+    "category":"Health counselor",
     "valid_rows":2
   },
   {
@@ -424,11 +424,7 @@
     "valid_rows":1
   },
   {
-    "category":"Grocery store",
-    "valid_rows":1
-  },
-  {
-    "category":"Distribution service",
+    "category":"Greenhouse & Equipment Supplier",
     "valid_rows":1
   },
   {
@@ -436,7 +432,7 @@
     "valid_rows":1
   },
   {
-    "category":"Education center",
+    "category":"Distribution service",
     "valid_rows":1
   },
   {
@@ -448,7 +444,7 @@
     "valid_rows":1
   },
   {
-    "category":"Fertility clinic",
+    "category":"Education center",
     "valid_rows":1
   },
   {
@@ -460,11 +456,7 @@
     "valid_rows":1
   },
   {
-    "category":"Food producer",
-    "valid_rows":1
-  },
-  {
-    "category":"Cinema",
+    "category":"Fertility clinic",
     "valid_rows":1
   },
   {
@@ -484,15 +476,19 @@
     "valid_rows":1
   },
   {
+    "category":"Business networking company",
+    "valid_rows":1
+  },
+  {
+    "category":"Beach",
+    "valid_rows":1
+  },
+  {
     "category":"Blood bank",
     "valid_rows":1
   },
   {
-    "category":"Boxing gym",
-    "valid_rows":1
-  },
-  {
-    "category":"Business networking company",
+    "category":"Cinema",
     "valid_rows":1
   },
   {
@@ -524,27 +520,23 @@
     "valid_rows":1
   },
   {
-    "category":"Beach",
+    "category":"Boxing gym",
     "valid_rows":1
   },
   {
-    "category":"Greenhouse & Equipment Supplier",
+    "category":"Grocery store",
     "valid_rows":1
   },
   {
-    "category":"Organic food store",
-    "valid_rows":1
-  },
-  {
-    "category":"Ophthalmologist",
-    "valid_rows":1
-  },
-  {
-    "category":"Nursing school",
+    "category":"Food producer",
     "valid_rows":1
   },
   {
     "category":"Nursing agency",
+    "valid_rows":1
+  },
+  {
+    "category":"Municipal administration office",
     "valid_rows":1
   },
   {
@@ -556,15 +548,7 @@
     "valid_rows":1
   },
   {
-    "category":"Municipal administration office",
-    "valid_rows":1
-  },
-  {
-    "category":"Medical group",
-    "valid_rows":1
-  },
-  {
-    "category":"Optometrist",
+    "category":"Nursing school",
     "valid_rows":1
   },
   {
@@ -572,23 +556,15 @@
     "valid_rows":1
   },
   {
-    "category":"Medical diagnostic imaging center",
+    "category":"Organic food store",
     "valid_rows":1
   },
   {
-    "category":"Island",
+    "category":"Ophthalmologist",
     "valid_rows":1
   },
   {
-    "category":"Lodging",
-    "valid_rows":1
-  },
-  {
-    "category":"Marketing agency",
-    "valid_rows":1
-  },
-  {
-    "category":"Market",
+    "category":"Mineral water wholesaler",
     "valid_rows":1
   },
   {
@@ -596,27 +572,19 @@
     "valid_rows":1
   },
   {
-    "category":"Holistic medicine practitioner",
+    "category":"Lodging",
     "valid_rows":1
   },
   {
-    "category":"Housing authority",
+    "category":"Island",
     "valid_rows":1
   },
   {
-    "category":"Homeopath",
+    "category":"Market",
     "valid_rows":1
   },
   {
-    "category":"Hearing aid store",
-    "valid_rows":1
-  },
-  {
-    "category":"Health insurance agency",
-    "valid_rows":1
-  },
-  {
-    "category":"High school",
+    "category":"Marketing agency",
     "valid_rows":1
   },
   {
@@ -628,7 +596,35 @@
     "valid_rows":1
   },
   {
-    "category":"Mineral water wholesaler",
+    "category":"Housing authority",
+    "valid_rows":1
+  },
+  {
+    "category":"High school",
+    "valid_rows":1
+  },
+  {
+    "category":"Health insurance agency",
+    "valid_rows":1
+  },
+  {
+    "category":"Hearing aid store",
+    "valid_rows":1
+  },
+  {
+    "category":"Holistic medicine practitioner",
+    "valid_rows":1
+  },
+  {
+    "category":"Homeopath",
+    "valid_rows":1
+  },
+  {
+    "category":"Medical group",
+    "valid_rows":1
+  },
+  {
+    "category":"Medical diagnostic imaging center",
     "valid_rows":1
   },
   {

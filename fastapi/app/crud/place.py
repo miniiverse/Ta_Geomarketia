@@ -60,6 +60,7 @@ def list_places(
     page_size: int,
     category: str | None = None,
     min_rating: float | None = None,
+    cluster_id: int | None = None,
 ) -> PaginatedResponse[PlaceOut]:
     query = _base_query(db, dataset_id)
 
@@ -67,6 +68,8 @@ def list_places(
         query = query.filter(Place.category == category)
     if min_rating is not None:
         query = query.filter(Place.rating >= min_rating)
+    if cluster_id is not None:
+        query = query.filter(Place.cluster_id == cluster_id)
 
     total = query.count()
     total_pages = math.ceil(total / page_size) if total else 0

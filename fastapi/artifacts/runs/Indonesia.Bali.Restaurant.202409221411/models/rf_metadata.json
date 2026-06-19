@@ -1,0 +1,76 @@
+{
+  "notebook": "api_retrain",
+  "timestamp": "2026-06-12T14:06:36.085456",
+  "target_db": "Indonesia.Bali.Restaurant.202409221411.db",
+  "run_dir": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411",
+  "model_path": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411\\models\\rf_location_reco_v1.joblib",
+  "features": [
+    "rating",
+    "review_log",
+    "hotspot_score",
+    "competitor_density_500m",
+    "same_category_density_500m",
+    "nearest_neighbor_dist_m",
+    "dist_to_cluster_centroid_m",
+    "cluster_id"
+  ],
+  "parameters": {
+    "n_estimators": 300,
+    "class_weight": "balanced",
+    "random_seed": 42,
+    "spatial_split": "grid_1km_group_shuffle"
+  },
+  "metrics": {
+    "f1_macro": 0.9584,
+    "confusion_matrix": [
+      [
+        218,
+        5,
+        0
+      ],
+      [
+        9,
+        238,
+        12
+      ],
+      [
+        0,
+        5,
+        252
+      ]
+    ],
+    "report": {
+      "High": {
+        "precision": 0.9545454545454546,
+        "recall": 0.980544747081712,
+        "f1-score": 0.9673704414587332,
+        "support": 257.0
+      },
+      "Low": {
+        "precision": 0.960352422907489,
+        "recall": 0.9775784753363229,
+        "f1-score": 0.9688888888888889,
+        "support": 223.0
+      },
+      "Medium": {
+        "precision": 0.9596774193548387,
+        "recall": 0.918918918918919,
+        "f1-score": 0.9388560157790927,
+        "support": 259.0
+      },
+      "accuracy": 0.9580514208389715,
+      "macro avg": {
+        "precision": 0.958191765602594,
+        "recall": 0.959014047112318,
+        "f1-score": 0.9583717820422383,
+        "support": 739.0
+      },
+      "weighted avg": {
+        "precision": 0.9580963785378281,
+        "recall": 0.9580514208389715,
+        "f1-score": 0.9578350930499346,
+        "support": 739.0
+      }
+    }
+  }
+}

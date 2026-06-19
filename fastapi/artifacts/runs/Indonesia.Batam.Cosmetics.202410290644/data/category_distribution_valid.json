@@ -1,15 +1,15 @@
 [
   {
     "category":"Cosmetics store",
-    "valid_rows":95
+    "valid_rows":92
   },
   {
     "category":"Beauty salon",
-    "valid_rows":71
+    "valid_rows":67
   },
   {
     "category":"Health and beauty shop",
-    "valid_rows":40
+    "valid_rows":38
   },
   {
     "category":"Convenience store",
@@ -40,10 +40,6 @@
     "valid_rows":10
   },
   {
-    "category":"Shopping mall",
-    "valid_rows":7
-  },
-  {
     "category":"Nail salon",
     "valid_rows":7
   },
@@ -52,11 +48,15 @@
     "valid_rows":7
   },
   {
-    "category":"Vitamin & supplements store",
-    "valid_rows":5
+    "category":"Shopping mall",
+    "valid_rows":7
   },
   {
     "category":"Wellness center",
+    "valid_rows":5
+  },
+  {
+    "category":"Vitamin & supplements store",
     "valid_rows":5
   },
   {
@@ -68,20 +68,16 @@
     "valid_rows":3
   },
   {
-    "category":"Department store",
+    "category":"Herbal medicine store",
     "valid_rows":3
   },
   {
-    "category":"Herbal medicine store",
+    "category":"Department store",
     "valid_rows":3
   },
   {
     "category":"Shop",
     "valid_rows":3
-  },
-  {
-    "category":"Apartment complex",
-    "valid_rows":2
   },
   {
     "category":"Traditional market",
@@ -92,11 +88,11 @@
     "valid_rows":2
   },
   {
-    "category":"Produce market",
+    "category":"Barber shop",
     "valid_rows":2
   },
   {
-    "category":"Barber shop",
+    "category":"Apartment complex",
     "valid_rows":2
   },
   {
@@ -120,7 +116,7 @@
     "valid_rows":2
   },
   {
-    "category":"Hair removal service",
+    "category":"Eyelash salon",
     "valid_rows":2
   },
   {
@@ -132,7 +128,7 @@
     "valid_rows":2
   },
   {
-    "category":"Eyelash salon",
+    "category":"Produce market",
     "valid_rows":2
   },
   {
@@ -148,15 +144,15 @@
     "valid_rows":2
   },
   {
-    "category":"Barber supply store",
-    "valid_rows":1
-  },
-  {
     "category":"Auto market",
     "valid_rows":1
   },
   {
     "category":"Amusement center",
+    "valid_rows":1
+  },
+  {
+    "category":"Food producer",
     "valid_rows":1
   },
   {
@@ -172,19 +168,15 @@
     "valid_rows":1
   },
   {
-    "category":"Eye care center",
-    "valid_rows":1
-  },
-  {
     "category":"Facial spa",
     "valid_rows":1
   },
   {
-    "category":"Dental clinic",
+    "category":"Eye care center",
     "valid_rows":1
   },
   {
-    "category":"Discount supermarket",
+    "category":"Dental clinic",
     "valid_rows":1
   },
   {
@@ -196,7 +188,7 @@
     "valid_rows":1
   },
   {
-    "category":"Corporate office",
+    "category":"Discount supermarket",
     "valid_rows":1
   },
   {
@@ -212,7 +204,11 @@
     "valid_rows":1
   },
   {
-    "category":"Beauty products vending machine",
+    "category":"Corporate office",
+    "valid_rows":1
+  },
+  {
+    "category":"Barber supply store",
     "valid_rows":1
   },
   {
@@ -224,15 +220,15 @@
     "valid_rows":1
   },
   {
-    "category":"Food producer",
-    "valid_rows":1
-  },
-  {
-    "category":"Fashion accessories store",
+    "category":"Beauty products vending machine",
     "valid_rows":1
   },
   {
     "category":"Farmers' market",
+    "valid_rows":1
+  },
+  {
+    "category":"Fashion accessories store",
     "valid_rows":1
   },
   {

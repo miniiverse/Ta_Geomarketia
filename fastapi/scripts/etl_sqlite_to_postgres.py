@@ -231,10 +231,10 @@ def read_places(db_path: Path) -> Iterator[dict[str, Any]]:
         conn.row_factory = sqlite3.Row
         cur = conn.execute("PRAGMA table_info(places)")
         cols = {row[1] for row in cur.fetchall()}
-        if not {"name", "latitude", "longitude", "category"} <= cols:
+        if not {"name", "latitude", "longitude"} <= cols:
             print(
                 f"  ! {db_path.name} is missing required columns "
-                "(name/latitude/longitude/category) — skipping",
+                "(name/latitude/longitude) — skipping",
                 file=sys.stderr,
             )
             return

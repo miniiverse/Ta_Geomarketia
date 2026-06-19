@@ -84,9 +84,12 @@ class RFParameters(BaseModel):
 class RFMetrics(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    f1_macro: float
+    f1_macro: float | None = None
+    rmse: float | None = None
+    r2: float | None = None
     confusion_matrix: list[list[int]] | None = None
     report: dict[str, Any] = {}
+    best_model: dict[str, Any] = {}
 
 
 class TrainingReportOut(BaseModel):
@@ -153,6 +156,8 @@ class RunSummary(BaseModel):
     noise_ratio_pct: float
     silhouette_score: float | None
     f1_macro: float | None
+    rmse: float | None = None
+    r2: float | None = None
     eps_meter: float
     min_samples: int
     timestamp: str | None

@@ -88,6 +88,7 @@ def list_places(
     page_size: int = Query(settings.DEFAULT_PAGE_SIZE, ge=1, le=settings.MAX_PAGE_SIZE),
     category: str | None = Query(None),
     min_rating: float | None = Query(None, ge=0, le=5),
+    cluster_id: int | None = Query(None),
     db: Session = Depends(get_db),
 ):
     return place_crud.list_places(
@@ -97,6 +98,7 @@ def list_places(
         page_size=page_size,
         category=category,
         min_rating=min_rating,
+        cluster_id=cluster_id,
     )
 
 

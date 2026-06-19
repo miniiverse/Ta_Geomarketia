@@ -1,7 +1,7 @@
 """SQLAlchemy ORM model for the places table (Postgres)."""
 
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 from app.core.database import Base
 
@@ -62,3 +62,21 @@ class Dataset(Base):
 
     def __repr__(self) -> str:
         return f"<Dataset(db_key='{self.db_key}')>"
+
+
+class AiConfig(Base):
+    """Represents the active AI configuration for a dataset."""
+
+    __tablename__ = "ai_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    dataset_id = Column(UUID(as_uuid=True), nullable=True, index=True)
+    eps_meters = Column("eps_meters", Float, nullable=False, default=150.0)
+    min_samples = Column("min_samples", Integer, nullable=False, default=10)
+    radius_options = Column("radius_options", JSONB, nullable=False, default=[500, 750, 1000])
+    msi_thresholds = Column("msi_thresholds", JSONB, nullable=False, default={"over_saturated": 50, "under_served": 10})
+    is_active = Column("is_active", Boolean, nullable=False, default=True)
+    created_at = Column("created_at", DateTime(timezone=True), nullable=True)
+
+    def __repr__(self) -> str:
+        return f"<AiConfig(dataset_id={self.dataset_id}, active={self.is_active})>"

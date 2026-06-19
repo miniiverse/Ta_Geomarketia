@@ -7,6 +7,7 @@ Run from the ``fastapi/`` directory:
     python scripts/sync_artifacts.py --db Indonesia.Batam.Kuliner.202406162232
     python scripts/sync_artifacts.py --db Indonesia.Batam.Kuliner.202406162232 --source /custom/path
     python scripts/sync_artifacts.py --all          # sync every run that exists in the source
+    python scripts/sync_artifacts.py --all --active-only
     python scripts/sync_artifacts.py --all --dry-run
 
 Workflow
@@ -24,16 +25,26 @@ Only the files the API actually reads are copied — large intermediate files
 
     data/
         feature_store.csv
+        base_candidate_grid.parquet
         category_distribution.json
         category_distribution_valid.json   (if present)
     models/
         clustering_metadata.json
+        regression_metadata.json
         rf_metadata.json
-        rf_location_reco_v*.joblib          (all versions)
+        active.json
+        reg_location_reco_v*.joblib         (all versions)
+        rf_location_reco_v*.joblib          (legacy versions)
     reports/
         clustering_result.png
+        clustering_map.png
+        clustering_top_clusters.png
         cluster_vs_noise.png
         category_distribution_top10.png
+        model_comparison.csv
+        model_comparison.png
+        reg_shap_importance.csv
+        reg_shap_summary.png
         rf_confusion_matrix.png
         rf_shap_summary.png
         rf_shap_waterfall.png
@@ -44,6 +55,7 @@ Only the files the API actually reads are copied — large intermediate files
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -72,20 +84,29 @@ from app.core.config import RUNS_PATH  # noqa: E402  (after sys.path setup)
 # ---------------------------------------------------------------------------
 DATA_FILES = [
     "feature_store.csv",
+    "base_candidate_grid.parquet",
     "category_distribution.json",
     "category_distribution_valid.json",
 ]
 
 MODEL_FILES = [
     "clustering_metadata.json",
+    "regression_metadata.json",
     "rf_metadata.json",
+    "active.json",
 ]
-# All rf_location_reco_v*.joblib files are copied dynamically
+# All versioned regression and legacy RF joblib files are copied dynamically.
 
 REPORT_FILES = [
     "clustering_result.png",
+    "clustering_map.png",
+    "clustering_top_clusters.png",
     "cluster_vs_noise.png",
     "category_distribution_top10.png",
+    "model_comparison.csv",
+    "model_comparison.png",
+    "reg_shap_importance.csv",
+    "reg_shap_summary.png",
     "rf_confusion_matrix.png",
     "rf_shap_summary.png",
     "rf_shap_waterfall.png",
@@ -113,7 +134,42 @@ def _copy_file(src: Path, dst: Path, dry_run: bool) -> bool:
     return True
 
 
-def sync_run(db_key: str, source_root: Path, dest_root: Path, dry_run: bool) -> dict:
+def _versioned_model_files(models_dir: Path, active_only: bool) -> list[Path]:
+    """Return model files to sync, preferring the active pointer when requested."""
+    if not models_dir.exists():
+        return []
+
+    if active_only:
+        active_path = models_dir / "active.json"
+        if active_path.exists():
+            try:
+                active_version = json.loads(active_path.read_text(encoding="utf-8")).get("active_version")
+                if active_version is not None:
+                    for family in ("reg", "rf"):
+                        candidate = models_dir / f"{family}_location_reco_v{active_version}.joblib"
+                        if candidate.exists():
+                            return [candidate]
+            except (OSError, ValueError, TypeError):
+                pass
+
+        regression = sorted(models_dir.glob("reg_location_reco_v*.joblib"))
+        legacy = sorted(models_dir.glob("rf_location_reco_v*.joblib"))
+        candidates = regression or legacy
+        return candidates[-1:] if candidates else []
+
+    files: list[Path] = []
+    for pattern in ("reg_location_reco_v*.joblib", "rf_location_reco_v*.joblib"):
+        files.extend(sorted(models_dir.glob(pattern)))
+    return files
+
+
+def sync_run(
+    db_key: str,
+    source_root: Path,
+    dest_root: Path,
+    dry_run: bool,
+    active_only: bool = False,
+) -> dict:
     """Sync one run from *source_root*/<db_key>/ to *dest_root*/<db_key>/."""
     src_run = source_root / db_key
     dst_run = dest_root / db_key
@@ -139,23 +195,23 @@ def sync_run(db_key: str, source_root: Path, dest_root: Path, dry_run: bool) -> 
         else:
             stats["skipped"] += 1
 
-    # ── models/ — all versioned joblib files ────────────────────────────
+    # ── models/ — active-only or all versioned joblib files ─────────────
     src_models = src_run / "models"
-    if src_models.exists():
-        for joblib_file in sorted(src_models.glob("rf_location_reco_v*.joblib")):
-            ok = _copy_file(joblib_file, dst_run / "models" / joblib_file.name, dry_run)
-            if ok:
-                stats["copied"] += 1
-            else:
-                stats["skipped"] += 1
-
-    # ── reports/ ─────────────────────────────────────────────────────────
-    for fname in REPORT_FILES:
-        ok = _copy_file(src_run / "reports" / fname, dst_run / "reports" / fname, dry_run)
+    for joblib_file in _versioned_model_files(src_models, active_only=active_only):
+        ok = _copy_file(joblib_file, dst_run / "models" / joblib_file.name, dry_run)
         if ok:
             stats["copied"] += 1
         else:
             stats["skipped"] += 1
+
+    # Reports support admin/QA endpoints but are not required for inference.
+    if not active_only:
+        for fname in REPORT_FILES:
+            ok = _copy_file(src_run / "reports" / fname, dst_run / "reports" / fname, dry_run)
+            if ok:
+                stats["copied"] += 1
+            else:
+                stats["skipped"] += 1
 
     return {
         "db_key": db_key,
@@ -211,6 +267,11 @@ def main() -> None:
         action="store_true",
         help="Print what would be copied without actually copying anything.",
     )
+    parser.add_argument(
+        "--active-only",
+        action="store_true",
+        help="Copy only the model selected by active.json for each database.",
+    )
     args = parser.parse_args()
 
     # Resolve source and destination
@@ -243,12 +304,18 @@ def main() -> None:
 
     total_copied = total_skipped = 0
     for db_key in db_keys:
-        print(f"── {db_key}")
-        result = sync_run(db_key, source_runs, dest_root, dry_run=args.dry_run)
+        print(f"-- {db_key}")
+        result = sync_run(
+            db_key,
+            source_runs,
+            dest_root,
+            dry_run=args.dry_run,
+            active_only=args.active_only,
+        )
         if result["status"] == "error":
             print(f"   ERROR: {result['error']}")
         else:
-            print(f"   copied={result['copied']}  skipped={result['skipped']}  → {result['dest']}")
+            print(f"   copied={result['copied']}  skipped={result['skipped']}  -> {result['dest']}")
             total_copied += result["copied"]
             total_skipped += result["skipped"]
 

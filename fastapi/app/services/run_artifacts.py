@@ -36,7 +36,6 @@ from typing import Any
 
 import joblib
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 
 from app.core.config import ARTIFACTS_PATH, RUNS_PATH
 
@@ -46,17 +45,14 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-# Canonical 19-column schema produced by the training notebook (Tahap 8).
-# Any feature store that deviates from this set raises a ValueError at load
-# time so notebook-API drift is caught immediately.
+# Minimum schema accepted from both legacy classifier artifacts and the new
+# regression feature store. Recommendation-specific feature names are
+# normalized in the recommendation endpoint during migration.
 FEATURE_STORE_REQUIRED_COLS: frozenset[str] = frozenset(
     {
         "id", "name", "category",
         "latitude", "longitude", "x_utm", "y_utm",
-        "cluster_id", "dist_to_cluster_centroid_m",
-        "competitor_density_500m", "competitor_density_1km",
-        "same_category_density_500m", "nearest_neighbor_dist_m",
-        "rating", "review_log",
+        "cluster_id",
     }
 )
 
@@ -82,7 +78,7 @@ REPORT_WHITELIST: frozenset[str] = frozenset(
 _fs_cache: dict[tuple[str, int], pd.DataFrame] = {}
 
 # joblib model cache: (path_str, mtime_ns) → RandomForestClassifier
-_model_cache: dict[tuple[str, int], RandomForestClassifier] = {}
+_model_cache: dict[tuple[str, int], Any] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -101,13 +97,16 @@ def run_dir(db_name: str) -> Path:
 def has_run(db_name: str) -> bool:
     """Return True when *db_name* has a complete training run.
 
-    A run is considered complete when both the feature store CSV and the
-    RF metadata JSON are present.
+    A run is considered complete when the feature store CSV and either
+    regression or legacy RF metadata are present.
     """
     rd = run_dir(db_name)
     return (
         (rd / "data" / "feature_store.csv").exists()
-        and (rd / "models" / "rf_metadata.json").exists()
+        and (
+            (rd / "models" / "regression_metadata.json").exists()
+            or (rd / "models" / "rf_metadata.json").exists()
+        )
     )
 
 
@@ -220,17 +219,23 @@ def clustering_metadata(db_name: str) -> dict[str, Any]:
 
 
 def rf_metadata(db_name: str) -> dict[str, Any]:
-    """Return the parsed ``rf_metadata.json`` for *db_name*.
+    """Return parsed model metadata for *db_name*.
+
+    Prefer ``regression_metadata.json`` and fall back to the legacy
+    ``rf_metadata.json`` name while older artifacts are still present.
 
     Raises
     ------
     FileNotFoundError
         If the file does not exist.
     """
-    path = run_dir(db_name) / "models" / "rf_metadata.json"
+    model_dir = run_dir(db_name) / "models"
+    path = model_dir / "regression_metadata.json"
+    if not path.exists():
+        path = model_dir / "rf_metadata.json"
     if not path.exists():
         raise FileNotFoundError(
-            f"rf_metadata.json not found for '{db_name}': {path}"
+            f"model metadata not found for '{db_name}' in {model_dir}"
         )
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
@@ -307,7 +312,7 @@ def shap_importance(db_name: str) -> pd.DataFrame:
 # Model loading (P2.3 — migrated from recommendation.py)
 # ---------------------------------------------------------------------------
 
-def _load_model_cached(model_path: str) -> RandomForestClassifier:
+def _load_model_cached(model_path: str) -> Any:
     """Load a joblib model, using the mtime-keyed cache."""
     p = Path(model_path)
     if not p.exists():
@@ -325,7 +330,7 @@ def _load_model_cached(model_path: str) -> RandomForestClassifier:
 
 def get_latest_model(
     db_name: str,
-) -> tuple[RandomForestClassifier | None, dict[str, Any] | None]:
+) -> tuple[Any | None, dict[str, Any] | None]:
     """Return the best available trained model and its metadata dict.
 
     Resolution order
@@ -349,20 +354,26 @@ def get_latest_model(
                 with active_ptr.open("r", encoding="utf-8") as f:
                     active_version = json.load(f).get("active_version")
                 if active_version is not None:
-                    model_path = str(run_models_dir / f"rf_location_reco_v{active_version}.joblib")
+                    reg_model_path = run_models_dir / f"reg_location_reco_v{active_version}.joblib"
+                    rf_model_path = run_models_dir / f"rf_location_reco_v{active_version}.joblib"
+                    model_path = str(reg_model_path if reg_model_path.exists() else rf_model_path)
                     if Path(model_path).exists():
-                        meta = _read_json_safe(run_models_dir / "rf_metadata.json")
+                        meta = _read_json_safe(run_models_dir / "regression_metadata.json")
+                        if not meta:
+                            meta = _read_json_safe(run_models_dir / "rf_metadata.json")
                         return _load_model_cached(model_path), meta
             except Exception as exc:
                 logger.warning(f"Could not read active.json for '{db_name}': {exc}")
 
         # Fall back to highest-numbered version
-        candidates = sorted(
-            glob.glob(str(run_models_dir / "rf_location_reco_v*.joblib"))
-        )
+        candidates = sorted(glob.glob(str(run_models_dir / "reg_location_reco_v*.joblib")))
+        if not candidates:
+            candidates = sorted(glob.glob(str(run_models_dir / "rf_location_reco_v*.joblib")))
         if candidates:
             latest = candidates[-1]
-            meta = _read_json_safe(run_models_dir / "rf_metadata.json")
+            meta = _read_json_safe(run_models_dir / "regression_metadata.json")
+            if not meta:
+                meta = _read_json_safe(run_models_dir / "rf_metadata.json")
             try:
                 return _load_model_cached(latest), meta
             except Exception as exc:
@@ -371,12 +382,14 @@ def get_latest_model(
     # ── 3. Legacy global models ──────────────────────────────────────────
     legacy_dir = ARTIFACTS_PATH / "models"
     if legacy_dir.exists():
-        candidates = sorted(
-            glob.glob(str(legacy_dir / "rf_location_reco_v*.joblib"))
-        )
+        candidates = sorted(glob.glob(str(legacy_dir / "reg_location_reco_v*.joblib")))
+        if not candidates:
+            candidates = sorted(glob.glob(str(legacy_dir / "rf_location_reco_v*.joblib")))
         if candidates:
             latest = candidates[-1]
-            meta = _read_json_safe(legacy_dir / "rf_metadata.json")
+            meta = _read_json_safe(legacy_dir / "regression_metadata.json")
+            if not meta:
+                meta = _read_json_safe(legacy_dir / "rf_metadata.json")
             try:
                 logger.info(f"Using legacy global model for '{db_name}': {latest}")
                 return _load_model_cached(latest), meta

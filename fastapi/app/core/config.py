@@ -35,7 +35,7 @@ class Settings(BaseSettings):
 
     # Default pagination
     DEFAULT_PAGE_SIZE: int = 50
-    MAX_PAGE_SIZE: int = 100
+    MAX_PAGE_SIZE: int = 5000
 
     class Config:
         env_file = ".env"

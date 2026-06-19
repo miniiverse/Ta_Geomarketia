@@ -1,0 +1,59 @@
+{
+  "notebook": "api_retrain",
+  "timestamp": "2026-06-12T14:06:32.770867",
+  "target_db": "Indonesia.Bali.Restaurant.202409221411.db",
+  "db_files": [
+    "Indonesia.Bali.Restaurant.202409221411.db"
+  ],
+  "paths": {
+    "run_dir": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411",
+    "data_dir": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411\\data",
+    "report_dir": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411\\reports",
+    "model_dir": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411\\models",
+    "feature_store_path": "C:\\Users\\DANN\\Documents\\project\\geomarket\\fastapi\\artifacts\\runs\\Indonesia.Bali.Restaurant.202409221411\\data\\feature_store.csv"
+  },
+  "params": {
+    "eps_meter": 500.0,
+    "min_samples": 10,
+    "category_col": "category",
+    "crs_input": "EPSG:4326",
+    "crs_output": "EPSG:32750"
+  },
+  "results": {
+    "n_clusters": 55,
+    "n_noise": 2016,
+    "n_clustered": 1822,
+    "noise_ratio_pct": 52.53,
+    "silhouette_score": -0.1491,
+    "davies_bouldin_idx": 1.4506
+  },
+  "output": {
+    "feature_columns": [
+      "id",
+      "name",
+      "latitude",
+      "longitude",
+      "x_utm",
+      "y_utm",
+      "category",
+      "rating",
+      "review",
+      "price_level",
+      "address",
+      "url",
+      "services",
+      "open_hours",
+      "hotspot_score",
+      "cluster_id",
+      "competitor_density_500m",
+      "competitor_density_1km",
+      "nearest_neighbor_dist_m",
+      "same_category_density_500m",
+      "dist_to_cluster_centroid_m",
+      "review_log",
+      "source_category",
+      "source_file",
+      "source_table"
+    ]
+  }
+}

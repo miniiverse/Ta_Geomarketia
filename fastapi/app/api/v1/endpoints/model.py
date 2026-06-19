@@ -1,21 +1,3 @@
-"""Model management endpoints: async training, status polling, version control, and DB sync.
-
-Phase 5 changes
----------------
-- ``run_training_task`` now writes all artifacts into
-  ``<ARTIFACTS_DIR>/runs/<db_key>/models/`` (same layout as the notebook).
-  The legacy ``fastapi/models/`` directory is no longer written to.
-- Artifacts written per retrain:
-    rf_location_reco_v{N}.joblib
-    rf_metadata.json          (overwritten — always reflects the latest run)
-    active.json               (version pointer)
-    rf_shap_importance.csv    (regenerated)
-    rf_confusion_matrix.png   (regenerated)
-    rf_shap_summary.png       (regenerated)
-- ``rollback_model`` writes ``active.json`` in the per-run models directory
-  so ``run_artifacts.get_latest_model`` picks up the correct version.
-- ``list_versions`` already reads from the per-run directory (Phase 2).
-"""
 
 from __future__ import annotations
 
@@ -42,7 +24,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.api.v1.endpoints.analysis import _dataset_id, get_places_df
+from app.api.v1.endpoints.analysis import _dataset_id, get_places_df, _get_dbscan_defaults
 from app.api.v1.endpoints.recommendation import FEATURE_COLS, build_features
 from app.services import run_artifacts
 from app.schemas.run_artifacts import (
@@ -134,7 +116,43 @@ def run_training_task(db_name: str, db_session: Session, dataset_id: str) -> Non
             )
 
         # ── 2. Build all 8 features ──────────────────────────────────────
-        df_fs = build_features(df)
+        eps, min_samples = _get_dbscan_defaults(db_name, db_session, dataset_id)
+        df_fs, clustering_metrics = build_features(df, eps=eps, min_samples=min_samples)
+
+        # ── 2a. Save feature store ───────────────────────────────────────
+        data_dir = run_artifacts.run_dir(db_name) / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        feature_store_path = data_dir / "feature_store.csv"
+        df_fs.to_csv(feature_store_path, index=False)
+
+        # ── 2b. Save clustering metadata ─────────────────────────────────
+        clustering_metadata = {
+            "notebook": "api_retrain",
+            "timestamp": pd.Timestamp.now().isoformat(),
+            "target_db": f"{db_name}.db",
+            "db_files": [f"{db_name}.db"],
+            "paths": {
+                "run_dir": str(run_artifacts.run_dir(db_name)),
+                "data_dir": str(data_dir),
+                "report_dir": str(reports_dir),
+                "model_dir": str(models_dir),
+                "feature_store_path": str(feature_store_path)
+            },
+            "params": {
+                "eps_meter": eps,
+                "min_samples": min_samples,
+                "category_col": "category",
+                "crs_input": "EPSG:4326",
+                "crs_output": df.attrs.get("crs_output", "EPSG:32648")
+            },
+            "results": clustering_metrics,
+            "output": {
+                "feature_columns": list(df_fs.columns)
+            }
+        }
+        clustering_metadata_path = models_dir / "clustering_metadata.json"
+        with clustering_metadata_path.open("w", encoding="utf-8") as f:
+            json.dump(clustering_metadata, f, indent=2)
 
         # ── 3. Proxy suitability labels (quantile-based, matches notebook) ─
         score = (
@@ -275,7 +293,30 @@ def run_training_task(db_name: str, db_session: Session, dataset_id: str) -> Non
         except Exception as cm_exc:
             logger.warning(f"Confusion matrix PNG failed (non-fatal): {cm_exc}")
 
-        # ── 12. Invalidate run_artifacts caches for this db_name ─────────
+        # ── 12. Write cluster_ids back to PostgreSQL ─────────
+        try:
+            updates = []
+            for _, row in df_fs.iterrows():
+                if not pd.isna(row["cluster_id"]):
+                    updates.append({"pid": int(row["id"]), "cid": int(row["cluster_id"]), "dataset_id": dataset_id})
+            
+            if updates:
+                stmt = text(
+                    "UPDATE places SET cluster_id = :cid, updated_at = NOW() "
+                    "WHERE id = :pid AND dataset_id = :dataset_id"
+                )
+                for chunk_start in range(0, len(updates), 500):
+                    chunk = updates[chunk_start : chunk_start + 500]
+                    db_session.execute(stmt, chunk)
+                db_session.commit()
+                logger.info(f"Synced {len(updates)} cluster_ids to postgres.")
+            else:
+                db_session.rollback()
+        except Exception as exc:
+            db_session.rollback()
+            logger.error(f"Failed to sync cluster_ids to postgres: {exc}")
+
+        # ── 13. Invalidate run_artifacts caches for this db_name ─────────
         # Force the next request to reload the updated rf_metadata.json
         # and the new joblib from disk.
         stale_fs = [k for k in run_artifacts._fs_cache if k[0] == db_name]
@@ -301,7 +342,21 @@ def run_training_task(db_name: str, db_session: Session, dataset_id: str) -> Non
 # ---------------------------------------------------------------------------
 # POST /model/retrain
 # ---------------------------------------------------------------------------
-@router.post("/retrain", summary="Trigger async model retraining")
+@router.post(
+    "/retrain",
+    summary="Trigger async model retraining",
+    tags=["Model"],
+    responses={
+        200: {
+            "description": "Retraining job triggered successfully.",
+            "content": {
+                "application/json": {
+                    "example": {"status": "running", "message": "Model retraining task triggered."}
+                }
+            }
+        }
+    }
+)
 def trigger_retrain(
     request: Request,
     db_name: str,
@@ -324,7 +379,26 @@ def trigger_retrain(
 # ---------------------------------------------------------------------------
 # GET /model/retrain/status
 # ---------------------------------------------------------------------------
-@router.get("/retrain/status", summary="Poll current training job status")
+@router.get(
+    "/retrain/status",
+    summary="Poll current training job status",
+    tags=["Model"],
+    responses={
+        200: {
+            "description": "Current status of the training job.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "completed",
+                        "error": None,
+                        "version": 3,
+                        "metrics": {"f1_macro": 0.85, "report": {}}
+                    }
+                }
+            }
+        }
+    }
+)
 def get_retrain_status(db_name: str):
     """Return the current training job status for the given dataset.
 
@@ -341,7 +415,16 @@ def get_retrain_status(db_name: str):
 # ---------------------------------------------------------------------------
 # GET /model/versions
 # ---------------------------------------------------------------------------
-@router.get("/versions", summary="List all saved model versions and metrics")
+@router.get(
+    "/versions",
+    summary="List all saved model versions and metrics",
+    tags=["Model"],
+    responses={
+        200: {
+            "description": "List of available models and the currently active version."
+        }
+    }
+)
 def list_versions(db_name: str):
     """Return all persisted model versions for the dataset, newest first.
 
@@ -355,19 +438,23 @@ def list_versions(db_name: str):
     # ── Per-run directory (notebook + API-trained after Phase 5) ────────
     run_models_dir = run_artifacts.run_dir(db_name) / "models"
     if run_models_dir.exists():
-        for joblib_path in sorted(run_models_dir.glob("rf_location_reco_v*.joblib")):
+        for joblib_path in sorted(run_models_dir.glob("*_location_reco_v*.joblib")):
             # Extract version number from filename
-            stem = joblib_path.stem  # e.g. rf_location_reco_v2
+            stem = joblib_path.stem  # e.g. reg_location_reco_v2
             try:
                 version_num = int(stem.rsplit("v", 1)[-1])
             except ValueError:
                 continue
-            meta = run_artifacts._read_json_safe(run_models_dir / "rf_metadata.json")
+            meta = run_artifacts._read_json_safe(run_models_dir / "regression_metadata.json")
+            if not meta:
+                meta = run_artifacts._read_json_safe(run_models_dir / "rf_metadata.json")
             versions.append({
                 "version": version_num,
                 "source": "run",
                 "timestamp": meta.get("timestamp"),
                 "f1_macro": meta.get("metrics", {}).get("f1_macro"),
+                "rmse": meta.get("metrics", {}).get("best_model", {}).get("rmse") if isinstance(meta.get("metrics", {}).get("best_model"), dict) else None,
+                "r2": meta.get("metrics", {}).get("best_model", {}).get("r2") if isinstance(meta.get("metrics", {}).get("best_model"), dict) else None,
                 "features": meta.get("features"),
                 "model_path": str(joblib_path),
             })
@@ -428,7 +515,28 @@ def list_versions(db_name: str):
 # ---------------------------------------------------------------------------
 # POST /model/rollback
 # ---------------------------------------------------------------------------
-@router.post("/rollback", summary="Activate a specific model version")
+@router.post(
+    "/rollback",
+    summary="Activate a specific model version",
+    tags=["Model"],
+    responses={
+        200: {
+            "description": "Model successfully rolled back.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "db_name": "batam_food",
+                        "active_version": 2,
+                        "message": "Model rolled back to version 2."
+                    }
+                }
+            }
+        },
+        404: {"description": "Specified model version not found."},
+        500: {"description": "Internal server error during rollback."},
+    }
+)
 def rollback_model(
     db_name: str,
     version: int = Query(..., description="Target version to make active"),
@@ -444,7 +552,9 @@ def rollback_model(
     """
     # ── Look in per-run directory first (Phase 5 layout) ────────────────
     run_models_dir = run_artifacts.run_dir(db_name) / "models"
-    model_path = run_models_dir / f"rf_location_reco_v{version}.joblib"
+    model_path = run_models_dir / f"reg_location_reco_v{version}.joblib"
+    if not model_path.exists():
+        model_path = run_models_dir / f"rf_location_reco_v{version}.joblib"
 
     if not model_path.exists():
         # Fall back to legacy naming convention
@@ -484,7 +594,32 @@ def rollback_model(
 # ---------------------------------------------------------------------------
 # POST /model/sync-db
 # ---------------------------------------------------------------------------
-@router.post("/sync-db", summary="Sync cluster_id from feature store back into Postgres")
+@router.post(
+    "/sync-db",
+    summary="Sync cluster_id from feature store back into Postgres",
+    tags=["Model"],
+    responses={
+        200: {
+            "description": "Successfully synchronized database clusters.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "db_name": "batam_food",
+                        "matched": 1500,
+                        "matched_by_id": 1400,
+                        "matched_by_name": 100,
+                        "unmatched": 10,
+                        "total": 1510,
+                        "message": "Synced cluster_id for 1500/1510 places"
+                    }
+                }
+            }
+        },
+        404: {"description": "Feature store not found."},
+        500: {"description": "Database sync failed."},
+    }
+)
 def sync_db(
     request: Request,
     db_name: str,

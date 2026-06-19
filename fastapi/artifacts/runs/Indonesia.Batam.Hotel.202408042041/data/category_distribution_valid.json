@@ -1,50 +1,34 @@
 [
   {
     "category":"Hotel",
-    "valid_rows":20
-  },
-  {
-    "category":"Condominium complex",
-    "valid_rows":11
+    "valid_rows":10
   },
   {
     "category":"Housing complex",
     "valid_rows":7
   },
   {
-    "category":"Lodging",
-    "valid_rows":7
-  },
-  {
-    "category":"Temporarily closed",
-    "valid_rows":5
-  },
-  {
     "category":"Permanently closed",
-    "valid_rows":4
-  },
-  {
-    "category":"Lodge",
-    "valid_rows":4
-  },
-  {
-    "category":"Shopping mall",
-    "valid_rows":4
-  },
-  {
-    "category":"Guest house",
     "valid_rows":3
+  },
+  {
+    "category":"Housing development",
+    "valid_rows":2
   },
   {
     "category":"Indonesia",
-    "valid_rows":3
+    "valid_rows":2
   },
   {
-    "category":"Restaurant",
-    "valid_rows":3
+    "category":"Shopping mall",
+    "valid_rows":2
   },
   {
-    "category":"Business center",
+    "category":"Temporarily closed",
+    "valid_rows":2
+  },
+  {
+    "category":"Lodging",
     "valid_rows":2
   },
   {
@@ -52,31 +36,7 @@
     "valid_rows":2
   },
   {
-    "category":"Homestay",
-    "valid_rows":2
-  },
-  {
-    "category":"Corporate office",
-    "valid_rows":2
-  },
-  {
-    "category":"Housing development",
-    "valid_rows":2
-  },
-  {
-    "category":"Beer garden",
-    "valid_rows":1
-  },
-  {
     "category":"Apartment complex",
-    "valid_rows":1
-  },
-  {
-    "category":"Housing authority",
-    "valid_rows":1
-  },
-  {
-    "category":"Camping Ground",
     "valid_rows":1
   },
   {
@@ -84,11 +44,11 @@
     "valid_rows":1
   },
   {
-    "category":"Cafe",
+    "category":"Corporate office",
     "valid_rows":1
   },
   {
-    "category":"Chinese restaurant",
+    "category":"Cafe",
     "valid_rows":1
   },
   {
@@ -96,15 +56,15 @@
     "valid_rows":1
   },
   {
-    "category":"Lounge",
+    "category":"Lodge",
+    "valid_rows":1
+  },
+  {
+    "category":"Guest house",
     "valid_rows":1
   },
   {
     "category":"Karaoke bar",
-    "valid_rows":1
-  },
-  {
-    "category":"Resort hotel",
     "valid_rows":1
   },
   {
@@ -116,19 +76,7 @@
     "valid_rows":1
   },
   {
-    "category":"School",
-    "valid_rows":1
-  },
-  {
     "category":"Seafood restaurant",
-    "valid_rows":1
-  },
-  {
-    "category":"Spa",
-    "valid_rows":1
-  },
-  {
-    "category":"Transit station",
     "valid_rows":1
   },
   {

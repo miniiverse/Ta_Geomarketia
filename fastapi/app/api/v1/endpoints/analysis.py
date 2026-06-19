@@ -12,7 +12,7 @@ from sklearn.cluster import DBSCAN
 from scipy.spatial import ConvexHull
 
 from app.api.deps import get_db
-from app.models.place import Place
+from app.models.place import Place, AiConfig
 from app.utils.geo import in_batam_bbox
 from app.utils.ml_utils import project_point, unproject_point
 from app.services import run_artifacts
@@ -22,25 +22,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-def _get_dbscan_defaults(db_name: str) -> tuple[float, int]:
-    """Return (eps_meter, min_samples) from the per-run clustering metadata.
+def _get_dbscan_defaults(db_name: str, db: Session, dataset_id: str) -> tuple[float, int]:
+    """Return (eps_meter, min_samples) from the database ai_config table.
 
-    Falls back to (500.0, 10) — the values used across all 8 current training
-    runs — if the metadata file is missing or malformed.
-
-    These are the parameters the notebook used when producing ``cluster_id``
-    values in the feature store.  Using the same values here ensures that
-    the on-demand DBSCAN in ``/clusters`` and ``/saturation`` is consistent
-    with the training pipeline.
+    Falls back to (500.0, 10) if the ai_config record is missing.
     """
     try:
-        cm = run_artifacts.clustering_metadata(db_name)
-        params = cm.get("params", {})
-        eps = float(params.get("eps_meter", 500.0))
-        ms = int(params.get("min_samples", 10))
-        return eps, ms
-    except Exception:
-        return 500.0, 10
+        config = db.query(AiConfig).filter(
+            AiConfig.dataset_id == dataset_id,
+            AiConfig.is_active == True
+        ).first()
+        if config:
+            return float(config.eps_meters), int(config.min_samples)
+    except Exception as exc:
+        logger.warning(f"Failed to fetch AiConfig for dataset {dataset_id}: {exc}")
+    
+    # Fallback if no database config exists
+    return 500.0, 10
 
 
 def get_places_df(db: Session, dataset_id: str | None = None) -> pd.DataFrame:
@@ -75,42 +73,81 @@ def get_places_df(db: Session, dataset_id: str | None = None) -> pd.DataFrame:
         .all()
     )
 
-    data = []
+    if not places:
+        df = pd.DataFrame()
+        df.attrs["crs_output"] = "EPSG:32648"
+        return df
+
+    # Extract valid coordinates
+    valid_coords = []
     for p in places:
         try:
             lat = float(p.latitude) if p.latitude is not None else None
             lng = float(p.longitude) if p.longitude is not None else None
-            if lat is None or lng is None:
+            if lat is None or lng is None or np.isnan(lat) or np.isnan(lng):
                 continue
-
-            # Notebook bbox — anything outside is rejected at training time
-            if not in_batam_bbox(lat, lng):
-                continue
-
-            # Project to UTM Zone 48N
-            x, y = project_point(lat, lng)
-
-            data.append({
-                "id": p.id,
-                "name": p.place_name or "Unnamed Place",
-                "latitude": lat,
-                "longitude": lng,
-                "x_utm": x,
-                "y_utm": y,
-                "category": p.category.strip() if p.category else "Uncategorized",
-                "rating": p.rating if p.rating is not None else 0.0,
-                "review": p.review_count if p.review_count is not None else 0,
-                "price_level": p.price_level if p.price_level is not None else 1,
-            })
+            valid_coords.append((p, lat, lng))
         except (ValueError, TypeError):
-            continue
+            pass
 
-    if not data:
-        return pd.DataFrame(columns=[
-            "id", "name", "latitude", "longitude", "x_utm", "y_utm",
-            "category", "rating", "review", "price_level"
-        ])
-    return pd.DataFrame(data)
+    if not valid_coords:
+        df = pd.DataFrame()
+        df.attrs["crs_output"] = "EPSG:32648"
+        return df
+
+    # Calculate IQR for lat and lng to filter outliers
+    lats = pd.Series([lat for _, lat, _ in valid_coords])
+    lngs = pd.Series([lng for _, _, lng in valid_coords])
+
+    Q1_lat, Q3_lat = lats.quantile(0.25), lats.quantile(0.75)
+    IQR_lat = Q3_lat - Q1_lat
+
+    Q1_lng, Q3_lng = lngs.quantile(0.25), lngs.quantile(0.75)
+    IQR_lng = Q3_lng - Q1_lng
+
+    # Use a generous multiplier for spatial data to only drop extreme outliers
+    multiplier = 5.0
+    lat_lower, lat_upper = Q1_lat - multiplier * IQR_lat, Q3_lat + multiplier * IQR_lat
+    lng_lower, lng_upper = Q1_lng - multiplier * IQR_lng, Q3_lng + multiplier * IQR_lng
+
+    filtered_coords = [
+        (p, lat, lng) for p, lat, lng in valid_coords
+        if lat_lower <= lat <= lat_upper and lng_lower <= lng <= lng_upper
+    ]
+
+    if not filtered_coords:
+        filtered_coords = valid_coords
+
+    med_lat = np.median([lat for _, lat, _ in filtered_coords])
+    med_lng = np.median([lng for _, _, lng in filtered_coords])
+
+    from app.utils.ml_utils import get_utm_epsg, project_point
+    epsg_code = get_utm_epsg(med_lat, med_lng)
+
+    data = []
+    for p, lat, lng in filtered_coords:
+        x, y = project_point(lat, lng, epsg_code=epsg_code)
+
+        data.append({
+            "id": p.id,
+            "name": p.place_name or "Unnamed Place",
+            "latitude": lat,
+            "longitude": lng,
+            "x_utm": x,
+            "y_utm": y,
+            "category": p.category.strip() if p.category else "Uncategorized",
+            "rating": p.rating if p.rating is not None else 0.0,
+            "review": p.review_count if p.review_count is not None else 0,
+            "price_level": p.price_level if p.price_level is not None else 1,
+            "address": p.address or "",
+            "url": p.url or "",
+            "services": p.services or "",
+            "open_hours": p.open_hours or "",
+        })
+
+    df = pd.DataFrame(data)
+    df.attrs["crs_output"] = epsg_code
+    return df
 
 
 def _dataset_id(request: Request) -> str:
@@ -190,8 +227,9 @@ def get_heatmap(
         
     # Unproject back to Lat/Lng
     grid_out = []
+    epsg_code = df.attrs.get("crs_output", "EPSG:32648")
     for (x, y), w in zip(active_grid, weights):
-        lat, lng = unproject_point(x, y)
+        lat, lng = unproject_point(x, y, epsg_code=epsg_code)
         grid_out.append({
             "lat": float(lat),
             "lng": float(lng),
@@ -221,7 +259,8 @@ def get_clusters(
     to override for exploratory analysis.
     """
     # Read per-run defaults; allow query-param overrides
-    default_eps, default_ms = _get_dbscan_defaults(db_name)
+    dataset_id = _dataset_id(request)
+    default_eps, default_ms = _get_dbscan_defaults(db_name, db, dataset_id)
     eps_val = eps if eps is not None else default_eps
     ms_val = min_samples if min_samples is not None else default_ms
 
@@ -247,6 +286,26 @@ def get_clusters(
     n_noise = list(labels).count(-1)
     noise_ratio = float(n_noise / len(labels) * 100.0) if len(labels) > 0 else 0.0
     
+    # Collect noise points explicitly
+    noise_points = []
+    if -1 in unique_labels:
+        df_noise = df_filtered[labels == -1]
+        for _, row in df_noise.iterrows():
+            noise_points.append({
+                "id": int(row["id"]),
+                "name": str(row["name"]),
+                "latitude": float(row["latitude"]),
+                "longitude": float(row["longitude"]),
+                "category": str(row["category"]),
+                "rating": float(row["rating"]),
+                "review": int(row["review"]),
+                "address": str(row.get("address", "")),
+                "url": str(row.get("url", "")),
+                "services": str(row.get("services", "")),
+                "open_hours": str(row.get("open_hours", "")),
+                "cluster_id": -1
+            })
+
     for label in sorted(unique_labels):
         if label == -1:
             continue
@@ -256,9 +315,10 @@ def get_clusters(
         df_cluster = df_filtered[cluster_mask]
         
         # Calculate centroid
+        epsg_code = df.attrs.get("crs_output", "EPSG:32648")
         centroid_x = float(np.mean(c_points[:, 0]))
         centroid_y = float(np.mean(c_points[:, 1]))
-        centroid_lat, centroid_lng = unproject_point(centroid_x, centroid_y)
+        centroid_lat, centroid_lng = unproject_point(centroid_x, centroid_y, epsg_code=epsg_code)
         
         # Convex hull in UTM
         hull_pts = []
@@ -266,36 +326,92 @@ def get_clusters(
             try:
                 hull = ConvexHull(c_points)
                 for idx in hull.vertices:
-                    lat, lng = unproject_point(c_points[idx, 0], c_points[idx, 1])
+                    lat, lng = unproject_point(c_points[idx, 0], c_points[idx, 1], epsg_code=epsg_code)
                     hull_pts.append({"lat": float(lat), "lng": float(lng)})
                 # Close the polygon loop
                 hull_pts.append(hull_pts[0])
             except Exception:
                 # Fallback to list of all points if hull calculation fails (collinear points)
                 for pt in c_points:
-                    lat, lng = unproject_point(pt[0], pt[1])
+                    lat, lng = unproject_point(pt[0], pt[1], epsg_code=epsg_code)
                     hull_pts.append({"lat": float(lat), "lng": float(lng)})
         else:
             for pt in c_points:
-                lat, lng = unproject_point(pt[0], pt[1])
+                lat, lng = unproject_point(pt[0], pt[1], epsg_code=epsg_code)
                 hull_pts.append({"lat": float(lat), "lng": float(lng)})
                 
-        # Stats
+        # Core stats
         avg_rating = float(df_cluster["rating"].mean())
-        dominant_cat = df_cluster["category"].value_counts().index[0] if not df_cluster.empty else "None"
-        
+        total_reviews = int(df_cluster["review"].sum())
+        avg_price_level = float(df_cluster["price_level"].mean()) if "price_level" in df_cluster.columns else None
+        cat_counts = df_cluster["category"].value_counts()
+        dominant_cat = cat_counts.index[0] if not df_cluster.empty else "None"
+
+        # Category breakdown (top 5)
+        cluster_total_count = len(df_cluster)
+        category_breakdown = [
+            {
+                "category": str(cat),
+                "count": int(cnt),
+                "pct": float(round(cnt / cluster_total_count * 100, 1))
+            }
+            for cat, cnt in cat_counts.head(5).items()
+        ]
+
+        # Rating distribution buckets
+        rating_dist = {
+            "excellent": int(((df_cluster["rating"] >= 4.5) & (df_cluster["rating"] <= 5.0)).sum()),
+            "good":      int(((df_cluster["rating"] >= 4.0) & (df_cluster["rating"] < 4.5)).sum()),
+            "fair":      int(((df_cluster["rating"] >= 3.0) & (df_cluster["rating"] < 4.0)).sum()),
+            "poor":      int((df_cluster["rating"] < 3.0).sum()),
+        }
+
+        # Density label based on cluster size relative to overall dataset
+        density_pct = cluster_total_count / len(df_filtered) * 100 if len(df_filtered) > 0 else 0
+        if density_pct >= 15:
+            density_label = "High"
+        elif density_pct >= 5:
+            density_label = "Medium"
+        else:
+            density_label = "Low"
+
+        # Extract individual points for this cluster
+        cluster_places = []
+        for _, row in df_cluster.iterrows():
+            cluster_places.append({
+                "id": int(row["id"]),
+                "name": str(row["name"]),
+                "latitude": float(row["latitude"]),
+                "longitude": float(row["longitude"]),
+                "category": str(row["category"]),
+                "rating": float(row["rating"]),
+                "review": int(row["review"]),
+                "address": str(row.get("address", "")),
+                "url": str(row.get("url", "")),
+                "services": str(row.get("services", "")),
+                "open_hours": str(row.get("open_hours", "")),
+                "cluster_id": int(label)
+            })
+
         clusters_out.append({
             "cluster_id": int(label),
             "hull": hull_pts,
             "center": {"lat": centroid_lat, "lng": centroid_lng},
-            "count": len(df_cluster),
+            "count": cluster_total_count,
             "dominant_category": dominant_cat,
-            "avg_rating": round(avg_rating, 2)
+            "avg_rating": round(avg_rating, 2),
+            "total_reviews": total_reviews,
+            "avg_price_level": round(avg_price_level, 2) if avg_price_level is not None else None,
+            "category_breakdown": category_breakdown,
+            "rating_distribution": rating_dist,
+            "density_label": density_label,
+            "places": cluster_places,
         })
         
     return {
         "clusters": clusters_out,
         "noise_ratio": round(noise_ratio, 2),
+        "noise_points": noise_points,
         "params_used": {"eps": eps_val, "min_samples": ms_val},
     }
 
@@ -317,7 +433,8 @@ def get_competition(
         return {"total_competitors": 0, "category_breakdown": [], "competitors": []}
         
     # Project target coordinates to UTM
-    target_x, target_y = project_point(lat, lng)
+    epsg_code = df.attrs.get("crs_output", "EPSG:32648")
+    target_x, target_y = project_point(lat, lng, epsg_code=epsg_code)
     
     # Calculate Euclidean distance in meters
     dists = np.sqrt((df["x_utm"] - target_x) ** 2 + (df["y_utm"] - target_y) ** 2)
@@ -353,7 +470,11 @@ def get_competition(
             "category": str(row["category"]),
             "rating": float(row["rating"]),
             "review": int(row["review"]),
-            "distance_m": float(round(row["distance_m"], 1))
+            "distance_m": float(round(row["distance_m"], 1)),
+            "address": str(row.get("address", "")),
+            "url": str(row.get("url", "")),
+            "services": str(row.get("services", "")),
+            "open_hours": str(row.get("open_hours", ""))
         })
         
     return {
@@ -431,8 +552,9 @@ def get_market_gap(
     gap = np.clip(w_demand - w_supply, 0.0, 1.0)
     
     grid_out = []
+    epsg_code = df.attrs.get("crs_output", "EPSG:32648")
     for (x, y), g in zip(active_grid, gap):
-        lat, lng = unproject_point(x, y)
+        lat, lng = unproject_point(x, y, epsg_code=epsg_code)
         grid_out.append({
             "lat": float(lat),
             "lng": float(lng),
@@ -458,7 +580,8 @@ def get_saturation(
 
     ``eps`` and ``min_samples`` default to the per-run training values.
     """
-    default_eps, default_ms = _get_dbscan_defaults(db_name)
+    dataset_id = _dataset_id(request)
+    default_eps, default_ms = _get_dbscan_defaults(db_name, db, dataset_id)
     eps_val = eps if eps is not None else default_eps
     ms_val = min_samples if min_samples is not None else default_ms
 
@@ -487,9 +610,10 @@ def get_saturation(
         df_cluster = df[cluster_mask]
         
         # Calculate centroid
+        epsg_code = df.attrs.get("crs_output", "EPSG:32648")
         centroid_x = float(np.mean(c_points[:, 0]))
         centroid_y = float(np.mean(c_points[:, 1]))
-        centroid_lat, centroid_lng = unproject_point(centroid_x, centroid_y)
+        centroid_lat, centroid_lng = unproject_point(centroid_x, centroid_y, epsg_code=epsg_code)
         
         # Convex hull
         hull_pts = []
@@ -497,16 +621,16 @@ def get_saturation(
             try:
                 hull = ConvexHull(c_points)
                 for idx in hull.vertices:
-                    lat, lng = unproject_point(c_points[idx, 0], c_points[idx, 1])
+                    lat, lng = unproject_point(c_points[idx, 0], c_points[idx, 1], epsg_code=epsg_code)
                     hull_pts.append({"lat": float(lat), "lng": float(lng)})
                 hull_pts.append(hull_pts[0])
             except Exception:
                 for pt in c_points:
-                    lat, lng = unproject_point(pt[0], pt[1])
+                    lat, lng = unproject_point(pt[0], pt[1], epsg_code=epsg_code)
                     hull_pts.append({"lat": float(lat), "lng": float(lng)})
         else:
             for pt in c_points:
-                lat, lng = unproject_point(pt[0], pt[1])
+                lat, lng = unproject_point(pt[0], pt[1], epsg_code=epsg_code)
                 hull_pts.append({"lat": float(lat), "lng": float(lng)})
                 
         # Calculate MSI (Market Saturation Index)
@@ -576,8 +700,18 @@ def get_dominant_category(request: Request, db_name: str, db: Session = Depends(
     if counts.empty:
         return {"dominant": None}
         
-    dom_name = counts.index[0]
-    dom_count = int(counts.values[0])
+    # Filter out meaningless categories to find the true dominant business category
+    meaningless = {"unknown", "uncategorized", "none", ""}
+    valid_counts = counts[~counts.index.str.lower().isin(meaningless)]
+    
+    if valid_counts.empty:
+        # Fallback to the original logic if EVERYTHING is unknown
+        dom_name = counts.index[0]
+        dom_count = int(counts.values[0])
+    else:
+        dom_name = valid_counts.index[0]
+        dom_count = int(valid_counts.values[0])
+        
     dom_pct = float(round((dom_count / len(df)) * 100, 2))
     
     dom_df = df[df["category"] == dom_name]
