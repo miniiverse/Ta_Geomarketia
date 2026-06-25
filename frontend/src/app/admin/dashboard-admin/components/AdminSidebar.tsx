@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface AdminSidebarProps {
   open: boolean;
   onClose: () => void;
-  enableTransition?: boolean; 
+  enableTransition?: boolean;
 }
 
 const navItems = [
@@ -102,8 +102,8 @@ export default function AdminSidebar({
   enableTransition = true,
 }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  const visibleNavItems = navItems;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -115,6 +115,15 @@ export default function AdminSidebar({
   useEffect(() => {
     if (isMobile && open) onClose();
   }, [isMobile, onClose, open, pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+    } finally {
+      router.push("/login");
+    }
+  };
 
   const sidebarWidth = isMobile ? "240px" : "248px";
 
@@ -197,7 +206,7 @@ export default function AdminSidebar({
           </p>
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-            {visibleNavItems.map((item) => {
+            {navItems.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(item.href + "/");
               return (
@@ -272,8 +281,8 @@ export default function AdminSidebar({
             borderTop: "1px solid rgba(255,255,255,0.1)",
           }}
         >
-          <Link
-            href="/logout"
+          <button
+            onClick={handleLogout}
             style={{
               display: "flex",
               alignItems: "center",
@@ -285,10 +294,13 @@ export default function AdminSidebar({
               fontWeight: 500,
               color: "rgba(255,255,255,0.6)",
               background: "transparent",
+              border: "none",
+              cursor: "pointer",
               textDecoration: "none",
               transition: "background 0.18s, color 0.18s",
               letterSpacing: "-0.01em",
               minHeight: isMobile ? "48px" : "auto",
+              width: "100%",
             }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.background =
@@ -316,7 +328,7 @@ export default function AdminSidebar({
               <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
             Logout
-          </Link>
+          </button>
         </div>
       </aside>
 

@@ -221,7 +221,8 @@ export default function AdminNavbar({
 
   const showLogoText = !isMobile;
   const showNameText = !isMobile && !isTablet;
-  const showAdminBadge = !isMobile;
+  const showRoleBadge = !isMobile;
+  const roleBadgeLabel = role === "Administrator" ? "Admin" : role;
 
   return (
     <>
@@ -345,7 +346,7 @@ export default function AdminNavbar({
                 Geomarketia
               </span>
             )}
-            {showAdminBadge && (
+            {showRoleBadge && (
               <span
                 style={{
                   background: "#EBF3FF",
@@ -362,7 +363,7 @@ export default function AdminNavbar({
                   flexShrink: 0,
                 }}
               >
-                Admin
+                {roleBadgeLabel}
               </span>
             )}
           </div>
