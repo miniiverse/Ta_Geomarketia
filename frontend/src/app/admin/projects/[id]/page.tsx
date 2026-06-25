@@ -264,7 +264,7 @@ const ClusterMapComponent = dynamic(
 );
 
 const IntelligentSystemMap = dynamic(
-  () => import("../components/IntelligentSystemMap"),
+  () => import("../components/IntelligentSystemMapFeature"),
   {
     ssr: false,
     loading: () => (

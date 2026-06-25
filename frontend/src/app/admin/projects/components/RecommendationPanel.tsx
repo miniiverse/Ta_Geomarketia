@@ -346,7 +346,7 @@ function EmptyState({ title, description }: { title: string; description: string
   );
 }
 
-export default function RecommendationPanel({
+function LegacyRecommendationPanel({
   selectedGroup,
   category,
   recommendations,
@@ -587,4 +587,11 @@ export default function RecommendationPanel({
       </div>
     </div>
   );
+}
+
+void LegacyRecommendationPanel;
+
+export default function RecommendationPanel(_props: Props) {
+  void _props;
+  return null;
 }

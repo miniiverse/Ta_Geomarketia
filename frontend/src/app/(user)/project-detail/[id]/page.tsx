@@ -500,7 +500,7 @@ const UserClusterMapComponent = dynamic(
 );
 
 const UserIntelligentSystemMap = dynamic(
-  () => import("./components/UserIntelligentSystemMap"),
+  () => import("./components/UserIntelligentSystemMapFeature"),
   {
     ssr: false,
     loading: () => (

@@ -35,11 +35,19 @@ export async function GET(request: NextRequest) {
     if (action === "recommendation") {
       const category = searchParams.get("category");
       const limit = searchParams.get("limit") ?? "5";
+      const subdistrict =
+        searchParams.get("subdistrict") ?? searchParams.get("sub_district");
 
       if (!category) return jsonError("category required", 400);
 
+      const params = new URLSearchParams({
+        category,
+        limit,
+      });
+      if (subdistrict) params.set("subdistrict", subdistrict);
+
       const res = await fetch(
-        `${FASTAPI}/api/v1/${encodeURIComponent(dbName)}/recommendation/location?category=${encodeURIComponent(category)}&limit=${encodeURIComponent(limit)}`,
+        `${FASTAPI}/api/v1/${encodeURIComponent(dbName)}/recommendation/location?${params.toString()}`,
         {
           method: "POST",
           cache: "no-store",

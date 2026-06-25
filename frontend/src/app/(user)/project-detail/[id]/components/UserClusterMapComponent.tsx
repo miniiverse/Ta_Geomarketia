@@ -1162,9 +1162,6 @@ export default function UserClusterMapComponent({
 
       <UserClusterAreaSummaryCard
         places={places}
-        geoClusterMap={
-          new Map(groups.map((g) => [g.geoCluster, g.places.length]))
-        }
         onZoomToCluster={(geoCluster) => {
           if (geoCluster === -999) {
             handleSelectCluster(null);

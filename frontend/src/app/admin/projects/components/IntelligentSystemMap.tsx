@@ -370,7 +370,7 @@ function FitBounds({ places }: { places: PlaceData[] }) {
   return null;
 }
 
-export default function IntelligentSystemMap({
+function LegacyIntelligentSystemMap({
   places = [],
   dbName,
 }: {
@@ -743,4 +743,14 @@ export default function IntelligentSystemMap({
       />
     </div>
   );
+}
+
+void LegacyIntelligentSystemMap;
+
+export default function IntelligentSystemMap(_props: {
+  places: PlaceData[];
+  dbName?: string;
+}) {
+  void _props;
+  return null;
 }

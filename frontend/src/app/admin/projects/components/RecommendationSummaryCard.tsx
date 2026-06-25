@@ -173,7 +173,7 @@ function SummaryStat({
   );
 }
 
-export default function RecommendationSummaryCard({
+function LegacyRecommendationSummaryCard({
   category,
   recommendations,
   loadingAnalysis,
@@ -394,4 +394,11 @@ export default function RecommendationSummaryCard({
       )}
     </div>
   );
+}
+
+void LegacyRecommendationSummaryCard;
+
+export default function RecommendationSummaryCard(_props: Props) {
+  void _props;
+  return null;
 }

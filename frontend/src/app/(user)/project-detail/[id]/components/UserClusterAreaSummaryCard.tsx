@@ -61,7 +61,6 @@ type CardEntry = {
 
 type UserClusterAreaSummaryCardProps = {
   places: PlaceData[];
-  geoClusterMap: Map<number, number>;
   onZoomToCluster: (geoCluster: number) => void;
   activeCluster: number | null;
   onActiveClusterChange: (geoCluster: number | null) => void;
@@ -69,7 +68,6 @@ type UserClusterAreaSummaryCardProps = {
 
 export default function UserClusterAreaSummaryCard({
   places,
-  geoClusterMap,
   onZoomToCluster,
   activeCluster,
   onActiveClusterChange,
