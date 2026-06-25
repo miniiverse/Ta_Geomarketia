@@ -23,6 +23,7 @@ const ITEMS_PER_PAGE = 4;
 
 interface Props {
   users: AdminUser[];
+  currentUserId?: number;
   currentUserRoleId?: number;
   onEdit: (user: AdminUser) => void;
   onDataChange: (users: AdminUser[]) => void;
@@ -191,7 +192,13 @@ function RoleDropdown({
       bg: C.successLight,
       border: "#BBF7D0",
     },
-    { id: 2, label: "Admin", color: C.blue, bg: "#EFF6FF", border: "#BFDBFE" },
+    {
+      id: 3,
+      label: "Manager",
+      color: C.purple,
+      bg: C.purpleLight,
+      border: "#DDD6FE",
+    },
   ];
 
   if (!anchorRect) return null;
@@ -295,12 +302,18 @@ function RoleDropdown({
 
 export default function UserTable({
   users,
+  currentUserId,
   currentUserRoleId,
   onEdit,
   onDataChange,
 }: Props) {
-  const isManager = currentUserRoleId === 3;
-  const canEditManagerAccount = isManager;
+  const isAdmin = currentUserRoleId === 2;
+  const canChangeRole = (user: AdminUser) =>
+    isAdmin && currentUserId !== user.id && user.role !== "admin";
+  const canEditUser = (user: AdminUser) =>
+    currentUserId === user.id || (user.role !== "admin" && (currentUserRoleId === 2 || currentUserRoleId === 3));
+  const canDeleteUser = (user: AdminUser) =>
+    currentUserId !== user.id && user.role !== "admin" && (currentUserRoleId === 2 || currentUserRoleId === 3);
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [confirm, setConfirm] = useState<{
     type: "delete" | "promote";
@@ -632,27 +645,17 @@ export default function UserTable({
                     justifyContent: "flex-start",
                   }}
                 >
+                  {(() => {
+                    const canEdit = canEditUser(user);
+                    return (
                   <button
                     onClick={() => onEdit(user)}
-                    disabled={
-                      loadingId === user.id ||
-                      (user.role === "manager" && !canEditManagerAccount)
-                    }
-                    title={
-                      user.role === "manager" && !canEditManagerAccount
-                        ? "Admin cannot edit manager accounts"
-                        : "Edit user"
-                    }
+                    disabled={loadingId === user.id || !canEdit}
+                    title={canEdit ? "Edit user" : "You cannot edit this account"}
                     style={{
                       ...actionButtonStyle(C.muted),
-                      opacity:
-                        user.role === "manager" && !canEditManagerAccount
-                          ? 0.45
-                          : 1,
-                      cursor:
-                        user.role === "manager" && !canEditManagerAccount
-                          ? "not-allowed"
-                          : "pointer",
+                      opacity: canEdit ? 1 : 0.45,
+                      cursor: canEdit ? "pointer" : "not-allowed",
                     }}
                   >
                     <svg
@@ -678,10 +681,13 @@ export default function UserTable({
                       Edit
                     </span>
                   </button>
+                    );
+                  })()}
 
-                  {isManager && user.role !== "manager" && (
+                  {isAdmin && (
                     <button
                       onClick={(e) => {
+                        if (!canChangeRole(user)) return;
                         const rect = (
                           e.currentTarget as HTMLElement
                         ).getBoundingClientRect();
@@ -690,9 +696,13 @@ export default function UserTable({
                           openDropdown === user.id ? null : user.id,
                         );
                       }}
-                      disabled={loadingId === user.id}
-                      title="Change role"
-                      style={actionButtonStyle(C.warning)}
+                      disabled={loadingId === user.id || !canChangeRole(user)}
+                      title={canChangeRole(user) ? "Change role" : "You cannot change this role"}
+                      style={{
+                        ...actionButtonStyle(C.warning),
+                        opacity: canChangeRole(user) ? 1 : 0.45,
+                        cursor: canChangeRole(user) ? "pointer" : "not-allowed",
+                      }}
                     >
                       <svg
                         width="13"
@@ -731,15 +741,17 @@ export default function UserTable({
                     </button>
                   )}
 
+                  {(() => {
+                    const canDelete = canDeleteUser(user);
+                    return (
                   <button
                     onClick={() => setConfirm({ type: "delete", user })}
-                    disabled={loadingId === user.id || user.role === "manager"}
-                    title="Delete user"
+                    disabled={loadingId === user.id || !canDelete}
+                    title={canDelete ? "Delete user" : "You cannot delete this account"}
                     style={{
                       ...actionButtonStyle(C.danger),
-                      opacity: user.role === "manager" ? 0.45 : 1,
-                      cursor:
-                        user.role === "manager" ? "not-allowed" : "pointer",
+                      opacity: canDelete ? 1 : 0.45,
+                      cursor: canDelete ? "pointer" : "not-allowed",
                     }}
                   >
                     <svg
@@ -767,6 +779,8 @@ export default function UserTable({
                       Delete
                     </span>
                   </button>
+                    );
+                  })()}
                 </div>
               </div>
             ))
@@ -840,7 +854,11 @@ export default function UserTable({
       {confirm?.type === "promote" && (
         <ConfirmDialog
           message={`Change role of "${confirm.user.fullname}" to ${
-            confirm.targetRoleId === 2 ? "Admin" : "User"
+            confirm.targetRoleId === 2
+              ? "Admin"
+              : confirm.targetRoleId === 3
+                ? "Manager"
+                : "User"
           }?`}
           confirmLabel="Confirm"
           confirmColor={C.warning}

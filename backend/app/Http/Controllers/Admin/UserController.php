@@ -43,10 +43,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if ($request->user()?->role_id === self::ROLE_ADMIN && $user->role_id === self::ROLE_MANAGER) {
+        if (! $this->canModifyUser($request->user(), $user)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Admin cannot edit manager accounts.',
+                'message' => 'You are not allowed to edit this account.',
             ], 403);
         }
 
@@ -86,11 +86,11 @@ class UserController extends Controller
             ], 422);
         }
 
-        if ($user->role_id === self::ROLE_MANAGER) {
+        if (! $this->canModifyUser($request->user(), $user)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Manager account cannot be deleted from this panel.',
-            ], 422);
+                'message' => 'You are not allowed to delete this account.',
+            ], 403);
         }
 
         if ($user->profile_photo) {
@@ -112,24 +112,17 @@ class UserController extends Controller
 
     public function promote(Request $request, $id)
     {
-        if ($request->user()?->role_id !== self::ROLE_MANAGER) {
+        if ($request->user()?->role_id !== self::ROLE_ADMIN) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only manager can update user roles.',
+                'message' => 'Only admin can update user roles.',
             ], 403);
         }
 
         $user = User::findOrFail($id);
         $validated = $request->validate([
-            'role_id' => ['required', 'integer', Rule::in([self::ROLE_USER, self::ROLE_ADMIN])],
+            'role_id' => ['required', 'integer', Rule::in([self::ROLE_USER, self::ROLE_MANAGER])],
         ]);
-
-        if ($user->role_id === self::ROLE_MANAGER) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Manager role can only be managed manually in the database.',
-            ], 422);
-        }
 
         $targetRole = Role::where('role_id', $validated['role_id'])->first();
         $adminRole = Role::where('role_id', self::ROLE_ADMIN)->first();
@@ -139,6 +132,13 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Required roles not found.',
             ], 500);
+        }
+
+        if ($user->role_id === $adminRole->role_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Admin accounts can only be managed manually from the database.',
+            ], 422);
         }
 
         if ($request->user()->user_id === $user->user_id && $user->role_id === $adminRole->role_id && $targetRole->role_id !== $adminRole->role_id) {
@@ -175,5 +175,22 @@ class UserController extends Controller
                 : null,
             'created_at' => $user->created_at,
         ];
+    }
+
+    private function canModifyUser(?User $actor, User $target): bool
+    {
+        if (! $actor) {
+            return false;
+        }
+
+        if ($actor->user_id === $target->user_id) {
+            return true;
+        }
+
+        if ($target->role_id === self::ROLE_ADMIN) {
+            return false;
+        }
+
+        return in_array($actor->role_id, [self::ROLE_ADMIN, self::ROLE_MANAGER], true);
     }
 }

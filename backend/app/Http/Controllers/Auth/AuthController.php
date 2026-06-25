@@ -137,7 +137,7 @@ class AuthController extends Controller
             Storage::disk('public')->delete($user->profile_photo);
         }
 
-        $folder = $user->role_id === 3 ? 'photos/manager' : ($user->role_id === 2 ? 'photos/admin' : 'photos');
+        $folder = $user->role_id === 2 ? 'photos/admin' : ($user->role_id === 3 ? 'photos/manager' : 'photos/user');
         $path   = $request->file('photo')->store($folder, 'public');
 
         $user->update(['profile_photo' => $path]);

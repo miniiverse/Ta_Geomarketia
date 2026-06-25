@@ -103,6 +103,7 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const visibleNavItems = navItems;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -113,7 +114,7 @@ export default function AdminSidebar({
 
   useEffect(() => {
     if (isMobile && open) onClose();
-  }, [pathname]);
+  }, [isMobile, onClose, open, pathname]);
 
   const sidebarWidth = isMobile ? "240px" : "248px";
 
@@ -196,7 +197,7 @@ export default function AdminSidebar({
           </p>
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(item.href + "/");
               return (

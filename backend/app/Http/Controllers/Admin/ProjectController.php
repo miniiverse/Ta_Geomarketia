@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
-    private const MANAGER_PROJECT_THUMBNAIL_PATH = 'projects/manager';
+    private const ADMIN_PROJECT_THUMBNAIL_PATH = 'projects/admin';
 
     public function index()
     {
@@ -44,10 +44,10 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->user()?->role_id !== 3) {
+        if ($request->user()?->role_id !== 2) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only manager can add projects.',
+                'message' => 'Only admin can add projects.',
             ], 403);
         }
 
@@ -66,7 +66,7 @@ class ProjectController extends Controller
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')
-                ->store(self::MANAGER_PROJECT_THUMBNAIL_PATH, 'public');
+                ->store(self::ADMIN_PROJECT_THUMBNAIL_PATH, 'public');
         }
 
         $project = Project::create([
@@ -118,7 +118,7 @@ class ProjectController extends Controller
                 Storage::disk('public')->delete($project->thumbnail);
             }
             $validated['thumbnail'] = $request->file('thumbnail')
-                ->store(self::MANAGER_PROJECT_THUMBNAIL_PATH, 'public');
+                ->store(self::ADMIN_PROJECT_THUMBNAIL_PATH, 'public');
         }
 
         $project->update([

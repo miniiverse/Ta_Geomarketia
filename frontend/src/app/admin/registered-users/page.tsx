@@ -111,7 +111,6 @@ export default function RegisteredUsersPage() {
     }
   };
 
-  console.log(users);
   const safeUsers = Array.isArray(users) ? users : [];
   const totalUsers = safeUsers.length;
   const totalManagers = safeUsers.filter((u) => u.role === "manager").length;
@@ -404,6 +403,7 @@ export default function RegisteredUsersPage() {
         ) : (
           <UserTable
             users={safeUsers}
+            currentUserId={currentUser?.id}
             currentUserRoleId={currentUser?.role_id}
             onEdit={setEditUser}
             onDataChange={setUsers}
