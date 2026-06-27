@@ -12,14 +12,21 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [enableTransition, setEnableTransition] = useState(false);
+  const lastMobileStateRef = useRef<boolean | null>(null);
 
   useEffect(() => {
-    const mobile = window.innerWidth < 768;
-    setIsMobile(mobile);
-    setSidebarOpen(!mobile);
+    let transitionFrame = 0;
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    const syncLayout = () => {
+      const mobile = window.innerWidth < 768;
+      lastMobileStateRef.current = mobile;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+
+    const layoutFrame = requestAnimationFrame(() => {
+      syncLayout();
+      transitionFrame = requestAnimationFrame(() => {
         setEnableTransition(true);
       });
     });
@@ -27,10 +34,17 @@ export default function AdminLayout({
     const check = () => {
       const m = window.innerWidth < 768;
       setIsMobile(m);
-      setSidebarOpen(!m);
+      if (lastMobileStateRef.current !== m) {
+        lastMobileStateRef.current = m;
+        setSidebarOpen(!m);
+      }
     };
     window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    return () => {
+      cancelAnimationFrame(layoutFrame);
+      cancelAnimationFrame(transitionFrame);
+      window.removeEventListener("resize", check);
+    };
   }, []);
 
   return (

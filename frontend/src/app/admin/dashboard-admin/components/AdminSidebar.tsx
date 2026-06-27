@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AdminSidebarProps {
   open: boolean;
@@ -104,6 +104,7 @@ export default function AdminSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
+  const previousPathnameRef = useRef(pathname);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -113,6 +114,9 @@ export default function AdminSidebar({
   }, []);
 
   useEffect(() => {
+    if (previousPathnameRef.current === pathname) return;
+
+    previousPathnameRef.current = pathname;
     if (isMobile && open) onClose();
   }, [isMobile, onClose, open, pathname]);
 

@@ -525,7 +525,7 @@ export default function ProjectsPage() {
               position: "fixed",
               inset: 0,
               background: "rgba(15,23,42,0.5)",
-              zIndex: 50,
+              zIndex: 250,
             }}
             onClick={() => {
               setShowAdd(false);
@@ -537,7 +537,7 @@ export default function ProjectsPage() {
             className="prj-modal-box"
             style={{
               position: "fixed",
-              zIndex: 51,
+              zIndex: 251,
               background: "#fff",
               boxShadow: "0 20px 60px rgba(26,86,219,0.15)",
               top: "50%",
