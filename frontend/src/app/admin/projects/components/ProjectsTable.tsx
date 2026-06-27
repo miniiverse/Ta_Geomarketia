@@ -19,10 +19,33 @@ type Project = {
   thumbnail?: string;
 };
 
+type ProjectApiItem = {
+  project_id: number;
+  title: string;
+  category?: {
+    name?: string | null;
+  } | null;
+  total_data?: number | null;
+  price?: string | number | null;
+  updated_at?: string | null;
+  project_date?: string | null;
+  description?: string;
+  api_url?: string;
+  city?: {
+    name?: string | null;
+  } | null;
+  thumbnail?: string;
+};
+
 function formatPrice(price: string | number | null): string {
   if (!price) return "Rp0";
   const num = typeof price === "string" ? parseFloat(price) : price;
   return "Rp" + num.toLocaleString("id-ID");
+}
+
+function parseRawPrice(price: string | number | null | undefined): number | null {
+  if (price === null || price === undefined || price === "") return null;
+  return typeof price === "string" ? parseFloat(price) : price;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -250,7 +273,6 @@ function FieldRow({
 }
 
 export default function ProjectsTable({
-  onAdd,
   canManageProjects = false,
   refreshKey,
   onDelete,
@@ -282,18 +304,18 @@ export default function ProjectsTable({
     try {
       const res = await fetch("/api/project");
       const json = await res.json();
-      const mapped: Project[] = (json.data || []).map((p: any) => ({
+      const mapped: Project[] = ((json.data || []) as ProjectApiItem[]).map((p) => ({
         id: p.project_id,
         name: p.title,
         category: p.category?.name || "-",
         totalData: p.total_data ?? 0,
-        price: formatPrice(p.price),
-        rawPrice: p.price ? parseFloat(p.price) : null,
-        date: formatDate(p.updated_at),
-        projectDate: formatDate(p.project_date),
+        price: formatPrice(p.price ?? null),
+        rawPrice: parseRawPrice(p.price),
+        date: formatDate(p.updated_at ?? null),
+        projectDate: formatDate(p.project_date ?? null),
         description: p.description,
         api_url: p.api_url,
-        city: p.city?.name,
+        city: p.city?.name ?? undefined,
         thumbnail: p.thumbnail,
       }));
       setProjects(mapped);
@@ -357,12 +379,12 @@ export default function ProjectsTable({
       if (editThumbnail) formData.append("thumbnail", editThumbnail);
 
       const res = await fetch(`/api/project/${editingProject.id}`, {
-        method: "PUT",
+        method: "POST",
         body: formData,
       });
 
       const text = await res.text();
-      const data = JSON.parse(text);
+      const data = text ? JSON.parse(text) : {};
       if (!res.ok) throw new Error(data.message || "Failed to save.");
 
       closeEdit();
@@ -371,8 +393,11 @@ export default function ProjectsTable({
         `Project "${editingProject.name}" updated successfully.`,
         "success",
       );
-    } catch (err: any) {
-      showToast(err.message || "Failed to save changes.", "error");
+    } catch (err: unknown) {
+      showToast(
+        err instanceof Error ? err.message : "Failed to save changes.",
+        "error",
+      );
     } finally {
       setIsSaving(false);
     }
