@@ -39,6 +39,44 @@ function displayCategoryName(category: string): string {
   return resolveCategoryId(category) === 2 ? "F&B" : category;
 }
 
+const PROJECT_CATEGORY_NAME_MAP: Record<string, string> = {
+  "toko komputer": "Computer Store",
+  "toko bangunan": "Building Supply Store",
+  kuliner: "Culinary",
+  school: "School",
+  kesehatan: "Healthcare",
+  hotel: "Hotel",
+  cosmetics: "Cosmetics",
+  pt: "Company",
+};
+
+function toProjectTitleCase(value: string): string {
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function translateProjectCategoryName(category: string): string {
+  const normalized = category.replace(/[_-]+/g, " ").trim().toLowerCase();
+  return PROJECT_CATEGORY_NAME_MAP[normalized] ?? toProjectTitleCase(category);
+}
+
+function generateProjectTitle(project: FastApiProject): string {
+  const dbParts = project.db_id.split(".");
+  const province = dbParts[0] || project.province || "";
+  const city = dbParts[1] || project.city || "";
+  const category = dbParts.length >= 3 ? dbParts[2] : project.category;
+
+  if (!category || !city || !province) return project.project_name;
+
+  return `${translateProjectCategoryName(category)}, ${toProjectTitleCase(city)}, ${toProjectTitleCase(province)}`;
+}
+
 function resolveCityId(city: string): number | null {
   const c = (city ?? "").toLowerCase().trim();
   if (c.includes("batam")) return 1;
@@ -244,14 +282,7 @@ export default function ProjectsPage() {
     const resolvedCategoryId = resolveCategoryId(autoFilled.category);
     const resolvedCityId = resolveCityId(autoFilled.city);
 
-    // Generate the project name from db_id.
-    // db_id format: "Indonesia.Batam.Culinary.202410290644"
-    // Result: "Culinary Batam, Indonesia"
-    const dbParts = autoFilled.db_id.split(".");
-    const generatedTitle =
-      dbParts.length >= 3
-        ? `${dbParts[2]} ${dbParts[1]}, ${dbParts[0]}`
-        : autoFilled.project_name;
+    const generatedTitle = generateProjectTitle(autoFilled);
 
     setIsSaving(true);
     try {
@@ -742,7 +773,7 @@ export default function ProjectsPage() {
                     <label style={labelStyle}>Project Name</label>
                     <input
                       readOnly
-                      value={autoFilled.city}
+                      value={generateProjectTitle(autoFilled)}
                       style={readonlyStyle}
                     />
                   </div>
