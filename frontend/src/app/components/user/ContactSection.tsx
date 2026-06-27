@@ -27,19 +27,71 @@ export default function ContactSection() {
           </p>
 
           <a
-            href="https://wa.me/6281234567890"
+            href="https://wa.me/6282172435087"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-whatsapp"
           >
-            <svg className="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg
+              className="btn-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.66-.5-5.22-1.44l-.37-.22-3.89.98.98-3.78-.25-.39A9.93 9.93 0 0 1 2 12C2 6.48 6.48 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 10-10 10zm5.44-7.48c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.14-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.46s1.06 2.85 1.21 3.05c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z" />
             </svg>
             Chat via WhatsApp
-            <svg className="btn-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              className="btn-arrow"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 10h12M11 5l5 5-5 5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </a>
+
+          <div className="contact-info">
+            <a href="mailto:geomarketia.app@gmail.com" className="contact-link">
+              <svg
+                className="contact-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M22 4L12 13 2 4" />
+              </svg>
+              geomarketia.app@gmail.com
+            </a>
+            <a
+              href="https://maps.app.goo.gl/2obDzEe5hiS7LS9K6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-link"
+            >
+              <svg
+                className="contact-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              View on Maps
+            </a>
+          </div>
         </div>
 
         <div className="right">
@@ -61,7 +113,12 @@ export default function ContactSection() {
 
               <div className="pin-wrap">
                 <div className="pin-body">
-                  <svg className="pin-icon" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                  <svg
+                    className="pin-icon"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    aria-hidden="true"
+                  >
                     <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.66-.5-5.22-1.44l-.37-.22-3.89.98.98-3.78-.25-.39A9.93 9.93 0 0 1 2 12C2 6.48 6.48 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 10-10 10zm5.44-7.48c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.14-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.46s1.06 2.85 1.21 3.05c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z" />
                   </svg>
                 </div>
@@ -70,7 +127,13 @@ export default function ContactSection() {
             </div>
 
             <div className="float-bubble float-bubble-1">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#1A56DB" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="#1A56DB"
+                aria-hidden="true"
+              >
                 <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.59 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52z" />
               </svg>
               <span>Online now</span>
@@ -228,6 +291,7 @@ export default function ContactSection() {
           transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
           box-shadow: 0 4px 20px rgba(26,86,219,0.28);
           letter-spacing: -0.01em;
+          margin-bottom: 24px;
         }
         .btn-whatsapp:hover {
           background: #1648c0;
@@ -243,6 +307,32 @@ export default function ContactSection() {
           transition: transform 0.2s;
         }
         .btn-whatsapp:hover .btn-arrow { transform: translateX(3px); }
+
+        .contact-info {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .contact-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #64748b;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.2s;
+        }
+
+        .contact-link:hover {
+          color: #1A56DB;
+        }
+
+        .contact-icon {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+        }
 
         .right {
           flex-shrink: 0;
@@ -436,6 +526,7 @@ export default function ContactSection() {
           .ring-inner { width: 135px; height: 135px; }
           .phone-body { width: 120px; }
           .phone-screen { height: 88px; }
+          .contact-link { font-size: 13px; }
         }
 
         @media (max-width: 360px) {
@@ -445,6 +536,7 @@ export default function ContactSection() {
           .phone-body { width: 110px; }
           .phone-screen { height: 80px; }
           .float-bubble { font-size: 11px; padding: 6px 10px; }
+          .contact-link { font-size: 12px; }
         }
       `}</style>
     </section>

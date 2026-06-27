@@ -271,22 +271,7 @@ const menuItems = [
       </svg>
     ),
   },
-
-  {
-    label: "My Analysis",
-    href: "/myanalysis",
-    danger: false,
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M4 19V5M10 19V9M16 19V13M22 19V3"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
+  
   {
     label: "Logout",
     href: "/",
