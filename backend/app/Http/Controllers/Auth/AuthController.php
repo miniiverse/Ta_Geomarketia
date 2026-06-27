@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
+    /*
+     * Registers a new user with default role 1 (User).
+     * Password is hashed before being saved to the database.
+     */
     public function register(RegisterRequest $request)
     {
         $user = User::create([
@@ -28,6 +32,11 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /*
+     * Logs in a user using username and password.
+     * Protected by a rate limiter of maximum 5 attempts per IP within 60 seconds.
+     * If successful, old tokens are deleted and a new Sanctum token is created.
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -77,6 +86,10 @@ class AuthController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves the currently logged-in user along with their role relation.
+     * Response is sent with a no-store Cache-Control header to prevent browser caching.
+     */
     public function me(Request $request)
     {
         $user = $request->user()->load('role');
@@ -98,6 +111,10 @@ class AuthController extends Controller
         ])->header('Cache-Control', 'no-store');
     }
 
+    /*
+     * Updates the profile of the currently logged-in user (fullname, username, email).
+     * Username and email are validated for uniqueness, except for the user themselves.
+     */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -125,6 +142,11 @@ class AuthController extends Controller
         ]);
     }
 
+    /*
+     * Updates the profile photo of the currently logged-in user.
+     * The old photo is deleted from storage before the new one is saved.
+     * Storage folder is determined based on the user's role (admin/manager/user).
+     */
     public function updatePhoto(Request $request)
     {
         $request->validate([
@@ -148,6 +170,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /*
+     * Logs out the user by deleting the currently used access token.
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

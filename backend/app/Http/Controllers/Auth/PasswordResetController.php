@@ -15,16 +15,15 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class PasswordResetController extends Controller
 {
-    // Durasi expired OTP dalam menit
     private const OTP_EXPIRE_MINUTES = 10;
 
-    /**
-     * Step 1 — Kirim OTP ke email.
-     * OTP di-hash dengan bcrypt sebelum disimpan ke database.
+    /*
+     * Step 1 — Sends an OTP to the user's email.
+     * OTP is hashed with bcrypt before being saved to the database.
+     * Rate limited to a maximum of 3 requests per 10 minutes per IP.
      */
     public function sendOtp(SendOtpRequest $request)
     {
-        // Rate limiting: maks 3 request per 10 menit per IP
         $key = 'otp-send:' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 3)) {
@@ -40,20 +39,16 @@ class PasswordResetController extends Controller
 
         $email = $request->email;
 
-        // Generate OTP 6 digit
         $otpPlain = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Hapus OTP lama
         PasswordResetOtp::where('email', $email)->delete();
 
-        // Simpan OTP baru
         PasswordResetOtp::create([
             'email'      => $email,
             'otp'        => Hash::make($otpPlain),
             'expires_at' => Carbon::now()->addMinutes(self::OTP_EXPIRE_MINUTES),
         ]);
 
-        // TEMPLATE EMAIL HTML
         $html = "
 <div style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;'>
     <div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; padding: 40px;'>
@@ -105,7 +100,6 @@ class PasswordResetController extends Controller
 </div>
 ";
 
-        // Kirim email HTML
         Mail::html($html, function ($message) use ($email) {
             $message->to($email)
                 ->subject('Geomarketia - Password Reset OTP');
@@ -117,10 +111,10 @@ class PasswordResetController extends Controller
         ]);
     }
 
-    /**
-     * Step 2 — Verifikasi OTP.
-     * Hanya mengecek validitas OTP tanpa langsung reset password.
-     * Frontend simpan email + OTP untuk dikirim di step 3.
+    /*
+     * Step 2 — Verifies the OTP.
+     * Only checks OTP validity without resetting the password immediately.
+     * Frontend stores email and OTP to be submitted in step 3.
      */
     public function verifyOtp(VerifyOtpRequest $request)
     {
@@ -154,9 +148,10 @@ class PasswordResetController extends Controller
         ]);
     }
 
-    /**
-     * Step 3 — Reset password.
-     * OTP di-verifikasi ulang di sini untuk keamanan (tidak cukup hanya trust frontend).
+    /*
+     * Step 3 — Resets the user's password.
+     * OTP is re-verified here for security, not solely trusting the frontend.
+     * All active tokens are deleted to force logout across all sessions.
      */
     public function resetPassword(ResetPasswordRequest $request)
     {
@@ -184,16 +179,13 @@ class PasswordResetController extends Controller
             ], 422);
         }
 
-        // Update password user
         $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password),
         ]);
 
-        // Hapus semua token aktif (force logout semua sesi)
         $user->tokens()->delete();
 
-        // Hapus OTP setelah berhasil dipakai
         $record->delete();
 
         return response()->json([

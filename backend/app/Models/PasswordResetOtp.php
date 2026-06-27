@@ -7,14 +7,20 @@ use Illuminate\Support\Carbon;
 
 class PasswordResetOtp extends Model
 {
+    /**
+     * The primary key associated with the table.
+     */
     protected $fillable = ['email', 'otp', 'expires_at'];
 
+    /**
+     * Indicates if the model should be timestamped.
+     */
     protected $casts = [
         'expires_at' => 'datetime',
     ];
 
     /**
-     * Cek apakah OTP sudah expired.
+     * Indicates if the model should be timestamped.
      */
     public function isExpired(): bool
     {

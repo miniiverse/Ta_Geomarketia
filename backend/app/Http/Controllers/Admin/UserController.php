@@ -16,6 +16,10 @@ class UserController extends Controller
     private const ROLE_ADMIN = 2;
     private const ROLE_MANAGER = 3;
 
+    /*
+     * Retrieves all users along with their role relation.
+     * Sorted by latest, results are formatted using formatUser().
+     */
     public function index()
     {
         $users = User::with('role')
@@ -25,10 +29,14 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'total' => $users->count(),
-            'users' => $users->map(fn (User $user) => $this->formatUser($user)),
+            'users' => $users->map(fn(User $user) => $this->formatUser($user)),
         ]);
     }
 
+    /*
+     * Retrieves the detail of a single user by ID.
+     * Automatically returns 404 if not found.
+     */
     public function show($id)
     {
         $user = User::with('role')->findOrFail($id);
@@ -39,6 +47,11 @@ class UserController extends Controller
         ]);
     }
 
+    /*
+     * Updates user data (fullname, username, email) by ID.
+     * Only allowed for actors with permission via canModifyUser().
+     * Username and email are validated for uniqueness, except for the user themselves.
+     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -75,6 +88,11 @@ class UserController extends Controller
         ]);
     }
 
+    /*
+     * Deletes a user by ID along with their profile photo and tokens.
+     * Cannot delete own account, and must have permission via canModifyUser().
+     * Projects owned by the deleted user are reassigned to the actor performing the deletion.
+     */
     public function destroy(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -110,6 +128,11 @@ class UserController extends Controller
         ]);
     }
 
+    /*
+     * Changes a user's role (only between User and Manager), exclusively for Admin.
+     * Cannot change the role of an Admin account or demote their own account.
+     * Validates the allowed role_id before performing the update.
+     */
     public function promote(Request $request, $id)
     {
         if ($request->user()?->role_id !== self::ROLE_ADMIN) {
@@ -161,6 +184,10 @@ class UserController extends Controller
         ]);
     }
 
+    /*
+     * Formats user data into a standard array for JSON response.
+     * Includes the full profile photo URL if available.
+     */
     private function formatUser(User $user): array
     {
         return [
@@ -177,6 +204,11 @@ class UserController extends Controller
         ];
     }
 
+    /*
+     * Checks whether the actor has permission to modify the target user.
+     * Admin and Manager can modify regular users, but cannot modify other Admins.
+     * A user can only modify their own account.
+     */
     private function canModifyUser(?User $actor, User $target): bool
     {
         if (! $actor) {

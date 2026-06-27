@@ -15,6 +15,11 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class TransactionsController extends Controller
 {
+    /*
+     * Retrieves a paginated list of all transactions with optional filters.
+     * Available filters: payment status, payment method, and keyword search.
+     * Returns order, payment, user, project data along with overall statistics.
+     */
     public function index(Request $request)
     {
         $query = Order::with(['payment', 'project', 'user'])
@@ -82,6 +87,11 @@ class TransactionsController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves the detail of a single transaction by order_id.
+     * Includes payment, project with category, and user relations.
+     * Automatically returns 404 if not found.
+     */
     public function show($id)
     {
         $order = Order::where('order_id', $id)
@@ -112,6 +122,11 @@ class TransactionsController extends Controller
         ]);
     }
 
+    /*
+     * Exports transaction data within a given date range to an Excel file (.xlsx).
+     * Builds a styled spreadsheet with headers and zebra-striped rows,
+     * then returns it as a direct file download to the browser.
+     */
     public function exportExcel(Request $request)
     {
         $request->validate([

@@ -10,6 +10,10 @@ use Carbon\Carbon;
 
 class UserProjectController extends Controller
 {
+    /**
+     * Retrieves a paginated list of projects based on filters and search criteria.
+     * Returns a JSON response with project data and metadata.
+     */
     public function index(Request $request)
     {
         $query = Project::with(['category', 'city'])
@@ -119,6 +123,10 @@ class UserProjectController extends Controller
         ]);
     }
 
+    /**
+     * Displays the details of a specific project.
+     * Returns a JSON response with the project data.
+     */
     public function show(Request $request, $id)
     {
         $p = Project::with(['category', 'city.province'])

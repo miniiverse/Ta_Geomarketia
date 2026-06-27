@@ -17,6 +17,9 @@ use App\Http\Controllers\Controller;
 
 class PaymentController extends Controller
 {
+    /*
+     * Initializes Midtrans configuration using values from the config file.
+     */
     public function __construct()
     {
         Config::$serverKey    = config('midtrans.server_key');
@@ -25,6 +28,11 @@ class PaymentController extends Controller
         Config::$is3ds        = true;
     }
 
+    /*
+     * Cancels an order if it is not paid or already cancelled.
+     * Updates both the order and payment status in the database.
+     * If the order has a Midtrans transaction, it attempts to cancel it via Midtrans API.
+     */
     private function midtransBase(): string
     {
         return Config::$isProduction
@@ -32,11 +40,18 @@ class PaymentController extends Controller
             : 'https://api.sandbox.midtrans.com/v2';
     }
 
+    /*
+     * Returns the base64-encoded authorization string for Midtrans API requests.
+     */
     private function midtransAuth(): string
     {
         return base64_encode(config('midtrans.server_key') . ':');
     }
 
+    /*
+     * Fetches the current status of a Midtrans transaction by its order ID.
+     * Returns an associative array of status data or null if the request fails.
+     */
     private function fetchMidtransStatus(string $midtransOrderId): ?array
     {
         try {
@@ -52,6 +67,10 @@ class PaymentController extends Controller
         }
     }
 
+    /*
+     * Updates the order and payment status based on the Midtrans transaction status.
+     * Returns true if the update was successful, false otherwise.
+     */
     private function markOrderFromMidtransStatus(Order $order, Payment $payment, array $statusData): bool
     {
         $transactionStatus = $statusData['transaction_status'] ?? null;
@@ -90,7 +109,10 @@ class PaymentController extends Controller
         return true;
     }
 
-
+    /*
+     * Cancels an old Midtrans transaction if it is still pending or authorized.
+     * Logs the result of the cancellation attempt.
+     */
     private function cancelOldMidtransTransactionIfPending(?string $oldMidtransOrderId): void
     {
         if (!$oldMidtransOrderId) {
@@ -144,12 +166,16 @@ class PaymentController extends Controller
                     Log::warning("createSnapToken: retry cancel {$oldMidtransOrderId} tetap gagal: " . json_encode($retryRes->json()));
                 }
             }
-
         } catch (\Throwable $e) {
             Log::warning("createSnapToken: error saat cek/cancel transaksi lama {$oldMidtransOrderId}: " . $e->getMessage());
         }
     }
 
+    /*
+     * Creates a Snap token for initiating a payment transaction.
+     * Validates the order and project IDs, checks the order status, and cancels any existing pending Midtrans transactions.
+     * Returns the Snap token upon successful creation.
+     */
     public function createSnapToken(Request $request)
     {
         $request->validate([
@@ -161,8 +187,8 @@ class PaymentController extends Controller
         $user    = Auth::user();
         $project = Project::where('project_id', $request->project_id)->firstOrFail();
         $order   = Order::where('order_id', $request->order_id)
-                        ->where('user_id', $user->user_id)
-                        ->firstOrFail();
+            ->where('user_id', $user->user_id)
+            ->firstOrFail();
 
         if ($order->order_status === 'paid') {
             return response()->json(['success' => false, 'message' => 'Order ini sudah dibayar.'], 400);
@@ -235,7 +261,7 @@ class PaymentController extends Controller
             ]);
 
             Payment::where('order_id', $order->order_id)
-                   ->update(['midtrans_transaction_id' => $midtransOrderId]);
+                ->update(['midtrans_transaction_id' => $midtransOrderId]);
 
             DB::commit();
 
@@ -246,7 +272,6 @@ class PaymentController extends Controller
                 'snap_token' => $snapToken,
                 'order_id'   => $order->order_id,
             ]);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('createSnapToken error: ' . $e->getMessage());
@@ -254,6 +279,10 @@ class PaymentController extends Controller
         }
     }
 
+    /*
+     * Handles incoming webhook notifications from Midtrans.
+     * Updates the status of the corresponding order and payment based on the notification.
+     */
     public function webhook(Request $request)
     {
         try {
@@ -282,9 +311,11 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'OK']);
             }
 
-            if ($payment->midtrans_transaction_id
+            if (
+                $payment->midtrans_transaction_id
                 && $payment->midtrans_transaction_id !== $midtransOrderId
-                && $payment->payment_status !== 'pending') {
+                && $payment->payment_status !== 'pending'
+            ) {
                 Log::info("Webhook diabaikan: order #{$orderId} sudah punya transaksi lain ({$payment->midtrans_transaction_id}), notif dari {$midtransOrderId} di-skip.");
                 return response()->json(['message' => 'OK']);
             }
@@ -320,19 +351,22 @@ class PaymentController extends Controller
             Log::info("Webhook OK: order #{$order->order_id} → {$orderStatus} | payment → {$paymentStatus}");
 
             return response()->json(['message' => 'OK']);
-
         } catch (\Throwable $e) {
             Log::error('Webhook error: ' . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
+    /*
+     * Retrieves the status of a specific order and its associated payment.
+     * Fetches the latest status from Midtrans if necessary.
+     */
     public function status(Request $request, $orderId)
     {
         $order = Order::where('order_id', $orderId)
-                      ->where('user_id', $request->user()->user_id)
-                      ->with('payment')
-                      ->firstOrFail();
+            ->where('user_id', $request->user()->user_id)
+            ->with('payment')
+            ->firstOrFail();
 
         if (
             $order->payment?->midtrans_transaction_id

@@ -13,6 +13,11 @@ use Midtrans\Transaction;
 
 class OrderController extends Controller
 {
+    /*
+     * Creates a new order for the authenticated user.
+     * Validates project_id and total_amount, checks for existing orders.
+     * Returns the order ID and success message upon creation.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -23,8 +28,8 @@ class OrderController extends Controller
         $user = $request->user();
 
         $alreadyOwned = Order::where('project_id', $request->project_id)
-                             ->where('order_status', 'paid')
-                             ->exists();
+            ->where('order_status', 'paid')
+            ->exists();
 
         if ($alreadyOwned) {
             return response()->json([
@@ -34,9 +39,9 @@ class OrderController extends Controller
         }
 
         $existing = Order::where('user_id', $user->user_id)
-                         ->where('project_id', $request->project_id)
-                         ->where('order_status', 'pending')
-                         ->first();
+            ->where('project_id', $request->project_id)
+            ->where('order_status', 'pending')
+            ->first();
 
         if ($existing) {
             return response()->json([
@@ -60,6 +65,10 @@ class OrderController extends Controller
         ], 201);
     }
 
+    /*
+     * Retrieves all orders for the authenticated user.
+     * If 'all' query parameter is false (default), only shows paid orders.
+     */
     public function index(Request $request)
     {
         $query = Order::where('user_id', $request->user()->user_id);
@@ -68,17 +77,17 @@ class OrderController extends Controller
         }
 
         $orders = $query->with([
-                        'payment',
-                        'project' => function ($q) {
-                            $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail')
-                              ->with([
-                                  'category:category_id,name',
-                                  'city:city_id,name',
-                              ]);
-                        },
-                    ])
-                    ->orderByDesc('created_at')
-                    ->get();
+            'payment',
+            'project' => function ($q) {
+                $q->select('project_id', 'title', 'category_id', 'city_id', 'total_data', 'price', 'thumbnail')
+                    ->with([
+                        'category:category_id,name',
+                        'city:city_id,name',
+                    ]);
+            },
+        ])
+            ->orderByDesc('created_at')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -86,12 +95,16 @@ class OrderController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves the detail of a single order by order_id for the authenticated user.
+     * Automatically returns 404 if not found or if the order does not belong to the user.
+     */
     public function show(Request $request, $id)
     {
         $order = Order::where('order_id', $id)
-                      ->where('user_id', $request->user()->user_id)
-                      ->with(['payment', 'project'])
-                      ->firstOrFail();
+            ->where('user_id', $request->user()->user_id)
+            ->with(['payment', 'project'])
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,
@@ -99,11 +112,16 @@ class OrderController extends Controller
         ]);
     }
 
+    /*
+     * Cancels an order by order_id for the authenticated user.
+     * Only allows cancellation if the order is not paid or already cancelled.
+     * If the order has a Midtrans transaction, attempts to cancel it via Midtrans API.
+     */
     public function cancel(Request $request, $id)
     {
         $order = Order::where('order_id', $id)
-                      ->where('user_id', $request->user()->user_id)
-                      ->firstOrFail();
+            ->where('user_id', $request->user()->user_id)
+            ->firstOrFail();
 
         if ($order->order_status === 'paid') {
             return response()->json([
@@ -121,7 +139,6 @@ class OrderController extends Controller
 
         $payment = Payment::where('order_id', $id)->first();
 
-        // ─── Helper: tandai order & payment sebagai cancelled ───────────────
         $markCancelled = function () use ($order, $payment) {
             $order->update(['order_status' => 'cancelled']);
             $payment?->update([
@@ -159,12 +176,11 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Order cancelled successfully.',
             ]);
-
         } catch (\Throwable $e) {
             $message = $e->getMessage();
             Log::warning("Midtrans cancel failed for order #{$id}: {$message}");
 
-            
+
             if (str_contains($message, "doesn't exist") || str_contains($message, '404')) {
                 DB::transaction($markCancelled);
 
@@ -191,7 +207,6 @@ class OrderController extends Controller
                         'success' => true,
                         'message' => 'Order cancelled successfully.',
                     ]);
-
                 } catch (\Throwable $retryE) {
                     $retryMsg = $retryE->getMessage();
                     Log::warning("Midtrans cancel retry also failed for order #{$id}: {$retryMsg}");

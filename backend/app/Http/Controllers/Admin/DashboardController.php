@@ -11,6 +11,11 @@ class DashboardController extends Controller
     private const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     private const SOLD_PAYMENT_STATUSES = ['settlement', 'capture'];
 
+    /*
+     * Retrieves total income per month, grouped by year.
+     * Only counts orders with status 'paid' and valid payment.
+     * Returns an array of year => [{ month, amount }].
+     */
     public function monthlyIncome(Request $request)
     {
         $orders = Order::with('payment')
@@ -60,6 +65,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves sales data per category, grouped by year.
+     * Calculates total_sold and total_revenue for each category.
+     * Returns an array of year => [{ category_id, category_name, total_sold, total_revenue }].
+     */
     public function categorySales(Request $request)
     {
         $orders = Order::with('project.category')
@@ -116,6 +126,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves a monthly sales summary, grouped by year.
+     * Calculates total amount, products_sold, and transactions per month.
+     * Returns an array of year => [{ month, amount, products_sold, transactions }].
+     */
     public function monthlySalesSummary(Request $request)
     {
         $orders = Order::with('payment')
@@ -180,6 +195,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    /*
+     * Retrieves the top 5 best-selling service categories by units sold.
+     * If units sold are equal, sorted by highest revenue.
+     * Returns an array of [{ category, sold, revenue }] with a maximum of 5 items.
+     */
     public function topSellingServices(Request $request)
     {
         $orders = Order::with('project.category')

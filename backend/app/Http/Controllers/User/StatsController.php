@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class StatsController extends Controller
 {
+    /**
+     * Retrieves the total number of unique projects and total transactions for the authenticated user.
+     * Returns a JSON response with the counts.
+     */
     public function index()
     {
         $userId = Auth::user()->user_id;

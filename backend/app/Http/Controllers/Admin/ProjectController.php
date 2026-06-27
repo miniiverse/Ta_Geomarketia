@@ -14,6 +14,10 @@ class ProjectController extends Controller
 {
     private const ADMIN_PROJECT_THUMBNAIL_PATH = 'projects/admin';
 
+    /*
+     * Retrieves all projects along with their category and city relations.
+     * Sorted by latest, returns an array of project data.
+     */
     public function index()
     {
         $projects = Project::with(['category', 'city'])
@@ -23,6 +27,10 @@ class ProjectController extends Controller
         return response()->json(['success' => true, 'data' => $projects]);
     }
 
+    /*
+     * Retrieves the detail of a single project by project_id.
+     * Automatically returns 404 if not found.
+     */
     public function show(string $id)
     {
         $project = Project::with(['category', 'city'])
@@ -32,16 +40,28 @@ class ProjectController extends Controller
         return response()->json(['success' => true, 'data' => $project]);
     }
 
+    /*
+     * Retrieves a list of all categories (category_id and name).
+     * Used for dropdown or filter needs on the frontend.
+     */
     public function categories()
     {
         return response()->json(Category::select('category_id', 'name')->get());
     }
 
+    /*
+     * Retrieves a list of all cities (city_id, province_id, and name).
+     * Used for dropdown or filter needs on the frontend.
+     */
     public function cities()
     {
         return response()->json(City::select('city_id', 'province_id', 'name')->get());
     }
 
+    /*
+     * Creates a new project, only allowed for users with role_id 2 (admin).
+     * Validates input, stores thumbnail if provided, then creates the project record.
+     */
     public function store(Request $request)
     {
         if ($request->user()?->role_id !== 2) {
@@ -88,6 +108,10 @@ class ProjectController extends Controller
         ], 201);
     }
 
+    /*
+     * Deletes a project by project_id.
+     * If the project has a thumbnail, the file is also deleted from storage.
+     */
     public function destroy(string $id)
     {
         $project = Project::where('project_id', $id)
@@ -102,6 +126,11 @@ class ProjectController extends Controller
         return response()->json(['success' => true, 'message' => 'Project deleted.']);
     }
 
+    /*
+     * Updates a project by project_id.
+     * Only price, description, and thumbnail can be changed.
+     * If a new thumbnail is provided, the old one is deleted from storage first.
+     */
     public function update(Request $request, string $id)
     {
         $project = Project::where('project_id', $id)
