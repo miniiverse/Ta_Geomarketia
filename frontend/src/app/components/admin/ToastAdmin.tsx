@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 type ToastType = "error" | "success" | "info";
 
 interface ToastProps {
+  title?: string;
   message: string;
   type?: ToastType;
   onClose: () => void;
@@ -58,7 +59,7 @@ const ICONS = {
   ),
 };
 
-export function Toast({ message, type = "error", onClose }: ToastProps) {
+export function Toast({ title, message, type = "error", onClose }: ToastProps) {
   const [visible, setVisible] = useState(false);
   const c = COLORS[type];
 
@@ -72,7 +73,7 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, []);
+  }, [onClose]);
 
   return (
     <div
@@ -97,18 +98,38 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
       <span style={{ color: c.icon, flexShrink: 0, marginTop: 1 }}>
         {ICONS[type]}
       </span>
-      <p
+      <div
         style={{
-          margin: 0,
-          fontSize: 14,
-          color: c.text,
-          fontWeight: 500,
-          lineHeight: 1.5,
+          display: "flex",
           flex: 1,
+          flexDirection: "column",
+          gap: title ? 2 : 0,
         }}
       >
-        {message}
-      </p>
+        {title && (
+          <strong
+            style={{
+              fontSize: 14,
+              color: c.text,
+              fontWeight: 700,
+              lineHeight: 1.3,
+            }}
+          >
+            {title}
+          </strong>
+        )}
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: c.text,
+            fontWeight: 500,
+            lineHeight: 1.5,
+          }}
+        >
+          {message}
+        </p>
+      </div>
       <button
         onClick={() => {
           setVisible(false);
@@ -139,6 +160,7 @@ export function Toast({ message, type = "error", onClose }: ToastProps) {
 
 interface ToastItem {
   id: number;
+  title?: string;
   message: string;
   type: ToastType;
 }
@@ -166,6 +188,7 @@ export function ToastContainer({ toasts, removeToast }: ToastContainerProps) {
       {toasts.map((t) => (
         <Toast
           key={t.id}
+          title={t.title}
           message={t.message}
           type={t.type}
           onClose={() => removeToast(t.id)}
@@ -178,9 +201,9 @@ export function ToastContainer({ toasts, removeToast }: ToastContainerProps) {
 export function useToast() {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const showToast = (message: string, type: ToastType = "error") => {
+  const showToast = (message: string, type: ToastType = "error", title?: string) => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, title, message, type }]);
   };
 
   const removeToast = (id: number) => {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AdminUser, UpdateUserPayload, updateUser } from "../../../../lib/api";
+import { AdminUser, updateUser } from "../../../../lib/api";
+import { useToast } from "../../../components/admin/ToastAdmin";
 
 const C = {
   blue: "#1A56DB",
@@ -82,6 +83,7 @@ export default function EditUserModal({ user, onClose, onSuccess }: Props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { showToast, ToastContainer } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -95,15 +97,24 @@ export default function EditUserModal({ user, onClose, onSuccess }: Props) {
   if (!user) return null;
 
   const handleSave = async () => {
-    if (!fullname.trim() || !username.trim() || !email.trim()) {
+    const trimmedEmail = email.trim();
+
+    if (!fullname.trim() || !username.trim() || !trimmedEmail) {
       setError("All fields are required.");
       return;
     }
+
+    if (!trimmedEmail.toLowerCase().endsWith("@gmail.com")) {
+      setError("");
+      showToast("Email must use a @gmail.com address.", "error", "Invalid Email");
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
-      await updateUser(user.id, { fullname, username, email });
-      onSuccess({ ...user, fullname, username, email });
+      await updateUser(user.id, { fullname, username, email: trimmedEmail });
+      onSuccess({ ...user, fullname, username, email: trimmedEmail });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to update user.");
     } finally {
@@ -113,6 +124,8 @@ export default function EditUserModal({ user, onClose, onSuccess }: Props) {
 
   return (
     <>
+      <ToastContainer />
+
       <div
         onClick={onClose}
         style={{
