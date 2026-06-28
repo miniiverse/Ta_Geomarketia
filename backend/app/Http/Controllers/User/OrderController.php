@@ -28,7 +28,7 @@ class OrderController extends Controller
         $user = $request->user();
 
         $alreadyOwned = Order::where('project_id', $request->project_id)
-            ->where('order_status', 'paid')
+            ->completedPurchase()
             ->exists();
 
         if ($alreadyOwned) {
@@ -73,7 +73,7 @@ class OrderController extends Controller
     {
         $query = Order::where('user_id', $request->user()->user_id);
         if (!$request->boolean('all')) {
-            $query->where('order_status', 'paid');
+            $query->completedPurchase();
         }
 
         $orders = $query->with([

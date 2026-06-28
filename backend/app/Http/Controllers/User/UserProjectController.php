@@ -78,7 +78,7 @@ class UserProjectController extends Controller
 
         $projects = $query->paginate($request->get('per_page', 9));
 
-        $appUrl = rtrim((string) config('app.url'), '/');
+        $appUrl = rtrim($request->getSchemeAndHttpHost(), '/');
 
         $projectDateYears = Project::selectRaw('YEAR(project_date) as year')
             ->whereNotNull('project_date')
@@ -132,7 +132,7 @@ class UserProjectController extends Controller
         $p = Project::with(['category', 'city.province'])
             ->findOrFail($id);
 
-        $appUrl = rtrim((string) config('app.url'), '/');
+        $appUrl = rtrim($request->getSchemeAndHttpHost(), '/');
         $thumbnailUrl = null;
         if ($p->thumbnail && trim($p->thumbnail) !== '') {
             $thumbnailUrl = $appUrl . '/storage/' . ltrim($p->thumbnail, '/');
@@ -145,7 +145,7 @@ class UserProjectController extends Controller
         if ($isAuthenticated) {
             $hasPurchased = Order::where('user_id', $user->user_id)
                 ->where('project_id', $p->project_id)
-                ->where('order_status', 'paid')          
+                ->completedPurchase()
                 ->exists();
         }
 

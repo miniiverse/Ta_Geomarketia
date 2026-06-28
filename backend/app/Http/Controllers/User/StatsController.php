@@ -16,10 +16,13 @@ class StatsController extends Controller
     {
         $userId = Auth::user()->user_id;
         $totalProjects = DB::table('orders')
-            ->where('user_id', $userId)
-            ->where('order_status', 'paid')
-            ->distinct('project_id')
-            ->count('project_id');
+            ->join('payments', 'payments.order_id', '=', 'orders.order_id')
+            ->where('orders.user_id', $userId)
+            ->where('orders.order_status', 'paid')
+            ->whereIn('payments.payment_status', ['settlement', 'capture'])
+            ->whereNotNull('payments.payment_time')
+            ->distinct('orders.project_id')
+            ->count('orders.project_id');
 
         $totalTransactions = DB::table('payments')
             ->join('orders', 'payments.order_id', '=', 'orders.order_id')

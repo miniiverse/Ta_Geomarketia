@@ -342,16 +342,29 @@ export default function ProjectsTable({
     setDeletingId(id);
     try {
       const res = await fetch(`/api/project/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+      if (!res.ok) {
+        const message =
+          res.status === 409
+            ? "Project cannot be deleted because it has already been purchased."
+            : data.message || "Unable to delete project. Please try again.";
+        throw new Error(message);
+      }
       setTimeout(() => {
         setProjects((prev) => prev.filter((p) => p.id !== id));
         setDeletingId(null);
         onDelete?.();
         showToast(`Project "${name}" deleted successfully.`, "success");
       }, 350);
-    } catch {
+    } catch (err: unknown) {
       setDeletingId(null);
-      showToast("Failed to delete project. Please try again.", "error");
+      showToast(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete project. Please try again.",
+        "error",
+      );
     }
   }
 

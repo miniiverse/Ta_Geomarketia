@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Order;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
@@ -117,11 +120,34 @@ class ProjectController extends Controller
         $project = Project::where('project_id', $id)
             ->firstOrFail();
 
-        if ($project->thumbnail) {
-            Storage::disk('public')->delete($project->thumbnail);
+        $hasCompletedPurchase = Order::where('project_id', $project->project_id)
+            ->completedPurchase()
+            ->exists();
+
+        if ($hasCompletedPurchase) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project cannot be deleted because it has a completed purchase.',
+            ], 409);
         }
 
-        $project->delete();
+        $thumbnail = $project->thumbnail;
+
+        DB::transaction(function () use ($project) {
+            $orderIds = Order::where('project_id', $project->project_id)
+                ->pluck('order_id');
+
+            if ($orderIds->isNotEmpty()) {
+                Payment::whereIn('order_id', $orderIds)->delete();
+                Order::whereIn('order_id', $orderIds)->delete();
+            }
+
+            $project->delete();
+        });
+
+        if ($thumbnail) {
+            Storage::disk('public')->delete($thumbnail);
+        }
 
         return response()->json(['success' => true, 'message' => 'Project deleted.']);
     }

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    private const PAID_PAYMENT_STATUSES = ['settlement', 'capture'];
+
     /**
      * The primary key associated with the table.
      */
@@ -66,5 +68,18 @@ class Order extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * Scope orders that represent a completed purchase.
+     */
+    public function scopeCompletedPurchase($query)
+    {
+        return $query
+            ->where('order_status', 'paid')
+            ->whereHas('payment', function ($q) {
+                $q->whereIn('payment_status', self::PAID_PAYMENT_STATUSES)
+                    ->whereNotNull('payment_time');
+            });
     }
 }
