@@ -105,7 +105,6 @@ function ExportModal({ onClose }: { onClose: () => void }) {
           overflow: "hidden",
         }}
       >
-        {/* Header */}
         <div
           style={{
             padding: "22px 24px 18px",
@@ -188,7 +187,6 @@ function ExportModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ padding: "22px 24px" }}>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "16px" }}

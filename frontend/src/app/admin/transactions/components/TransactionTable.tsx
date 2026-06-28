@@ -149,7 +149,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
 
   useEffect(() => { setPage(1); }, [filterStatus, filterPayment, filterMonth, filterDay]);
 
-  // Client-side date filter
   const displayed = transactions.filter((t) => {
     const date = t.payment_time ?? t.created_at;
     if (filterDay) return date && date.slice(0, 10) === filterDay;
@@ -212,11 +211,9 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
 
       <div style={{ background: "#fff", borderRadius: "20px", border: "1px solid #f1f5f9", boxShadow: "0 1px 12px rgba(26,86,219,0.06)", overflow: "hidden" }}>
 
-        {/* Toolbar */}
         <div className="trx-toolbar">
           <div className="trx-filters">
 
-            {/* Status */}
             <div style={{ position: "relative" }}>
               <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }} style={selectStyle}>
                 <option value="All">All Status</option>
@@ -227,7 +224,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
               {chevron}
             </div>
 
-            {/* Payment */}
             <div style={{ position: "relative" }}>
               <select value={filterPayment} onChange={(e) => { setFilterPayment(e.target.value); setPage(1); }} style={selectStyle}>
                 <option value="All">All Payments</option>
@@ -239,7 +235,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
               {chevron}
             </div>
 
-            {/* Month dropdown */}
             <div style={{ position: "relative" }}>
               <select
                 value={filterMonth}
@@ -255,7 +250,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
               {chevron}
             </div>
 
-            {/* Day picker */}
             <input
               type="date"
               value={filterDay}
@@ -264,7 +258,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
               className={`trx-date-input${filterDay ? " active" : ""}`}
             />
 
-            {/* Reset date */}
             {hasDateFilter && (
               <button
                 onClick={() => { setFilterMonth("All"); setFilterDay(""); }}
@@ -275,7 +268,6 @@ export default function TransactionTable({ stats: statsProp }: { stats?: Stats }
               </button>
             )}
 
-            {/* Search */}
             <div style={{ position: "relative" }}>
               <input
                 type="text" placeholder="Search order / project..."

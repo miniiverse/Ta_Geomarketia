@@ -54,7 +54,7 @@ function SortDropdown<T extends string>({
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-  if (!open) return; // kalau tidak open, tidak perlu listener
+  if (!open) return;
   const handler = (e: MouseEvent) => {
     if (ref.current && !ref.current.contains(e.target as Node)) {
       onToggle(null);

@@ -16,7 +16,6 @@ function parsePrice(priceStr: string): number {
   return parseInt(cleaned, 10) || 0;
 }
 
-// Deteksi apakah error karena project sudah dimiliki user lain
 function isProjectOwnedError(msg: string | null): boolean {
   if (!msg) return false;
   const lower = msg.toLowerCase();
@@ -29,7 +28,6 @@ function isProjectOwnedError(msg: string | null): boolean {
   );
 }
 
-// Alert modal untuk project yang sudah dimiliki user lain
 function ProjectOwnedAlert({
   onClose,
   onGoToProjects,
@@ -39,7 +37,6 @@ function ProjectOwnedAlert({
 }) {
   return (
     <>
-      {/* Backdrop */}
       <div
         onClick={onClose}
         style={{
@@ -52,7 +49,6 @@ function ProjectOwnedAlert({
         }}
       />
 
-      {/* Modal */}
       <div
         style={{
           position: "fixed",

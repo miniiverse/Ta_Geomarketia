@@ -124,7 +124,6 @@ export default function TransactionDetailPage() {
     loadData(true);
   }, [loadData]);
 
-  // ── Cancel order ──────────────────────────────────────────────────────────
   const handleCancel = async () => {
     setCancelling(true);
     setCancelError(null);
@@ -137,7 +136,6 @@ export default function TransactionDetailPage() {
 
       const data = await res.json();
 
-      // Log supaya mudah debug di console
       console.log("Cancel STATUS:", res.status);
       console.log("Cancel RESPONSE:", data);
 
@@ -156,7 +154,6 @@ export default function TransactionDetailPage() {
     }
   };
 
-  // ── Pay ───────────────────────────────────────────────────────────────────
   const handlePay = async () => {
     if (!data) return;
     if (snapOpenRef.current) return;
@@ -292,7 +289,6 @@ export default function TransactionDetailPage() {
               <StatusBadge status={status} />
             </div>
 
-            {/* Pending warning banner */}
             {isPending && (
               <div style={{
                 padding: "12px 2rem",
@@ -324,7 +320,6 @@ export default function TransactionDetailPage() {
               </div>
             )}
 
-            {/* Recipient & Payment Method */}
             <div style={{
               padding: "1.25rem 2rem",
               borderBottom: "1px solid #E5E7EB",
@@ -348,7 +343,6 @@ export default function TransactionDetailPage() {
               </div>
             </div>
 
-            {/* Invoice Items */}
             <div style={{ padding: "1.25rem 2rem", borderBottom: "1px solid #E5E7EB" }}>
               <p style={{ margin: "0 0 12px", fontSize: "0.72rem", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 Invoice Items
@@ -375,7 +369,6 @@ export default function TransactionDetailPage() {
               </div>
             </div>
 
-            {/* Transaction Details — only show when paid */}
             {isPaid && (
               <div style={{ padding: "1.25rem 2rem", borderBottom: "1px solid #E5E7EB" }}>
                 <p style={{ margin: "0 0 12px", fontSize: "0.72rem", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>
@@ -408,7 +401,6 @@ export default function TransactionDetailPage() {
               </div>
             )}
 
-            {/* Footer actions */}
             <div style={{
               padding: "1.25rem 2rem",
               display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -497,7 +489,6 @@ export default function TransactionDetailPage() {
         ) : null}
       </div>
 
-      {/* Cancel Confirmation Modal */}
       {showCancelModal && (
         <>
           <div
@@ -540,7 +531,6 @@ export default function TransactionDetailPage() {
               This action cannot be undone.
             </p>
 
-            {/* Error message tampil di sini kalau cancel gagal */}
             {cancelError && (
               <div style={{
                 background: "#FEF2F2", border: "1px solid #FECACA",

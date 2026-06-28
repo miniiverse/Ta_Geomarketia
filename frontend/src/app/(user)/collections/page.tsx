@@ -58,7 +58,7 @@ export default function Page() {
           totalData:  String(o.project?.total_data ?? "-"),
           amount:     formatRp(o.total_amount),
           status:     mapStatus(o.order_status, o.payment?.payment_status ?? null),
-          thumbnail:  o.project?.thumbnail ?? undefined, // ← tambah ini
+          thumbnail:  o.project?.thumbnail ?? undefined,
         }));
         setCollections(mapped);
       })

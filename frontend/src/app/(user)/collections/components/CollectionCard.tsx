@@ -16,7 +16,7 @@ export interface Collection {
   totalData: string;
   amount: string;
   status: CollectionStatus;
-  thumbnail?: string; // ← tambah
+  thumbnail?: string;
 }
 
 interface CollectionCardProps {
@@ -33,7 +33,6 @@ const CATEGORY_IMAGES: Record<string, string> = {
   default:           "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80&fit=crop",
 };
 
-// ← ganti getCategoryImage dengan ini
 function getImageUrl(thumbnail?: string, category?: string): string {
   if (thumbnail) {
     if (/^https?:\/\//i.test(thumbnail)) return thumbnail;
