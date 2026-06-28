@@ -27,14 +27,15 @@ class OrderController extends Controller
 
         $user = $request->user();
 
-        $alreadyOwned = Order::where('project_id', $request->project_id)
+        $alreadyOwned = Order::where('user_id', $user->user_id)
+            ->where('project_id', $request->project_id)
             ->completedPurchase()
             ->exists();
 
         if ($alreadyOwned) {
             return response()->json([
                 'success' => false,
-                'message' => 'This project is already owned by another user.',
+                'message' => 'You have already purchased this project.',
             ], 400);
         }
 
