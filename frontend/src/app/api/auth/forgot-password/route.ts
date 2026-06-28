@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
     const data = await res.json();
  
     if (!res.ok) {
-      // Tangkap pesan validasi Laravel (misalnya email bukan Gmail / tidak terdaftar)
       const message =
         data.errors?.email?.[0] ?? data.message ?? "Failed to send OTP.";
       return NextResponse.json({ message }, { status: res.status });

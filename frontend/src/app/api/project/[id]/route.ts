@@ -53,11 +53,10 @@ export async function PUT(
   try {
     const formData = await request.formData();
 
-    // ✅ Fix: Laravel butuh _method spoofing untuk PUT + FormData
     formData.append("_method", "PUT");
 
     const res = await fetch(`${SERVER}/api/projects/${id}`, {
-      method: "POST", // tetap POST, tapi Laravel baca _method=PUT
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",

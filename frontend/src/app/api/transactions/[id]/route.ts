@@ -6,7 +6,6 @@ function getToken(request: NextRequest) {
   return request.cookies.get('token')?.value;
 }
 
-// GET /api/transactions/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

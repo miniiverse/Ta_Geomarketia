@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
 
-  // Ambil FormData dari request, forward langsung ke Laravel
   const formData = await request.formData();
 
   const res = await fetch(`${server}/api/profile/photo`, {
@@ -16,7 +15,6 @@ export async function POST(request: NextRequest) {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
-      // Jangan set Content-Type — fetch otomatis urus boundary FormData
     },
     body: formData,
   });

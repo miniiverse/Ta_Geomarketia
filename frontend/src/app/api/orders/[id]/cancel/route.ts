@@ -6,7 +6,6 @@ function getToken(request: NextRequest) {
   return request.cookies.get('token')?.value;
 }
 
-// PUT /api/orders/[id]/cancel
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

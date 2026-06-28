@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch {
-      // Tetap lanjut logout meskipun request ke Laravel gagal
     }
   }
  

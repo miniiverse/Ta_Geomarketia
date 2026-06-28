@@ -25,13 +25,12 @@ export async function POST(request: NextRequest) {
       user: data.user,
     });
  
-    // Set token sebagai HTTP Only Cookie — tidak bisa diakses JavaScript browser
     response.cookies.set("token", data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 30, // 30 menit
+      maxAge: 60 * 30,
     });
  
     return response;

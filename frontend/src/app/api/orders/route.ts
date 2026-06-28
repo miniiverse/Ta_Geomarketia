@@ -6,7 +6,6 @@ function getToken(request: NextRequest) {
   return request.cookies.get('token')?.value;
 }
 
-// POST /api/orders — buat order baru
 export async function POST(request: NextRequest) {
   const token = getToken(request);
   if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -37,7 +36,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/orders — ambil semua order user
 export async function GET(request: NextRequest) {
   const token = getToken(request);
   if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
