@@ -66,8 +66,11 @@ Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/projects',        [ProjectController::class, 'store']);
-    Route::post('/projects/{id}',   [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {
+    Route::post('/projects/{id}',   [ProjectController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,manager'])->group(function () {

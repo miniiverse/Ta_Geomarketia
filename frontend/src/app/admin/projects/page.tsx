@@ -120,7 +120,9 @@ function parseDate(str: string): string {
 
 export default function ProjectsPage() {
   const { user } = useUser();
-  const canManageProjects = user?.role_id === 2;
+  const canAddProjects = user?.role_id === 2;
+  const canEditProjects = user?.role_id === 2 || user?.role_id === 3;
+  const canDeleteProjects = user?.role_id === 2;
   const [showAdd, setShowAdd] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -262,7 +264,7 @@ export default function ProjectsPage() {
   }
 
   async function handleSave() {
-    if (!canManageProjects) {
+    if (!canAddProjects) {
       alert("Only admin can add projects.");
       return;
     }
@@ -364,7 +366,7 @@ export default function ProjectsPage() {
           </span>
         </div>
 
-        {canManageProjects && (
+        {canAddProjects && (
           <button
             onClick={() => setShowAdd(true)}
             className="prj-add-btn"
@@ -510,14 +512,15 @@ export default function ProjectsPage() {
         </div>
 
         <ProjectsTable
-          onAdd={() => canManageProjects && setShowAdd(true)}
-          canManageProjects={canManageProjects}
+          onAdd={() => canAddProjects && setShowAdd(true)}
+          canEditProjects={canEditProjects}
+          canDeleteProjects={canDeleteProjects}
           refreshKey={refreshKey}
           onDelete={() => setRefreshKey((k) => k + 1)}
         />
       </div>
 
-      {showAdd && canManageProjects && (
+      {showAdd && canAddProjects && (
         <>
           <div
             className="prj-modal-overlay"

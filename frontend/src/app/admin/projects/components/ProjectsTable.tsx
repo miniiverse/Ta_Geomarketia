@@ -273,12 +273,14 @@ function FieldRow({
 }
 
 export default function ProjectsTable({
-  canManageProjects = false,
+  canEditProjects = false,
+  canDeleteProjects = false,
   refreshKey,
   onDelete,
 }: {
   onAdd: () => void;
-  canManageProjects?: boolean;
+  canEditProjects?: boolean;
+  canDeleteProjects?: boolean;
   refreshKey?: number;
   onDelete?: () => void;
 }) {
@@ -331,11 +333,16 @@ export default function ProjectsTable({
   }, [fetchProjects, refreshKey]);
 
   function requestDelete(project: Project) {
+    if (!canDeleteProjects) {
+      showToast("Only admin can delete projects.", "error");
+      return;
+    }
+
     setConfirmDelete(project);
   }
 
   async function handleConfirmDelete() {
-    if (!confirmDelete) return;
+    if (!confirmDelete || !canDeleteProjects) return;
     const id = confirmDelete.id;
     const name = confirmDelete.name;
     setConfirmDelete(null);
@@ -369,6 +376,11 @@ export default function ProjectsTable({
   }
 
   function openEdit(project: Project) {
+    if (!canEditProjects) {
+      showToast("Only admin and manager can edit projects.", "error");
+      return;
+    }
+
     setEditingProject(project);
     setEditPrice(project.rawPrice ? String(project.rawPrice) : "");
     setEditDescription(project.description || "");
@@ -384,6 +396,11 @@ export default function ProjectsTable({
 
   async function handleSaveEdit() {
     if (!editingProject) return;
+    if (!canEditProjects) {
+      showToast("Only admin and manager can edit projects.", "error");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const formData = new FormData();
@@ -701,8 +718,9 @@ export default function ProjectsTable({
             >
               Detail
             </button>
-            {canManageProjects && (
+            {(canEditProjects || canDeleteProjects) && (
               <>
+                {canEditProjects && (
                 <button
                   onClick={() => openEdit(project)}
                   style={{
@@ -733,6 +751,8 @@ export default function ProjectsTable({
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
+                )}
+                {canDeleteProjects && (
                 <button
                   onClick={() => requestDelete(project)}
                   style={{
@@ -765,6 +785,7 @@ export default function ProjectsTable({
                     <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
                   </svg>
                 </button>
+                )}
               </>
             )}
           </div>
@@ -1431,8 +1452,9 @@ export default function ProjectsTable({
                             <span className="pt-btn-label">Detail</span>
                           </button>
 
-                          {canManageProjects && (
+                          {(canEditProjects || canDeleteProjects) && (
                             <>
+                              {canEditProjects && (
                               <button
                                 onClick={() => openEdit(project)}
                                 className="pt-btn-edit"
@@ -1476,7 +1498,9 @@ export default function ProjectsTable({
                                 </svg>
                                 <span className="pt-btn-label">Edit</span>
                               </button>
+                              )}
 
+                              {canDeleteProjects && (
                               <button
                                 onClick={() => requestDelete(project)}
                                 className="pt-btn-delete"
@@ -1526,6 +1550,7 @@ export default function ProjectsTable({
                                 </svg>
                                 <span className="pt-btn-label">Delete</span>
                               </button>
+                              )}
                             </>
                           )}
                         </div>

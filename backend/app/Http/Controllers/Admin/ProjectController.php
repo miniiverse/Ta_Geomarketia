@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Storage;
 class ProjectController extends Controller
 {
     private const ADMIN_PROJECT_THUMBNAIL_PATH = 'projects/admin';
+    private const ROLE_ADMIN = 2;
+    private const ROLE_MANAGER = 3;
 
     /*
      * Retrieves all projects along with their category and city relations.
@@ -67,7 +69,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->user()?->role_id !== 2) {
+        if ($request->user()?->role_id !== self::ROLE_ADMIN) {
             return response()->json([
                 'success' => false,
                 'message' => 'Only admin can add projects.',
@@ -115,8 +117,15 @@ class ProjectController extends Controller
      * Deletes a project by project_id.
      * If the project has a thumbnail, the file is also deleted from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($request->user()?->role_id !== self::ROLE_ADMIN) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin can delete projects.',
+            ], 403);
+        }
+
         $project = Project::where('project_id', $id)
             ->firstOrFail();
 
@@ -159,6 +168,13 @@ class ProjectController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (! in_array($request->user()?->role_id, [self::ROLE_ADMIN, self::ROLE_MANAGER], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin and manager can edit projects.',
+            ], 403);
+        }
+
         $project = Project::where('project_id', $id)
             ->firstOrFail();
 
