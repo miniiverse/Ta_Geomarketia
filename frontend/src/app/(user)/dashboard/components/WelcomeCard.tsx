@@ -19,7 +19,6 @@ export default function WelcomeCard() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [initials, setInitials] = useState<string>("U");
 
-  // Fetch user info on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -50,8 +49,7 @@ export default function WelcomeCard() {
         if (user.profile_photo) {
           setPhotoUrl(user.profile_photo);
         }
-      } catch {
-      }
+      } catch {}
     };
 
     fetchUser();
@@ -63,7 +61,7 @@ export default function WelcomeCard() {
         width: "100%",
         background:
           "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #EFF6FF 100%)",
-        borderRadius: 20,
+        borderRadius: "clamp(12px, 2vw, 20px)",
         border: "1px solid #BFDBFE",
         boxShadow:
           "0 8px 40px rgba(26,86,219,0.08), 0 0 0 1px rgba(26,86,219,0.05)",
@@ -85,10 +83,10 @@ export default function WelcomeCard() {
       <div
         style={{
           position: "absolute",
-          left: -80,
-          top: -80,
-          width: 300,
-          height: 300,
+          left: "-clamp(60px, 15vw, 80px)",
+          top: "-clamp(60px, 15vw, 80px)",
+          width: "clamp(200px, 40vw, 300px)",
+          height: "clamp(200px, 40vw, 300px)",
           borderRadius: "50%",
           background:
             "radial-gradient(circle, rgba(26,86,219,0.08) 0%, transparent 65%)",
@@ -98,10 +96,10 @@ export default function WelcomeCard() {
       <div
         style={{
           position: "absolute",
-          right: -60,
-          bottom: -60,
-          width: 240,
-          height: 240,
+          right: "-clamp(40px, 12vw, 60px)",
+          bottom: "-clamp(40px, 12vw, 60px)",
+          width: "clamp(160px, 35vw, 240px)",
+          height: "clamp(160px, 35vw, 240px)",
           borderRadius: "50%",
           background:
             "radial-gradient(circle, rgba(26,86,219,0.06) 0%, transparent 65%)",
@@ -122,24 +120,33 @@ export default function WelcomeCard() {
         style={{
           position: "relative",
           zIndex: 2,
-          padding: "clamp(16px, 3vw, 22px) clamp(16px, 3vw, 28px)",
+          padding: "clamp(12px, 2.5vw, 22px) clamp(12px, 3vw, 28px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 20,
+          gap: "clamp(12px, 2vw, 20px)",
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "clamp(10px, 2vw, 16px)",
+            minWidth: 0,
+            flex: "1 1 auto",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
             <h1
               style={{
-                margin: "0 0 8px",
-                fontSize: "clamp(16px, 3vw, 22px)",
+                margin: "0 0 4px",
+                fontSize: "clamp(14px, 3vw, 22px)",
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
                 lineHeight: 1.15,
                 color: "#1A56DB",
+                wordBreak: "break-word",
               }}
             >
               Welcome back,{" "}
@@ -148,6 +155,7 @@ export default function WelcomeCard() {
                   background: "linear-gradient(90deg, #60A5FA, #34D399)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  display: "inline-block",
                 }}
               >
                 {fullname}
@@ -156,19 +164,34 @@ export default function WelcomeCard() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "clamp(8px, 1.5vw, 14px)",
+            flexWrap: "wrap",
+            justifyContent: "flex-end",
+            minWidth: 0,
+          }}
+        >
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              padding: "8px 14px",
+              gap: "clamp(6px, 1vw, 8px)",
+              padding: "clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 14px)",
               background: "rgba(26,86,219,0.07)",
               border: "1px solid #BFDBFE",
               borderRadius: 10,
             }}
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              style={{ flexShrink: 0 }}
+            >
               <polyline
                 points="22 12 18 12 15 21 9 3 6 12 2 12"
                 stroke="#1A56DB"
@@ -179,7 +202,7 @@ export default function WelcomeCard() {
             </svg>
             <span
               style={{
-                fontSize: 12,
+                fontSize: "clamp(10px, 1.5vw, 12px)",
                 fontWeight: 600,
                 color: "#1A56DB",
                 whiteSpace: "nowrap",
@@ -189,7 +212,14 @@ export default function WelcomeCard() {
             </span>
           </div>
 
-          <div style={{ width: 1, height: 34, background: "#BFDBFE" }} />
+          <div
+            style={{
+              width: 1,
+              height: "clamp(24px, 5vw, 34px)",
+              background: "#BFDBFE",
+              display: "none",
+            }}
+          />
 
           <div
             onMouseEnter={() => setUserHovered(true)}
@@ -197,8 +227,9 @@ export default function WelcomeCard() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              padding: "6px 12px 6px 6px",
+              gap: "clamp(6px, 1.5vw, 10px)",
+              padding:
+                "clamp(4px, 1vw, 6px) clamp(8px, 1.5vw, 12px) clamp(4px, 1vw, 6px) clamp(4px, 1vw, 6px)",
               background: userHovered
                 ? "rgba(26,86,219,0.1)"
                 : "rgba(26,86,219,0.05)",
@@ -206,12 +237,14 @@ export default function WelcomeCard() {
               borderRadius: 12,
               cursor: "pointer",
               transition: "all 0.2s ease",
+              minWidth: 0,
+              flexShrink: 0,
             }}
           >
             <div
               style={{
-                width: 34,
-                height: 34,
+                width: "clamp(28px, 6vw, 34px)",
+                height: "clamp(28px, 6vw, 34px)",
                 borderRadius: "50%",
                 overflow: "hidden",
                 border: "2px solid #93C5FD",
@@ -235,7 +268,7 @@ export default function WelcomeCard() {
               ) : (
                 <span
                   style={{
-                    fontSize: 12,
+                    fontSize: "clamp(10px, 2vw, 12px)",
                     fontWeight: 700,
                     color: "#fff",
                     fontFamily: "'Inter', sans-serif",
@@ -245,23 +278,29 @@ export default function WelcomeCard() {
                 </span>
               )}
             </div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: "clamp(11px, 2vw, 13px)",
                   fontWeight: 700,
                   color: "#1E3A8A",
                   lineHeight: 1.2,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {fullname}
               </div>
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: "clamp(9px, 1.5vw, 10px)",
                   color: "#60A5FA",
                   lineHeight: 1.3,
                   fontWeight: 500,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {role}
@@ -276,6 +315,19 @@ export default function WelcomeCard() {
         @keyframes wcPulse {
           0%, 100% { opacity: 1; box-shadow: 0 0 6px #93C5FD; }
           50%       { opacity: 0.4; box-shadow: 0 0 14px #93C5FD; }
+        }
+
+        @media (max-width: 640px) {
+          div[style*="zIndex: 2"] {
+            flex-direction: column;
+            align-items: stretch !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          div[style*="display: flex"] {
+            gap: 8px !important;
+          }
         }
       `}</style>
     </div>

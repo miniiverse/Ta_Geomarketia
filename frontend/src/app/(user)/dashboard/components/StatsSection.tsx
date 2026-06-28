@@ -9,7 +9,10 @@ type StatsData = {
 
 export default function StatsSection() {
   const [hovered, setHovered] = useState<number | null>(null);
-  const [data, setData] = useState<StatsData>({ totalProjects: 0, totalTransactions: 0 });
+  const [data, setData] = useState<StatsData>({
+    totalProjects: 0,
+    totalTransactions: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,10 +81,11 @@ export default function StatsSection() {
   return (
     <div
       style={{
-        marginTop: 20,
+        marginTop: "clamp(16px, 3vw, 20px)",
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        gap: 14,
+        gridTemplateColumns:
+          "repeat(auto-fit, minmax(clamp(160px, 85vw, 280px), 1fr))",
+        gap: "clamp(10px, 2.5vw, 14px)",
         fontFamily: "'Inter', sans-serif",
       }}
     >
@@ -89,12 +93,12 @@ export default function StatsSection() {
         <div
           style={{
             gridColumn: "1 / -1",
-            padding: "10px 14px",
+            padding: "clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 14px)",
             background: "#FEF2F2",
             border: "1px solid #FECACA",
             borderRadius: 10,
             color: "#DC2626",
-            fontSize: 13,
+            fontSize: "clamp(11px, 2vw, 13px)",
           }}
         >
           ⚠️ {error}
@@ -109,8 +113,8 @@ export default function StatsSection() {
           style={{
             background: hovered === i ? item.lightBg : "#ffffff",
             border: `1.5px solid ${hovered === i ? item.border : "#E8EEF8"}`,
-            borderRadius: 16,
-            padding: "clamp(14px, 3vw, 20px) clamp(14px, 3vw, 22px)",
+            borderRadius: "clamp(12px, 2.5vw, 16px)",
+            padding: "clamp(12px, 2.5vw, 20px) clamp(12px, 2.5vw, 22px)",
             position: "relative",
             overflow: "hidden",
             cursor: "default",
@@ -122,7 +126,6 @@ export default function StatsSection() {
             transform: hovered === i ? "translateY(-3px)" : "translateY(0)",
           }}
         >
-          {/* Top accent bar */}
           <div
             style={{
               position: "absolute",
@@ -131,19 +134,19 @@ export default function StatsSection() {
               right: 0,
               height: 3,
               background: `linear-gradient(90deg, ${item.color}, ${item.color}55)`,
-              borderRadius: "16px 16px 0 0",
+              borderRadius:
+                "clamp(12px, 2.5vw, 16px) clamp(12px, 2.5vw, 16px) 0 0",
               opacity: hovered === i ? 1 : 0,
               transition: "opacity 0.25s",
             }}
           />
 
-          {/* Card number */}
           <div
             style={{
               position: "absolute",
-              top: 14,
-              right: 16,
-              fontSize: 10,
+              top: "clamp(10px, 2vw, 14px)",
+              right: "clamp(12px, 2vw, 16px)",
+              fontSize: "clamp(8px, 1.5vw, 10px)",
               fontWeight: 700,
               color: `${item.color}50`,
               fontFamily: "'JetBrains Mono','Fira Code',monospace",
@@ -152,11 +155,10 @@ export default function StatsSection() {
             {`0${i + 1}`}
           </div>
 
-          {/* Icon */}
           <div
             style={{
-              width: 40,
-              height: 40,
+              width: "clamp(32px, 8vw, 40px)",
+              height: "clamp(32px, 8vw, 40px)",
               borderRadius: 11,
               background: item.lightBg,
               border: `1.5px solid ${item.border}`,
@@ -164,25 +166,26 @@ export default function StatsSection() {
               alignItems: "center",
               justifyContent: "center",
               color: item.color,
-              marginBottom: 14,
+              marginBottom: "clamp(10px, 2vw, 14px)",
               transition: "transform 0.2s",
               transform: hovered === i ? "scale(1.08)" : "scale(1)",
+              fontSize: "clamp(16px, 3vw, 20px)",
             }}
           >
             {item.icon}
           </div>
 
-          {/* Value */}
           <div
             style={{
-              fontSize: 36,
+              fontSize: "clamp(24px, 6vw, 36px)",
               fontWeight: 800,
               color: loading ? "#CBD5E1" : item.color,
               letterSpacing: "-0.04em",
               lineHeight: 1,
-              marginBottom: 4,
+              marginBottom: "clamp(2px, 0.5vw, 4px)",
               fontVariantNumeric: "tabular-nums",
               transition: "color 0.3s",
+              wordBreak: "break-word",
             }}
           >
             {item.value}
@@ -190,20 +193,31 @@ export default function StatsSection() {
 
           <div
             style={{
-              fontSize: 13,
+              fontSize: "clamp(11px, 2vw, 13px)",
               fontWeight: 700,
               color: "#0F172A",
-              marginBottom: 2,
+              marginBottom: "clamp(1px, 0.5vw, 2px)",
               letterSpacing: "-0.01em",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
             {item.label}
           </div>
-          <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 14 }}>
+          <div
+            style={{
+              fontSize: "clamp(9px, 1.5vw, 11px)",
+              color: "#94A3B8",
+              marginBottom: "clamp(10px, 2vw, 14px)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {item.sublabel}
           </div>
 
-          {/* Progress bar */}
           <div
             style={{
               height: 5,
@@ -226,6 +240,18 @@ export default function StatsSection() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        @media (max-width: 480px) {
+          div[style*="gridTemplateColumns"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          div[style*="position: relative"][style*="overflow: hidden"] {
+            padding: 12px !important;
+          }
+        }
       `}</style>
     </div>
   );
