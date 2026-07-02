@@ -14,15 +14,20 @@ Conventional and intuitive approaches to selecting business locations lead to a 
 
 **Map Analysis**
 - Market distribution map visualization with business location markers
-- Radius selector for analysis ranging from 1 to 5 km
+- Radius selector for analysis ranging from 1.5 to 10 km
 - Business detail popup for each marker on the map
 - AI Chat for map-based geospatial analysis
 
 **Cluster Area**
 - Business density cluster visualization
-- Area distribution and density statistics
+- Area summary including density level, total businesses, average rating, total reviews, digital presence, dominant business category, rating distribution, and top businesses by review count
 - Color-coded density markers
-- AI Chat for cluster-based analysis
+- Brief cluster summary (number of businesses) on selection
+
+**Intelligent System**
+- Interactive map for location recommendations
+- Filter recommendations by Sub District, Sub Category, and Top Rank
+- Recommendation results based on the selected filters
 
 **Project Management**
 - Browsable list of available market analysis projects
@@ -30,10 +35,12 @@ Conventional and intuitive approaches to selecting business locations lead to a 
 - Pre-Purchase AI Chat for consultation before transaction
 - Integrated payment system via Midtrans
 
-**Admin Dashboard**
-- Project management (add, edit, delete)
-- Purchase transaction monitoring
+**Admin & Manager Dashboard**
+- Project management (add, edit, delete) — restricted to Manager
+- Purchase transaction and payment detail monitoring
 - Export sales report to Excel format (.xlsx)
+- User data management (view, edit, delete)
+- Role management (promote/demote between Manager and User)
 
 ---
 
@@ -54,14 +61,62 @@ Conventional and intuitive approaches to selecting business locations lead to a 
 
 ## Development Method
 
-This project was developed using the **Agile Software Development** method with the following stages:
+This research applies the **Agile Software Development** method, which emphasizes an iterative, flexible, and collaborative approach to responding to dynamically changing system requirements (Ramadhan et al., 2025). Development begins with **Requirements & Planning**, identifying the platform's functional needs such as spatial data integration and map visualization features, based on priority. In the **Analysis & Design** stage, these requirements are translated into the system architecture, GeoJSON data structures, and interface prototypes built in Figma. Core development takes place in the **Iteration/Development** phase through modular coding cycles using Next.js and mapping libraries to dynamically present location data.
 
-1. Requirements & Planning
-2. Analysis & Design
-3. Iteration / Development
-4. Testing & Quality Assurance (Black-box Testing)
-5. Deployment
-6. Review
+Software quality is maintained through the **Testing & Quality Assurance** stage using black-box testing to validate coordinate accuracy and platform responsiveness. Once the system is confirmed stable, the **Deployment** stage migrates the code to a hosting server so Geomarketia can be accessed publicly. The methodology concludes with the **Review** stage, evaluating system performance and spatial data accuracy to ensure the development results align with the functional objectives and user needs (Ramadhan et al., 2025).
+
+---
+
+## System Requirements
+
+### Functional Requirements
+
+
+| No. | Code | Actor | Description |
+|-----|------|-------|--------------|
+| 1 | FR-01 | User, Manager | Register a new account. |
+| 2 | FR-02 | User, Admin, Manager | Log in to the system. |
+| 3 | FR-03 | User | View the platform landing page. |
+| 4 | FR-04 | User | View the list of available market analysis projects. |
+| 5 | FR-05 | User | Search for projects using the search field. |
+| 6 | FR-06 | User | Search for projects by category. |
+| 7 | FR-07 | User | Display an interactive map, select a search radius, and view nearby business information in the Map Analysis feature. |
+| 8 | FR-08 | User | Purchase a project. |
+| 9 | FR-09 | User | Make payment for a project. |
+| 10 | FR-10 | User | Access the Map Analysis feature after a successful purchase. |
+| 11 | FR-11 | User | View an interactive map with business location markers in Map Analysis. |
+| 12 | FR-12 | User | Select a search radius from 1.5 km to 10 km in Map Analysis. |
+| 13 | FR-13 | User | View a business information popup when a marker is selected in Map Analysis. |
+| 14 | FR-14 | User | Access the Cluster Area feature after a successful purchase. |
+| 15 | FR-15 | User | View an area summary including business density level, total businesses, average rating, total reviews, digital presence, dominant business category, rating distribution, and top businesses by review count. |
+| 16 | FR-16 | User | View density markers with different colors in Cluster Area. |
+| 17 | FR-17 | User | View a brief cluster summary (number of businesses) when a cluster is selected. |
+| 18 | FR-18 | User | Access the Intelligent System feature after a successful purchase. |
+| 19 | FR-19 | User | View an interactive map in the Intelligent System feature. |
+| 20 | FR-20 | User | Filter location recommendations by Sub District, Sub Category, and Top Rank. |
+| 21 | FR-21 | User | View location recommendation results based on the selected filters. |
+| 22 | FR-22 | Admin, Manager | View the list of available analysis projects in the system. |
+| 23 | FR-23 | Admin, Manager | View the list of project purchase transactions. |
+| 24 | FR-24 | Admin, Manager | View payment transaction details. |
+| 25 | FR-25 | Admin, Manager | Export sales report data to Excel (.xlsx). |
+| 26 | FR-26 | Admin, Manager | Edit a project and its information. |
+| 27 | FR-27 | Admin, Manager | Delete user data when necessary. |
+| 28 | FR-28 | Admin, Manager | View the list of user data. |
+| 29 | FR-29 | Admin, Manager | Edit user information, such as full name, username, and email. |
+| 30 | FR-30 | Admin | Add a new project along with its information to the system. |
+| 31 | FR-31 | Admin | Delete a project along with its information. |
+| 32 | FR-32 | Admin | Change an account role from Manager to User. |
+| 33 | FR-33 | Admin | Change an account role from User to Manager. |
+
+### Non-Functional Requirements
+
+
+| No. | Code | Category | Description |
+|-----|------|----------|--------------|
+| 1 | NFR-01 | Security | User passwords are stored as hashes, and dashboard/project access is restricted to logged-in users. |
+| 2 | NFR-02 | Reliability | The system does not experience fatal errors during testing, and data persists in the database even after a server restart. |
+| 3 | NFR-03 | Usability | The UI is easy for MSME (UMKM) users to understand, with a clear usage flow and a responsive layout for at least desktop and mobile. |
+| 4 | NFR-04 | Compatibility | The application runs properly on Chrome and Edge browsers at standard laptop screen resolutions. |
 
 ---
 
@@ -69,13 +124,27 @@ This project was developed using the **Agile Software Development** method with 
 
 Main entities in the system:
 
-- `users` — User data and roles (user/admin)
+- `users` — User data and roles (Manager, Admin, User)
 - `projects` — Market analysis project data
 - `categories` — Project categories (Retail, F&B, Healthcare)
 - `orders` — Purchase transaction records
 - `payments` — Payment details via Midtrans
 - `cities` & `provinces` — Geographic location data
-- `chatbot_sessions` & `chatbot_messages` — AI interaction history
+
+---
+
+## System Integration
+
+After all system components were configured, integration was performed to connect the Next.js frontend, Laravel backend, and MySQL database into a single, fully functional system.
+
+**1. Frontend–Backend Integration**
+The frontend is integrated with the backend by connecting Next.js to the Laravel API endpoints via HTTP requests. The frontend sends requests to the backend API to retrieve and submit data, such as project data, user authentication, and market analysis results.
+
+**2. Interactive Map Integration**
+Leaflet.js is integrated on the frontend to render interactive market analysis map visualizations. Spatial data in GeoJSON format is sent from the backend and rendered by Leaflet.js on the user interface, including the marker clustering feature.
+
+**3. Payment Gateway Integration**
+Midtrans is integrated to process project purchase transactions on the Geomarketia platform. The Laravel backend communicates with the Midtrans API to create transactions, and the results are forwarded to the frontend for display to the user.
 
 ---
 
@@ -127,33 +196,6 @@ Access the application at `http://localhost:8000`
 
 ---
 
-## Functional Requirements
-
-The system supports 29 use cases including:
-
-- User registration and authentication
-- Project search and category filtering
-- Map and cluster preview before purchase
-- Project purchase and payment
-- Map Analysis and Cluster Area access after purchase
-- AI interaction for geospatial analysis
-- Project and transaction management by admin
-- Sales report export
-
----
-
-## Non-Functional Requirements
-
-| Code | Category | Description |
-|------|----------|-------------|
-| NFR-01 | Performance | Pages load within 5 seconds on a normal connection |
-| NFR-02 | Security | Passwords are hashed; access is role-protected |
-| NFR-03 | Reliability | No fatal errors during testing; data persists on restart |
-| NFR-04 | Usability | Responsive UI for both desktop and mobile |
-| NFR-05 | Compatibility | Compatible with Chrome and Edge browsers |
-
----
-
 ## Supported Sectors
 
 - Retail
@@ -176,12 +218,13 @@ The system supports 29 use cases including:
 ---
 
 ## Links
-
+ 
 - Repository: [github.com/nelifauziyah88/Geomarketia](https://github.com/nelifauziyah88/Geomarketia.git)
-- Presentation Video: [youtu.be/BKvkmWBjipg](https://youtu.be/BKvkmWBjipg?si=W59mMHW5CI6p4D16)
-- Presentation Slides: [Google Drive](https://drive.google.com/file/d/1erVV18He2zdie33EHZxhObcB5n0qQKvf/view?usp=drive_link)
-- Final Report: [Google Drive](https://drive.google.com/file/d/1fvNhSIxAmVQnLmOtl1aS4zTA3BE7Sme0/view?usp=drive_link)
-
+- ATS Documents: [Google Drive](https://drive.google.com/drive/folders/18ne8UPHXVe9NYQj5sZowtidbADqI2gsl?usp=sharing)
+- ATS Presentation Video: [youtu.be/BKvkmWBjipg](https://youtu.be/BKvkmWBjipg?si=W59mMHW5CI6p4D16)
+- AAS Documents: [Google Drive](https://drive.google.com/drive/folders/1adKKXROS612SLRa0vxjNSak6IDOtZoGp?usp=drive_link)
+- AAS Presentation Video: *(coming soon)*
+- Product Demo Video: [youtu.be/BNZwai6gIAo](https://youtu.be/BNZwai6gIAo)
 ---
 
 ## SDGs Contribution
