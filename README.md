@@ -223,7 +223,7 @@ Access the application at `http://localhost:8000`
 - ATS Documents: [Google Drive](https://drive.google.com/drive/folders/18ne8UPHXVe9NYQj5sZowtidbADqI2gsl?usp=sharing)
 - ATS Presentation Video: [youtu.be/BKvkmWBjipg](https://youtu.be/BKvkmWBjipg?si=W59mMHW5CI6p4D16)
 - AAS Documents: [Google Drive](https://drive.google.com/drive/folders/1adKKXROS612SLRa0vxjNSak6IDOtZoGp?usp=drive_link)
-- AAS Presentation Video: *(coming soon)*
+- AAS Presentation Video: [youtu.be/BNZwai6gIAo](https://youtu.be/Z2fgdHofdus)
 - Product Demo Video: [youtu.be/BNZwai6gIAo](https://youtu.be/BNZwai6gIAo)
 ---
 
